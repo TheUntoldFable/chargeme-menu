@@ -1,24 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Requirements
+```javascript
+- Node ===> 18 or newer.
+- NPM ===> 8 or newer.
+```
 
 ## Getting Started
+Make sure all packages are installed:
 
-First, run the development server:
+```bash
+npm i
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:1337](http://localhost:1337) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:1337) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ***Commit Guideline***
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- `build`: Build related changes (eg: npm related/ adding external dependencies)
+- `chore`: A code change that external user won't see (eg: change to .gitignore file or .prettierrc file)
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation related changes
+- `refactor`: A code that neither fix bug nor adds a feature. (eg: You can use this when there is semantic changes like renaming a variable/ function name)
+- `perf`: A code that improves performance
+- `style`: A code that is related to styling
+- `test`: Adding new test or making changes to existing test
+
+> A typical git commit message will look like  
+
+```
+<type>(<scope>): <subject>
+```
 
 ## Learn More
 
@@ -26,8 +43,6 @@ To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
 ## Deploy on Vercel
 
