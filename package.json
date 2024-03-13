@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "lint-staged": {
-    "*.{js,ts,tsx,json}": "eslint --cache --fix"
+    "*.{js,ts,tsx,json}": [
+      "eslint --cache --fix",
+      "prettier --write"
+    ]
   },
   "scripts": {
     "dev": "next dev -- -p 1337",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "format": "prettier --config .prettierrc --write",
     "prepare": "husky && husky install"
   },
   "dependencies": {
