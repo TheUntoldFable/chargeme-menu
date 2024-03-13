@@ -32,7 +32,7 @@ yarn-error.log*
 .vercel
 
 #eslint
-.eslitcache
+.eslintcache
 
 # typescript
 *.tsbuildinfo
