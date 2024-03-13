@@ -13,7 +13,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --config .prettierrc --write",
+    "format": "prettier --write .",
     "prepare": "husky && husky install"
   },
   "dependencies": {
