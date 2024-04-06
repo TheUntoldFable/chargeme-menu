@@ -37,3 +37,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/.idea/.gitignore
+/.idea/aws.xml
+/src/components/ui/card.tsx
+/.idea/chargeme-menu.iml
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/dbnavigator.xml
+/public/images/logo.png
+/.idea/material_theme_project_new.xml
+/.idea/modules.xml
+/.idea/prettier.xml
+/.idea/codeStyles/Project.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
+/.idea/git_toolbox_prj.xml

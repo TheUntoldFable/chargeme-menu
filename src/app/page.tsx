@@ -1,19 +1,21 @@
-import { Button } from '@/components/ui/button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover';
+'use client';
+
+import Wrapper from '@/components/common/wrapper';
+import Header from '@/components/common/header';
+import CategoryCard from '@/components/common/CategoryCard';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center  p-24">
-      <Popover>
-        <PopoverTrigger>
-          <Button variant="outline">Click here</Button>
-        </PopoverTrigger>
-        <PopoverContent className="border">WELCOME!</PopoverContent>
-      </Popover>
+    <main className="bg-black">
+      <Wrapper>
+        <Header classNames="mb-8" />
+        <h1>Добре дошли!</h1>
+        <CategoryCard
+          classNames="mt-12"
+          name="Храни"
+          categories={[...Array(10)]}
+        />
+      </Wrapper>
     </main>
   );
 }
