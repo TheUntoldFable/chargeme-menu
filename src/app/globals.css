@@ -69,8 +69,13 @@
 @layer base {
   * {
     @apply border-border;
+    @apply text-white;
   }
   body {
     @apply bg-background text-foreground;
   }
+  h1{
+    @apply text-4xl font-bold
+  }
+
 }
