@@ -23,6 +23,10 @@ const config = {
         sans: ['var(--font-sans)', ...fontFamily.sans]
       },
       colors: {
+        red: '#DD2F2C',
+        black: '#111111',
+        yellow: '#E9C500',
+        yellowSecondary: '#EDDB75',
         defaultGray: '#ADADAD',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -78,7 +82,7 @@ const config = {
         'accordion-up': 'accordion-up 0.2s ease-out'
       },
       maxWidth: {
-        mobile: '420px'
+        mobile: '440px'
       },
       backgroundImage: {
         default: "url('/images/background.png')"

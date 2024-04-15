@@ -1,21 +1,23 @@
 'use client';
 
-import Wrapper from '@/components/common/wrapper';
-import Header from '@/components/common/header';
-import CategoryCard from '@/components/common/CategoryCard';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import Container from '@/components/common/container';
+import CategoriesCard from '@/components/Category/CategoriesCard';
 
 export default function Home() {
   return (
-    <main className="bg-black">
-      <Wrapper>
-        <Header classNames="mb-8" />
-        <h1>Добре дошли!</h1>
-        <CategoryCard
-          classNames="mt-12"
-          name="Храни"
-          categories={[...Array(10)]}
-        />
-      </Wrapper>
+    <main>
+      <Container title="Добре дошли!">
+        <ScrollArea className="h-screen min-w-full">
+          {[...Array(10)].map(() => (
+            <CategoriesCard
+              classNames="mt-8 mb-2 mx-auto"
+              name="Храни"
+              categories={[...Array(10)]}
+            />
+          ))}
+        </ScrollArea>
+      </Container>
     </main>
   );
 }
