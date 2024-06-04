@@ -9,7 +9,7 @@ export default function Home() {
     <main className="bg-black">
       <Wrapper>
         <Header classNames="mb-8" />
-        <h1>Добре дошли!</h1>
+        <h1>Zdr!</h1>
         <CategoryCard
           classNames="mt-12"
           name="Храни"
