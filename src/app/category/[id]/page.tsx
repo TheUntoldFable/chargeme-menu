@@ -20,7 +20,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               price: 12.99,
               weight: 120,
               desc: 'TEST',
-              type: 'yellow'
+              type: 'yellow',
+              isSelected: false,
+              quantity: 3
             }}
           />
         ))}
