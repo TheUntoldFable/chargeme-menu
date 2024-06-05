@@ -1,13 +1,15 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import Link from 'next/link';
+'use client';
 
-interface CategoryCardProps {
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import MenuItem from '@/components/Category/MenuItem';
+
+interface CategoriesProps {
   name: string;
   categories: string[];
   classNames?: string;
 }
 
-const CategoryCard = ({ name, categories, classNames }: CategoryCardProps) => {
+const CategoriesCard = ({ name, categories, classNames }: CategoriesProps) => {
   return (
     <Card
       className={`
@@ -38,16 +40,12 @@ const CategoryCard = ({ name, categories, classNames }: CategoryCardProps) => {
         <p className="font-bold capitalize">{name ?? 'Test'}</p>
       </CardHeader>
       <CardContent className="w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none">
-        {categories.map((c) => (
-          <Link href="#">
-            <p className="capitalize py-1 border-b-defaultGray border-b-[1px]">
-              {c ?? 'Test'}
-            </p>
-          </Link>
+        {categories.map((c, index) => (
+          <MenuItem key={`${c}-${index}`} name={c} catQuantity={12} />
         ))}
       </CardContent>
     </Card>
   );
 };
 
-export default CategoryCard;
+export default CategoriesCard;

@@ -4,7 +4,19 @@ import { PropsWithChildren } from 'react';
 
 const Wrapper = ({ children }: PropsWithChildren) => {
   return (
-    <div className="max-w-mobile bg-cover bg-default flex flex-1 flex-col items-center bg-no-repeat mx-auto min-h-screen">
+    <div
+      className="
+    flex
+    flex-1
+    flex-col
+    items-center
+    max-h-screen
+    max-w-mobile
+    bg-cover
+    bg-default
+    bg-no-repeat
+    mx-auto"
+    >
       {children}
     </div>
   );
