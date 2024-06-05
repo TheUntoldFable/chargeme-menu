@@ -13,7 +13,7 @@ interface OrderPageProps {
 export default function OrderPage({ params }: OrderPageProps) {
   const cartItems = useRecoilValue(cartState);
   return (
-    <Container title="Пици">
+    <Container title="Избрано">
       <ScrollArea className="h-screen min-w-full">
         {cartItems.map((i) => (
           <SelectedProduct
