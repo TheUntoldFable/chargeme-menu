@@ -2,7 +2,6 @@
 
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
-import Circle from '../../../public/svg/Circle';
 import { Button } from '@/components/ui/button';
 import { useRecoilState } from 'recoil';
 import IconPlus from '../../../public/svg/IconPlus';
@@ -27,7 +26,6 @@ const ProductCard = ({ itemData, classNames, isCartScreen }: ProductCardProps) =
     const filteredItems = cartItems.filter((i) => i.id !== id);
     setCartItems(filteredItems);
     toast({
-      // TODO: Find out why toast text styles are bugging
       variant: 'destructive',
       title: 'Премахване от количка',
       description: `Продуктът ${title} е успешно премахнат от вашата количка!`
