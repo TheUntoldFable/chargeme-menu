@@ -4,11 +4,12 @@ import IconArrowRight from '../../../public/svg/IconArrowRight';
 interface MenuItemProps {
   name: string;
   catQuantity: number;
+  id: string,
 }
 
-const MenuItem = ({ name, catQuantity }: MenuItemProps) => {
+const MenuItem = ({ name, catQuantity, id }: MenuItemProps) => {
   return (
-    <Link href={`/category/${Math.random()}`}>
+    <Link href={`/category/${id}`}>
       <div className="flex flex-1 justify-between border-b-defaultGray border-b-[1px] py-1">
         <p className="capitalize ">{name ?? '[Empty]'}</p>
         <div className="flex items-center gap-3">
