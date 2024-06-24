@@ -1,37 +1,40 @@
+'use client'
+
 import { cn } from '@/lib/utils';
-import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 
 import RecoilContextProvider from '@/recoilProvider';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans'
+    subsets: ['latin'],
+    variable: '--font-sans'
 });
 
-export const metadata: Metadata = {
-  title: 'ChargeMe Digital Menu',
-  description: 'Your ChargeMe digital menu.'
-};
+const queryClient = new QueryClient()
 
 export default function RootLayout({
-  children
+    children
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={cn(
-          'min-h-screen bg-background font-sans antialiased',
-          inter.variable
-        )}
-      >
-        <Toaster />
-        <RecoilContextProvider>{children}</RecoilContextProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body
+                className={cn(
+                    'min-h-screen bg-background font-sans antialiased',
+                    inter.variable
+                )}
+            >
+                <Toaster />
+                <RecoilContextProvider>
+                    <QueryClientProvider client={queryClient}>
+                        {children}
+                    </QueryClientProvider>
+                </RecoilContextProvider>
+            </body>
+        </html>
+    );
 }

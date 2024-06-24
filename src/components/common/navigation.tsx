@@ -41,7 +41,7 @@ export default function BottomNavigation({
           <p className="text-sm bold">Моят избор</p>
         </div>
       </Link>
-      <Link href="/">
+      <Link href="/cart">
         <div className="flex flex-col items-center">
           <IconWallet />
           <p className="text-sm bold">Плащане</p>

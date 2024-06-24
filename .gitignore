@@ -43,7 +43,6 @@ next-env.d.ts
 /.idea/chargeme-menu.iml
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea/dbnavigator.xml
-/public/images/logo.png
 /.idea/material_theme_project_new.xml
 /.idea/modules.xml
 /.idea/prettier.xml

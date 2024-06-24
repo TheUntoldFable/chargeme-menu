@@ -36,7 +36,6 @@ const ProductCard = ({ badge, itemData, classNames }: ProductCardProps) => {
     const filteredItems = cartItems.filter((i) => i.id !== id);
     setCartItems(filteredItems);
     toast({
-      // TODO: Find out why toast text styles are bugging
       variant: 'destructive',
       title: 'Премахване от количка',
       description: `Продуктът ${title} е успешно премахнат от вашата количка!`
@@ -48,7 +47,6 @@ const ProductCard = ({ badge, itemData, classNames }: ProductCardProps) => {
       ...cartItems,
       { ...itemData, isSelected: true, quantity: 1 }
     ]);
-    // TODO: Find out why toast text styles are bugging
     toast({
       variant: 'default',
       title: 'Добавяне в количка',

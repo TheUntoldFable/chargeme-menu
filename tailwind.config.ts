@@ -28,6 +28,7 @@ const config = {
         yellow: '#E9C500',
         yellowSecondary: '#EDDB75',
         defaultGray: '#ADADAD',
+        green: "#50C878",
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
