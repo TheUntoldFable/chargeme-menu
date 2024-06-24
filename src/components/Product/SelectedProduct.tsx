@@ -20,7 +20,6 @@ interface ProductCardProps {
 
 const ProductCard = ({ itemData, classNames, isCartScreen }: ProductCardProps) => {
   const [cartItems, setCartItems] = useRecoilState(cartState);
-  const [orderItems, setOrderItems] = useRecoilState(orderState);
 
   const handleRemoveFromCart = () => {
     const filteredItems = cartItems.filter((i) => i.id !== id);
@@ -34,7 +33,7 @@ const ProductCard = ({ itemData, classNames, isCartScreen }: ProductCardProps) =
 
   if (!itemData) return null;
 
-  const { title, price, weight, id, isSelected, quantity } = itemData;
+  const { title, price, weight, id, isSelected, quantity = 0 } = itemData;
 
   const increment = () => {
     const itemIndex = cartItems.findIndex((i) => i.id === id);

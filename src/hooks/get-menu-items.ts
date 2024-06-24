@@ -1,19 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
+import { API_BASE_URL, headers } from '@/api/config';
+import { Subcategory } from '@/types/categories';
+import { UseQueryResult, useQuery } from '@tanstack/react-query';
 
-export type TGithubUser = {
-    name: string;
-    bio: string;
-};
-
-export const fetchMenuItems = async () => {
-    const res = await fetch('https://api.chargem3.com/menu-items');
+export const fetchMenuItems = async (id: string): Promise<Subcategory[]> => {
+    const res = await fetch(`${API_BASE_URL}/menu-items/subcategory/${id}`);
     if (!res.ok) {
         throw new Error('Network response was not ok');
     }
-    const data = await res.json();
+    const data: Subcategory[] = await res.json();
     return data;
 };
 
-export const useMenuItems = () => {
-    return useQuery({ queryKey: ['test'], queryFn: fetchMenuItems, meta: { headers: { 'Access-Control-Allow-Origin': '*' } } });
+export const useMenuItems = (id: string): UseQueryResult<Subcategory[]> => {
+    return useQuery({
+        queryKey: ['menu-items', id],
+        queryFn: () => fetchMenuItems(id),
+        meta: { headers }
+    });
 };
