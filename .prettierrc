@@ -1,6 +1,15 @@
 {
-  "semi": true,
-  "trailingComma": "none",
-  "singleQuote": true,
-  "printWidth": 80
+  "singleAttributePerLine": true,
+  "endOfLine": "auto",
+  "printWidth": 140,
+  "trailingComma": "es5",
+  "semi": false,
+  "doubleQuote": true,
+  "jsxSingleQuote": true,
+  "singleQuote": false,
+  "useTabs": false,
+  "tabWidth": 2,
+  "plugins": [
+    "prettier-plugin-organize-imports"
+  ]
 }
