@@ -1,12 +1,12 @@
-'use client';
+"use client"
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import MenuItem from '@/components/Category/MenuItem';
+import MenuItem from "@/components/Category/MenuItem"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 interface CategoriesProps {
-  name: string;
-  categories: string[];
-  classNames?: string;
+  name: string
+  categories: string[]
+  classNames?: string
 }
 
 const CategoriesCard = ({ name, categories, classNames }: CategoriesProps) => {
@@ -22,7 +22,7 @@ const CategoriesCard = ({ name, categories, classNames }: CategoriesProps) => {
      justify-center ${classNames}`}
     >
       <CardHeader
-        className="
+        className='
         z-10
       text-xl
       absolute
@@ -35,17 +35,17 @@ const CategoriesCard = ({ name, categories, classNames }: CategoriesProps) => {
       w-32
       py-2
       px-4
-      rounded-xl"
+      rounded-xl'
       >
-        <p className="font-bold capitalize">{name ?? 'Test'}</p>
+        <p className='font-bold capitalize'>{name ?? "Test"}</p>
       </CardHeader>
-      <CardContent className="w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none">
+      <CardContent className='w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none'>
         {categories.map((c, index) => (
           <MenuItem key={`${c}-${index}`} name={c} catQuantity={12} />
         ))}
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default CategoriesCard;
+export default CategoriesCard

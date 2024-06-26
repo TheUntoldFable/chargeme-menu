@@ -1,12 +1,12 @@
-'use client';
+"use client"
 
-import React from 'react';
-import { RecoilRoot } from 'recoil';
+import React from "react"
+import { RecoilRoot } from "recoil"
 
 export default function RecoilContextProvider({
-  children
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode
 }) {
-  return <RecoilRoot>{children}</RecoilRoot>;
+    return <RecoilRoot>{children}</RecoilRoot>
 }
