@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import TotalPrice from '@/components/ui/total-price';
+import { orderState } from '@/store/order';
 
 interface OrderPageProps {
     params: { id: string };
@@ -16,6 +17,7 @@ interface OrderPageProps {
 
 export default function OrderPage({ params }: OrderPageProps) {
     const [cartItems, setCartItems] = useRecoilState(cartState);
+    const [orderItems, setOrderItems] = useRecoilState(orderState);
 
     const handleRemoveFromCart = () => {
         setCartItems([]);
@@ -25,6 +27,12 @@ export default function OrderPage({ params }: OrderPageProps) {
             description: `Количката е изчистена`
         });
     };
+    const createOrder = () => {
+        setOrderItems([
+          ...cartItems,
+          ...orderItems
+        ]);
+      };
     return (
         <Container title="Избрано">
             <ScrollArea className="h-screen min-w-full">
@@ -42,6 +50,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                 type="button"
                 id="add"
                 variant='secondary'
+                onClick={createOrder}
             >
                 Поръчай
             </Button>

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { useRecoilState } from 'recoil';
 import IconPlus from '../../../public/svg/IconPlus';
 import IconMinus from '../../../public/svg/IconMinus';
-import { orderState } from '@/store/order';
 import { Product } from '@/models/product';
 import { cartState } from '@/store/cart';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -107,7 +106,7 @@ const ProductCard = ({ itemData, classNames, isCartScreen }: ProductCardProps) =
           alt="Img"
         />
         <div className="flex flex-1 flex-col gap-4 px-4 mb-4 justify-between">
-          <h1>{title}</h1>
+          <h2 className='text-2xl'>{title}</h2>
           <div className="flex flex-row justify-between gap-1">
             <div className="flex gap-2">
               <p>{weight}гр.</p>

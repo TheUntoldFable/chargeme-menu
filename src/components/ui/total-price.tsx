@@ -13,7 +13,7 @@ export default function TotalPrice({ items, withSelection }: TotalPriceProps) {
         if (withSelection)
         items = items.filter((item) => item.isSelected)
         items.forEach((item) => {
-            totalPrice += item.quantity || 0 * item.price;
+            totalPrice += (item.quantity ?? 0) * item.price;
         })
 
         return totalPrice.toFixed(2);
