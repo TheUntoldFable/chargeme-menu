@@ -2,6 +2,7 @@
   "name": "chargeme-menu",
   "version": "0.1.0",
   "private": true,
+  "type": "commonjs",
   "lint-staged": {
     "*.{js,ts,tsx,json}": [
       "eslint --cache --fix",
