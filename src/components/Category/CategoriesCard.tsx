@@ -41,7 +41,11 @@ const CategoriesCard = ({ name, categories, classNames }: CategoriesProps) => {
       </CardHeader>
       <CardContent className='w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none'>
         {categories.map((c, index) => (
-          <MenuItem key={`${c}-${index}`} name={c} catQuantity={12} />
+          <MenuItem
+            key={`${c}-${index}`}
+            name={c}
+            catQuantity={12}
+          />
         ))}
       </CardContent>
     </Card>

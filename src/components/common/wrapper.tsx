@@ -1,11 +1,15 @@
-'use client';
+"use client"
 
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren } from "react"
 
-const Wrapper = ({ children }: PropsWithChildren) => {
+export type WrapperProps = {
+  className?: string
+} & PropsWithChildren
+
+const Wrapper = ({ children, className }: WrapperProps) => {
   return (
     <div
-      className="
+      className={`
     flex
     flex-1
     flex-col
@@ -15,11 +19,12 @@ const Wrapper = ({ children }: PropsWithChildren) => {
     bg-cover
     bg-default
     bg-no-repeat
-    mx-auto"
+    mx-auto
+    ${className}`}
     >
       {children}
     </div>
-  );
-};
+  )
+}
 
-export default Wrapper;
+export default Wrapper
