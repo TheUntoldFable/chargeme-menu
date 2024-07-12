@@ -1,8 +1,6 @@
 /** @type {import("next").NextConfig} */
 
-const {
-  withHydrationOverlay,
-} = require("next-hydration-overlay/next")
+import { withHydrationOverlay } from "@builder.io/react-hydration-overlay/next"
 
 const isProd = process.env.NODE_ENV === "production"
 
