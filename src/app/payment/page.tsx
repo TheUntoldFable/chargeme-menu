@@ -1,22 +1,18 @@
 "use client"
 
-import React from "react"
-
+import React, { Suspense } from "react"
 import { Elements } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
-
 import Wrapper from "@/components/common/wrapper"
 import CheckoutForm from "@/components/Payment/CheckoutForm"
-
 import { stringToStripeAmount } from "@/lib/utils"
 import { useSearchParams } from "next/navigation"
 
-// Make sure to call loadStripe outside of a component’s render to avoid
-// recreating the Stripe object on every render.
+// Make sure to call loadStripe outside of a component’s render to avoid recreating the Stripe object on every render.
 // This is your test publishable API key.
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "")
 
-export default function App() {
+function PaymentPage() {
   const [clientSecret, setClientSecret] = React.useState("")
   const searchParam = useSearchParams()
   const totalAmount = searchParam.get("totalAmount") ?? ""
@@ -30,7 +26,7 @@ export default function App() {
     })
       .then((res) => res.json())
       .then((data) => setClientSecret(data.clientSecret))
-  }, [])
+  }, [totalAmount])
 
   const appearance: any = {
     theme: "stripe",
@@ -51,5 +47,13 @@ export default function App() {
         </Elements>
       )}
     </Wrapper>
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentPage />
+    </Suspense>
   )
 }
