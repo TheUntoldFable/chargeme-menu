@@ -8,7 +8,7 @@ const calculateOrderAmount = (items: []): number => {
   // Replace this constant with a calculation of the order's amount
   // Calculate the order total on the server to prevent
   // people from directly manipulating the amount on the client
-  const sum = items.reduce((acc, curr) => {
+  const sum = items.reduce((acc, curr:any) => {
     console.log(acc, curr, "acc", "curr")
     return acc + curr?.amount
   }, 0)
