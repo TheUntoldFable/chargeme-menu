@@ -39,7 +39,8 @@
     "recoil-persist": "^5.1.0",
     "stripe": "^16.2.0",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "webpack": "^5.93.0"
   },
   "devDependencies": {
     "@types/node": "^20",
