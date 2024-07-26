@@ -64,6 +64,7 @@ export default function OrderPage({ params }: OrderPageProps) {
           className='w-full'
         >
           <Button
+            disabled={!cartItems || cartItems.length < 1}
             className='
             w-[60%]
             text-lg
