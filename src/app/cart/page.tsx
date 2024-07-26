@@ -43,6 +43,7 @@ export default function Cart({ params }: OrderPageProps) {
         }}
       >
         <Button
+          disabled={!cartItems || cartItems.length < 1}
           className='w-[60%]
            text-lg
            gap-2

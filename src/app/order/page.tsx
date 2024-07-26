@@ -59,7 +59,10 @@ export default function OrderPage({ params }: OrderPageProps) {
       />
 
       <AlertDialog>
-        <AlertDialogTrigger className='w-full'>
+        <AlertDialogTrigger
+          disabled={!cartItems || cartItems.length < 1}
+          className='w-full'
+        >
           <Button
             className='
             w-[60%]
