@@ -1,8 +1,8 @@
-'use client';
+"use client"
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import MenuItem from '@/components/Category/MenuItem';
-import { CategoriesProps } from '@/types/categories';
+import MenuItem from "@/components/Category/MenuItem"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { CategoriesProps } from "@/types/categories"
 
 const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) => {
     return (
@@ -13,11 +13,11 @@ const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) =>
      w-[85%]
      border-defaultGray
      border-[1px]
-     flex
+     flex 3
      justify-center ${classNames}`}
         >
             <CardHeader
-                className="
+                className='
         z-10
       text-xl
       absolute
@@ -30,17 +30,23 @@ const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) =>
       w-32
       py-2
       px-4
-      rounded-xl"
+      rounded-xl'
             >
-                <p className="font-bold capitalize">{name ?? 'Test'}</p>
+                <p className='font-bold capitalize'>{name ?? "Test"}</p>
             </CardHeader>
-            <CardContent className="w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none">
-                {subCategories.length && subCategories.map((subCategory, index) => (
-                    <MenuItem key={`${subCategory}-${index}`} name={subCategory.name} catQuantity={subCategories.length} id={subCategory.id}/>
-                ))}
+            <CardContent className='w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none'>
+                {subCategories.length &&
+                    subCategories.map((subCategory, index) => (
+                        <MenuItem
+                            key={`${subCategory}-${index}`}
+                            name={subCategory.name}
+                            catQuantity={subCategories.length}
+                            id={subCategory.id}
+                        />
+                    ))}
             </CardContent>
         </Card>
-    );
-};
+    )
+}
 
-export default CategoriesCard;
+export default CategoriesCard

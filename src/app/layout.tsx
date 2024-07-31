@@ -1,40 +1,32 @@
-'use client'
+"use client"
 
-import { cn } from '@/lib/utils';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { cn } from "@/lib/utils"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { Inter } from "next/font/google"
+import "./globals.css"
 
-import RecoilContextProvider from '@/recoilProvider';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from "@/components/ui/toaster"
+import RecoilContextProvider from "@/recoilProvider"
 
 const inter = Inter({
-    subsets: ['latin'],
-    variable: '--font-sans'
-});
+  subsets: ["latin"],
+  variable: "--font-sans",
+})
 
 const queryClient = new QueryClient()
-
 export default function RootLayout({
-    children
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode
 }>) {
-    return (
-        <html lang="en">
-            <body
-                className={cn(
-                    'min-h-screen bg-background font-sans antialiased',
-                    inter.variable
-                )}
-            >
-                <Toaster />
-                <RecoilContextProvider>
-                    <QueryClientProvider client={queryClient}>
-                        {children}
-                    </QueryClientProvider>
-                </RecoilContextProvider>
-            </body>
-        </html>
-    );
+  return (
+    <html lang='en'>
+      <body className={cn("min-h-screen bg-background font-sa nsantialiased", inter.variable)}>
+        <Toaster />
+        <RecoilContextProvider>
+          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        </RecoilContextProvider>
+      </body>
+    </html>
+  )
 }
