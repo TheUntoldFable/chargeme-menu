@@ -7,6 +7,7 @@ import "./globals.css"
 
 import { Toaster } from "@/components/ui/toaster"
 import RecoilContextProvider from "@/recoilProvider"
+import { HydrationOverlay } from "@builder.io/react-hydration-overlay"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,12 +20,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const env = process.env.NODE_ENV
   return (
     <html lang='en'>
-      <body className={cn("min-h-screen bg-background font-sa nsantialiased", inter.variable)}>
+      <head>
+        <title>ChargeMe Menu</title>
+      </head>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
         <Toaster />
         <RecoilContextProvider>
-          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+          <QueryClientProvider client={queryClient}>
+            {/*Detect hydration issues in dev mode*/}
+            {env !== "production" ? <HydrationOverlay>{children}</HydrationOverlay> : children}
+          </QueryClientProvider>
         </RecoilContextProvider>
       </body>
     </html>

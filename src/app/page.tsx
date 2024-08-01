@@ -9,13 +9,12 @@ export default function Home() {
     <main>
       <Container title='Добре дошли!'>
         <ScrollArea className='h-screen min-w-full'>
-          {[...Array(10)].map(() => (
+          {[...Array(10)].map((_item, index) => (
             <CategoriesCard
+              key={`key-${index}`}
               classNames='mt-8 mb-2 mx-auto'
               name='Храни'
-              categories={[
-                ...Array(10),
-              ]}
+              categories={[...Array(10)]}
             />
           ))}
         </ScrollArea>

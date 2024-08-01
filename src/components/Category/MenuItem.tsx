@@ -8,7 +8,7 @@ interface MenuItemProps {
 
 const MenuItem = ({ name, catQuantity }: MenuItemProps) => {
   return (
-    <Link href={`/category/${Math.random()}`}>
+    <Link href={`./category/test`}>
       <div className='flex flex-1 justify-between border-b-defaultGray border-b-[1px] py-1'>
         <p className='capitalize '>{name ?? "[Empty]"}</p>
         <div className='flex items-center gap-3'>
