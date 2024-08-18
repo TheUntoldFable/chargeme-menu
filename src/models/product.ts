@@ -7,5 +7,5 @@ export interface Product {
     weight: number
     price: number
     isSelected: boolean
-    quantity?: number
+    quantity: number
 }

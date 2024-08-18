@@ -2,8 +2,8 @@ import { API_BASE_URL, headers } from "@/api/config"
 import { MenuItem } from "@/types/categories"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 
-export const fetchMenuItems = async (id: string): Promise<MenuItem[]> => {
-    const res = await fetch(`${API_BASE_URL}/menu-items/subcategory/${id}`)
+export const fetchMenuItemsByCategory = async (id: string): Promise<MenuItem[]> => {
+    const res = await fetch(`${API_BASE_URL}/menu-items/category/${id}`)
     if (!res.ok) {
         throw new Error("Network response was not ok")
     }
@@ -11,10 +11,10 @@ export const fetchMenuItems = async (id: string): Promise<MenuItem[]> => {
     return data
 }
 
-export const useMenuItems = (id: string): UseQueryResult<MenuItem[]> => {
+export const useCategoryMenuItems = (id: string): UseQueryResult<MenuItem[]> => {
     return useQuery({
-        queryKey: ["menu-items", id],
-        queryFn: () => fetchMenuItems(id),
+        queryKey: ["category-id", id],
+        queryFn: () => fetchMenuItemsByCategory(id),
         meta: { headers },
     })
 }

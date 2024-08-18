@@ -35,15 +35,20 @@ const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) =>
                 <p className='font-bold capitalize'>{name ?? "Test"}</p>
             </CardHeader>
             <CardContent className='w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none'>
-                {subCategories.length &&
+                {subCategories.length ? (
                     subCategories.map((subCategory, index) => (
                         <MenuItem
                             key={`${subCategory}-${index}`}
                             name={subCategory.name}
-                            catQuantity={subCategories.length}
-                            id={subCategory.id}
+                            catQuantity={subCategory?.menuItemCount ?? 1}
+                            id={subCategory.category ?? subCategory.id}
+                            type={subCategory.category ? "category" : "subcategory"}
+                            productId={subCategory.category ? subCategory.id : undefined}
                         />
-                    ))}
+                    ))
+                ) : (
+                    <></>
+                )}
             </CardContent>
         </Card>
     )
