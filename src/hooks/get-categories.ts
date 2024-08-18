@@ -1,5 +1,5 @@
 import { API_BASE_URL, headers } from "@/api/config"
-import { MenuCategory } from "@/types/categories"
+import { MenuCategory } from "@/models/categories"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { fetchMenuItemsByCategory } from "./get-menu-items-by-category"
 

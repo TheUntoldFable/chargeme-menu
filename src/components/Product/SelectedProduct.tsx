@@ -2,19 +2,9 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { ProductCardProps } from "@/models/product"
 import IconMinus from "../../../public/svg/IconMinus"
 import IconPlus from "../../../public/svg/IconPlus"
-
-interface ProductCardProps {
-    id: string | number
-    price: number
-    quantity: number
-    tempQuantity?: number
-    classNames?: string
-    decrement: (id: string | number, quantity: number) => void
-    increment: (id: string | number, quantity: number) => void
-    children: React.ReactNode
-}
 
 const ProductCard = ({ children, id, price, quantity, tempQuantity, classNames, decrement, increment }: ProductCardProps) => {
     return (

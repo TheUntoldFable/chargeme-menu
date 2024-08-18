@@ -1,17 +1,13 @@
 "use client"
 
-import { Product } from "@/models/product"
+import { OrderProductProps } from "@/models/product"
 import { cartState } from "@/store/cart"
 import Image from "next/image"
 import { useRecoilState } from "recoil"
 import IconPlus from "../../../public/svg/IconPlus"
 import { toast } from "../ui/use-toast"
 
-interface ProductCardProps {
-    itemData: Product
-}
-
-const OrderProduct = ({ itemData }: ProductCardProps) => {
+const OrderProduct = ({ title, weight, id }: OrderProductProps) => {
     const [cartItems, setCartItems] = useRecoilState(cartState)
 
     const handleRemoveFromCart = () => {
@@ -23,10 +19,6 @@ const OrderProduct = ({ itemData }: ProductCardProps) => {
             description: `Продуктът ${title} е успешно премахнат от вашата количка!`,
         })
     }
-
-    if (!itemData) return null
-
-    const { title, weight, id } = itemData
 
     return (
         <>

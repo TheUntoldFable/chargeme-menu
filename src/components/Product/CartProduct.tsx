@@ -1,17 +1,10 @@
 "use client"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import { CartProductProps } from "@/models/product"
 import { orderState } from "@/store/order"
 import Image from "next/image"
 import { useRecoilState } from "recoil"
-
-interface CartProductProps {
-    title: string
-    weight: number
-    id: string | number
-    isSelected: boolean
-    quantity: number
-}
 
 const CartProduct = ({ title, quantity, weight, id, isSelected }: CartProductProps) => {
     const [orderItems, setOrderItems] = useRecoilState(orderState)

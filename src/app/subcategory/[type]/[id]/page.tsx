@@ -50,6 +50,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                                 desc: item.description,
                                 type: "yellow",
                                 isSelected: false,
+                                quantity: 0,
                             }}
                         />
                     ))}

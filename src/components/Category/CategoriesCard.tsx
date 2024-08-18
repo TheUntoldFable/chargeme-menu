@@ -2,7 +2,7 @@
 
 import MenuItem from "@/components/Category/MenuItem"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { CategoriesProps } from "@/types/categories"
+import { CategoriesProps } from "@/models/categories"
 
 const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) => {
     return (

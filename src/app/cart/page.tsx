@@ -10,11 +10,7 @@ import { orderState } from "@/store/order"
 import { useEffect, useState } from "react"
 import { useRecoilValue } from "recoil"
 
-interface OrderPageProps {
-    params: { id: string }
-}
-
-export default function Cart({ params }: OrderPageProps) {
+export default function Cart() {
     const orderItems = useRecoilValue(orderState)
     const [tempQuantity, setTempQuantity] = useState<{ [key: string]: number }>({})
 

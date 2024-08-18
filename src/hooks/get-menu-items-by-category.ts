@@ -1,5 +1,5 @@
 import { API_BASE_URL, headers } from "@/api/config"
-import { MenuItem } from "@/types/categories"
+import { MenuItem } from "@/models/categories"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 
 export const fetchMenuItemsByCategory = async (id: string): Promise<MenuItem[]> => {

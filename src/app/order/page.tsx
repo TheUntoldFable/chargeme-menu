@@ -11,11 +11,7 @@ import { cartState } from "@/store/cart"
 import { orderState } from "@/store/order"
 import { useRecoilState } from "recoil"
 
-interface OrderPageProps {
-    params: { id: string }
-}
-
-export default function OrderPage({ params }: OrderPageProps) {
+export default function OrderPage() {
     const [cartItems, setCartItems] = useRecoilState(cartState)
     const [orderItems, setOrderItems] = useRecoilState(orderState)
 
@@ -76,7 +72,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                         decrement={decrement}
                         {...item}
                     >
-                        <OrderProduct itemData={item} />
+                        <OrderProduct {...item} />
                     </SelectedProduct>
                 ))}
             </ScrollArea>
