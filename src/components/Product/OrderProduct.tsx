@@ -36,7 +36,7 @@ const OrderProduct = ({ title, weight, id }: OrderProductProps) => {
                 alt='Img'
             />
             <div className='flex flex-1 flex-col gap-4 px-4 mb-4 justify-between'>
-                <h2 className='text-2xl'>{title}</h2>
+                <h2 className='text-2xl text-white'>{title}</h2>
                 <div className='flex flex-row justify-between gap-1'>
                     <div className='flex gap-2'>
                         <p>{weight}гр.</p>

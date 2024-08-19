@@ -28,9 +28,7 @@ const CartProduct = ({ title, quantity, weight, id, isSelected }: CartProductPro
                 className='mx-2 bg-transparent border-[2px] border-white text-black w-6 h-6'
                 checked={isSelected}
             />
-            <div className='bg-white text-black w-6 h-6 rounded-full text-center cursor-pointer absolute -top-2.5 -right-2.5'>
-                {quantity}
-            </div>
+            <div className='bg-white w-6 h-6 rounded-full text-center cursor-pointer absolute -top-2.5 -right-2.5'>{quantity}</div>
             <Image
                 src='/images/pizza.png'
                 width={200}
@@ -39,7 +37,7 @@ const CartProduct = ({ title, quantity, weight, id, isSelected }: CartProductPro
                 alt='Img'
             />
             <div className='flex flex-1 flex-col gap-4 px-4 mb-4 justify-between'>
-                <h2 className='text-2xl'>{title}</h2>
+                <h2 className='text-2xl text-white'>{title}</h2>
                 <div className='flex flex-row justify-between gap-1'>
                     <div className='flex gap-2'>
                         <p>{weight}гр.</p>

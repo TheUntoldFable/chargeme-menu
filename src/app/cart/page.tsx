@@ -6,7 +6,9 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import TotalPrice from "@/components/ui/total-price"
+import { calculateTotalPrice } from "@/lib/utils"
 import { orderState } from "@/store/order"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useRecoilValue } from "recoil"
 
@@ -58,15 +60,31 @@ export default function Cart() {
                 withSelection={true}
                 tempQuantity={tempQuantity}
             />
-            <Button
-                className='w-[60%] text-lg gap-2 mb-4'
-                type='button'
-                id='add'
-                variant='secondary'
-                disabled={!orderItems.some((item) => item.isSelected)}
+            <Link
+                className='w-full flex items-center justify-center'
+                href={{
+                    pathname: "/payment",
+                    query: {
+                        totalAmount: calculateTotalPrice(orderItems, true),
+                    },
+                }}
             >
-                Плати
-            </Button>
+                <Button
+                    disabled={!orderItems || orderItems.length < 1}
+                    className='w-[60%]
+           text-lg
+           gap-2
+           mb-4
+           active:scale-75
+           transition-transform
+           ease-in-out'
+                    type='button'
+                    id='add'
+                    variant='secondary'
+                >
+                    Плати
+                </Button>
+            </Link>
         </Container>
     )
 }

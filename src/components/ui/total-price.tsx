@@ -28,7 +28,7 @@ export default function TotalPrice({ items, withSelection, tempQuantity }: Total
                 mb-8
                 bg-black bg-opacity-55`}
         >
-            <CardContent className='flex flex-row items-center p-2 w-full rounded-lg border-none bold justify-center h-11 whitespace-pre'>
+            <CardContent className='flex text-white flex-row items-center p-2 w-full rounded-lg border-none bold justify-center h-11 whitespace-pre'>
                 Обща сума: <span className='text-yellow'>{calculateTotalPrice()} лв.</span>
             </CardContent>
         </Card>

@@ -40,7 +40,6 @@ const ProductCard = ({ children, id, price, quantity, tempQuantity, classNames, 
           items-center
           justify-around
           text-lg gap-2
-          text-black
           '
                 >
                     <div
