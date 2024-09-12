@@ -8,8 +8,6 @@
   "jsxSingleQuote": true,
   "singleQuote": false,
   "useTabs": false,
-  "tabWidth": 2,
-  "plugins": [
-    "prettier-plugin-organize-imports"
-  ]
+  "tabWidth": 4,
+  "plugins": ["prettier-plugin-organize-imports"]
 }

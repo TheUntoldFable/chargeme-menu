@@ -2,27 +2,22 @@
 
 import MenuItem from "@/components/Category/MenuItem"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { CategoriesProps } from "@/models/categories"
 
-interface CategoriesProps {
-  name: string
-  categories: string[]
-  classNames?: string
-}
-
-const CategoriesCard = ({ name, categories, classNames }: CategoriesProps) => {
-  return (
-    <Card
-      className={`
+const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) => {
+    return (
+        <Card
+            className={`
      bg-transparent
      relative
      w-[85%]
      border-defaultGray
      border-[1px]
-     flex
+     flex 3
      justify-center ${classNames}`}
-    >
-      <CardHeader
-        className='
+        >
+            <CardHeader
+                className='
         z-10
       text-xl
       absolute
@@ -36,20 +31,27 @@ const CategoriesCard = ({ name, categories, classNames }: CategoriesProps) => {
       py-2
       px-4
       rounded-xl'
-      >
-        <p className='font-bold capitalize'>{name ?? "Test"}</p>
-      </CardHeader>
-      <CardContent className='w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none'>
-        {categories.map((c, index) => (
-          <MenuItem
-            key={`${c}-${index}`}
-            name={c}
-            catQuantity={12}
-          />
-        ))}
-      </CardContent>
-    </Card>
-  )
+            >
+                <p className='font-bold capitalize'>{name ?? "Test"}</p>
+            </CardHeader>
+            <CardContent className='w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none'>
+                {subCategories.length ? (
+                    subCategories.map((subCategory, index) => (
+                        <MenuItem
+                            key={`${subCategory}-${index}`}
+                            name={subCategory.name}
+                            catQuantity={subCategory?.menuItemCount ?? 1}
+                            id={subCategory.categoryId ? subCategory.categoryId : subCategory.id}
+                            type={subCategory.categoryId ? "category" : "subcategory"}
+                            productId={subCategory.categoryId ? subCategory.id : undefined}
+                        />
+                    ))
+                ) : (
+                    <></>
+                )}
+            </CardContent>
+        </Card>
+    )
 }
 
 export default CategoriesCard
