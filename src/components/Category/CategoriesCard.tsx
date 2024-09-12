@@ -41,9 +41,9 @@ const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) =>
                             key={`${subCategory}-${index}`}
                             name={subCategory.name}
                             catQuantity={subCategory?.menuItemCount ?? 1}
-                            id={subCategory.category ?? subCategory.id}
-                            type={subCategory.category ? "category" : "subcategory"}
-                            productId={subCategory.category ? subCategory.id : undefined}
+                            id={subCategory.categoryId ? subCategory.categoryId : subCategory.id}
+                            type={subCategory.categoryId ? "category" : "subcategory"}
+                            productId={subCategory.categoryId ? subCategory.id : undefined}
                         />
                     ))
                 ) : (

@@ -37,17 +37,37 @@ export default function OrderPage() {
             description: `Количката е изчистена`,
         })
     }
+
     const createOrder = () => {
         const orderItemMap = new Map(orderItems.map((item) => [item.id, item.quantity]))
+
         const updatedCartItems = cartItems.map((cartItem) => {
             const orderQuantity = orderItemMap.get(cartItem.id) || 0
+            orderItemMap.delete(cartItem.id)
             return {
                 ...cartItem,
                 quantity: cartItem.quantity + orderQuantity,
             }
         })
 
-        setOrderItems(updatedCartItems)
+        const newOrderItems = Array.from(orderItemMap.entries())
+            .map(([id, quantity]) => {
+                const newItem = orderItems.find((item) => item.id === id)
+
+                if (!newItem || newItem.id === undefined) {
+                    return null
+                }
+
+                return {
+                    ...newItem,
+                    quantity,
+                }
+            })
+            .filter((item) => item !== null)
+
+        const finalCartItems = [...updatedCartItems, ...newOrderItems]
+
+        setOrderItems(finalCartItems)
         setCartItems([])
         router.push("./cart")
     }

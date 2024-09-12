@@ -4,7 +4,7 @@ export interface MenuItem {
     name: string
     price: number
     description: string
-    category: string
+    categoryId: string
     subcategory: string
     allergens: string[]
     restaurant: string

@@ -15,14 +15,17 @@ export default function Home() {
                 <ScrollArea className='h-screen min-w-full'>
                     {!isLoading ? (
                         categories?.length &&
-                        categories.map((item) => (
-                            <CategoriesCard
-                                key={item.id}
-                                classNames='mt-8 mb-2 mx-auto'
-                                name={item.name}
-                                subCategories={item.subcategories}
-                            />
-                        ))
+                        categories.map(
+                            (item) =>
+                                !!item.subcategories.length && (
+                                    <CategoriesCard
+                                        key={item.id}
+                                        classNames='mt-8 mb-2 mx-auto'
+                                        name={item.name}
+                                        subCategories={item.subcategories}
+                                    />
+                                )
+                        )
                     ) : (
                         <Loader />
                     )}
