@@ -11,7 +11,7 @@ const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesP
     ${isWine ? "bg-wine-dark" : "bg-black"}
      relative
      w-[85%]
-    ${isWine ? "border-wine-light" : "border-defaultGray"}
+    ${isWine ? "border-wine-border-btn" : "border-defaultGray"}
      border-[1px]
      flex 3
      justify-center ${classNames}`}
@@ -24,7 +24,7 @@ const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesP
     ${isWine ? "bg-wine-default" : "bg-black"}
       items-center
       justify-center
-    ${isWine ? "border-wine-light" : "border-defaultGray"}
+    ${isWine ? "border-wine-border-card" : "border-defaultGray"}
       border-[1px]
       -top-6
       w-32

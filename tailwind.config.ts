@@ -27,6 +27,8 @@ const config = {
                 "wine-default": "#6A1439",
                 "wine-dark": "#420F24D9",
                 "wine-light": "#E53069",
+                "wine-border-card": "#872D49",
+                "wine-border-btn": "#AD4C6B",
                 alterGreen: "#228B22",
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
