@@ -23,4 +23,5 @@ export interface CategoriesProps {
     name: string
     subCategories: MenuItem[]
     classNames?: string
+    isWine: boolean
 }

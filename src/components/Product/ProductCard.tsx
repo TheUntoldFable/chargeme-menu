@@ -16,12 +16,12 @@ interface ProductCardProps {
     badge?: string
     itemData: Product
     classNames?: string
+    isWine: boolean
 }
 
-const ProductCard = ({ badge, itemData, classNames }: ProductCardProps, ref: LegacyRef<HTMLDivElement> | undefined) => {
+const ProductCard = ({ badge, itemData, classNames, isWine }: ProductCardProps, ref: LegacyRef<HTMLDivElement> | undefined) => {
     const { toast } = useToast()
     const [cartItems, setCartItems] = useRecoilState(cartState)
-
     if (!itemData) return null
 
     const { desc, title, type, price, weight, id } = itemData
@@ -115,13 +115,13 @@ const ProductCard = ({ badge, itemData, classNames }: ProductCardProps, ref: Leg
       border-defaultGray'
             >
                 <Button
-                    className='w-[60%] text-lg gap-2'
+                    className={`w-[60%] text-lg gap-2 ${isWine ? "bg-wine-light text-white" : "bg-inherit text-black"}`}
                     type='button'
                     id='add'
                     variant={isInCart ? "destructive" : "default"}
                     onClick={isInCart ? handleRemoveFromCart : handleAddToCart}
                 >
-                    {isInCart ? <IconMinus /> : <IconPlus />}
+                    {isInCart ? <IconMinus color={isWine ? "#fff" : "#000"} /> : <IconPlus color={isWine ? "#fff" : "#000"} />}
                     {isInCart ? "Премахни" : "Добави"}
                 </Button>
             </CardFooter>

@@ -4,11 +4,11 @@ import MenuItem from "@/components/Category/MenuItem"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { CategoriesProps } from "@/models/categories"
 
-const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) => {
+const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesProps) => {
     return (
         <Card
             className={`
-     bg-transparent
+    ${isWine ? "bg-wine-gradient" : "bg-black"}
      relative
      w-[85%]
      border-defaultGray
@@ -17,11 +17,11 @@ const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) =>
      justify-center ${classNames}`}
         >
             <CardHeader
-                className='
+                className={`
         z-10
       text-xl
       absolute
-      bg-black
+    ${isWine ? "bg-wine-gradient" : "bg-black"}
       items-center
       justify-center
       border-defaultGray
@@ -30,7 +30,7 @@ const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) =>
       w-32
       py-2
       px-4
-      rounded-xl'
+      rounded-xl`}
             >
                 <p className='font-bold capitalize'>{name ?? "Test"}</p>
             </CardHeader>
@@ -44,6 +44,7 @@ const CategoriesCard = ({ name, subCategories, classNames }: CategoriesProps) =>
                             id={subCategory.categoryId ? subCategory.categoryId : subCategory.id}
                             type={subCategory.categoryId ? "category" : "subcategory"}
                             productId={subCategory.categoryId ? subCategory.id : undefined}
+                            isWine={isWine}
                         />
                     ))
                 ) : (

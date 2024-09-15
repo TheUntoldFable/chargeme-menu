@@ -7,12 +7,13 @@ interface MenuItemProps {
     id: string
     type: string
     productId?: string
+    isWine: boolean
 }
 
-const MenuItem = ({ name, catQuantity, id, type, productId }: MenuItemProps) => {
+const MenuItem = ({ name, catQuantity, id, type, productId, isWine }: MenuItemProps) => {
     const buildUrl = () => {
-        if (productId) return `/subcategory/${type}/${id}?productId=${productId}`
-        return `/subcategory/${type}/${id}`
+        if (productId) return `/subcategory/${type}/${id}?productId=${productId}&isWine=${isWine}`
+        return `/subcategory/${type}/${id}?isWine=${isWine}`
     }
 
     return (
@@ -20,7 +21,7 @@ const MenuItem = ({ name, catQuantity, id, type, productId }: MenuItemProps) => 
             <div className='flex flex-1 justify-between border-b-defaultGray border-b-[1px] py-1'>
                 <p className='capitalize '>{name ?? "[Empty]"}</p>
                 <div className='flex items-center gap-3'>
-                    <p className='text-yellow'>{catQuantity}</p>
+                    <p className={`${isWine ? "text-wine-light" : "text-yellow"}`}>{catQuantity}</p>
                     <IconArrowRight />
                 </div>
             </div>
