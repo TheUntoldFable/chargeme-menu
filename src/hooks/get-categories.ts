@@ -4,7 +4,7 @@ import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { fetchMenuItemsByCategory } from "./get-menu-items-by-category"
 
 export const fetchCategories = async (): Promise<MenuCategory[]> => {
-    const res = await fetch(`${API_BASE_URL}/menu-items/categories`)
+    const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/3`)
     if (!res.ok) {
         throw new Error("Network response was not ok")
     }

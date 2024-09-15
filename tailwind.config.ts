@@ -24,6 +24,8 @@ const config = {
                 yellowSecondary: "#EDDB75",
                 defaultGray: "#ADADAD",
                 green: "#50C878",
+                "wine-default": "#6A1439",
+                "wine-dark": "#420F24D9",
                 "wine-light": "#E53069",
                 alterGreen: "#228B22",
                 border: "hsl(var(--border))",

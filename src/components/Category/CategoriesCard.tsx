@@ -8,10 +8,10 @@ const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesP
     return (
         <Card
             className={`
-    ${isWine ? "bg-wine-gradient" : "bg-black"}
+    ${isWine ? "bg-wine-dark" : "bg-black"}
      relative
      w-[85%]
-     border-defaultGray
+    ${isWine ? "border-wine-light" : "border-defaultGray"}
      border-[1px]
      flex 3
      justify-center ${classNames}`}
@@ -21,15 +21,16 @@ const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesP
         z-10
       text-xl
       absolute
-    ${isWine ? "bg-wine-gradient" : "bg-black"}
+    ${isWine ? "bg-wine-default" : "bg-black"}
       items-center
       justify-center
-      border-defaultGray
+    ${isWine ? "border-wine-light" : "border-defaultGray"}
       border-[1px]
       -top-6
       w-32
       py-2
       px-4
+      w-auto
       rounded-xl`}
             >
                 <p className='font-bold capitalize'>{name ?? "Test"}</p>
