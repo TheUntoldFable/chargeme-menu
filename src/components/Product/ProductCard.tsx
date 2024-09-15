@@ -115,7 +115,7 @@ const ProductCard = ({ badge, itemData, classNames, isWine }: ProductCardProps, 
       border-defaultGray'
             >
                 <Button
-                    className={`w-[60%] text-lg gap-2 ${isWine ? "bg-wine-light text-white" : "bg-inherit text-black"}`}
+                    className={`w-[60%] text-lg gap-2 ${isWine ? "bg-wine-light text-white" : "text-black"}`}
                     type='button'
                     id='add'
                     variant={isInCart ? "destructive" : "default"}
