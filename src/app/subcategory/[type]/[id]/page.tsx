@@ -14,6 +14,7 @@ interface CategoryPageProps {
 
 export default function CategoryPage({ params }: CategoryPageProps) {
     const productId = useSearchParams().get("productId")
+    const isWine = useSearchParams().get("isWine") || "false"
     const productRef = useRef<null | HTMLDivElement>(null)
     const { type } = params
     const { data: menuItems, isLoading: isLoadingMenuItems } =
@@ -40,6 +41,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                         <ProductCard
                             key={item.id}
                             ref={productId === item.id ? productRef : null}
+                            isWine={JSON.parse(isWine)}
                             classNames='mt-8 mb-2 mx-auto'
                             badge='Най-поръчвано'
                             itemData={{
