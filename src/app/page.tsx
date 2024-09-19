@@ -16,13 +16,14 @@ export default function Home() {
                     {!isLoading ? (
                         categories?.length &&
                         categories.map(
-                            (item) =>
+                            (item, index) =>
                                 !!item.subcategories.length && (
                                     <CategoriesCard
                                         key={item.id}
                                         classNames='mt-8 mb-2 mx-auto'
                                         name={item.name}
                                         subCategories={item.subcategories}
+                                        isWine={index === 0}
                                     />
                                 )
                         )
