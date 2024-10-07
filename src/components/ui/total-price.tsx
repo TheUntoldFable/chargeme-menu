@@ -1,7 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { calculateTotalPrice } from "@/lib/utils"
 import { Product } from "@/models/product"
-import { useCallback } from "react"
 
 interface TotalPriceProps {
     items: Product[]
@@ -12,15 +11,15 @@ interface TotalPriceProps {
 }
 
 export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0, inputTip }: TotalPriceProps) {
-    const sum = useCallback((): number => calculateTotalPrice(items, withSelection, tempQuantity), [items])
+    const sum = (): number => calculateTotalPrice(items, withSelection, tempQuantity)
 
-    const returnPrice = useCallback(() => {
+    const returnPrice = () => {
         if (inputTip) return String((tip + sum()).toFixed(2))
 
         if (tip) return String((tip * sum() + sum()).toFixed(2))
 
         return String(sum())
-    }, [items, tip, inputTip])
+    }
 
     return (
         <Card
