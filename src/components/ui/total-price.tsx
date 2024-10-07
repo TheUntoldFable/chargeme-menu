@@ -1,37 +1,26 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { calculateTotalPrice } from "@/lib/utils"
 import { Product } from "@/models/product"
+import { useCallback } from "react"
 
 interface TotalPriceProps {
     items: Product[]
     withSelection: boolean
     tempQuantity?: { [key: string]: number }
-    shouldShowTip?: boolean
     tip?: number
-    percentage?: boolean
+    inputTip?: boolean
 }
 
-export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0, percentage, shouldShowTip }: TotalPriceProps) {
-    const calculateTotalPrice = () => {
-        let totalPrice = 0
-        if (withSelection) items = items.filter((item) => item.isSelected)
-        items.forEach((item) => {
-            totalPrice += (tempQuantity ? tempQuantity[item.id] : item.quantity) * item.price
-        })
+export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0, inputTip }: TotalPriceProps) {
+    const sum = useCallback((): number => calculateTotalPrice(items, withSelection, tempQuantity), [items])
 
-        return totalPrice
-    }
+    const returnPrice = useCallback(() => {
+        if (inputTip) return String((tip + sum()).toFixed(2))
 
-    const returnPrice = () => {
-        if (shouldShowTip) {
-            if (percentage) {
-                return (tip * Number(calculateTotalPrice()) + Number(calculateTotalPrice())).toFixed(2)
-            }
+        if (tip) return String((tip * sum() + sum()).toFixed(2))
 
-            return (tip + Number(calculateTotalPrice())).toFixed(2)
-        } else {
-            return calculateTotalPrice()
-        }
-    }
+        return String(sum())
+    }, [items, tip, inputTip])
 
     return (
         <Card

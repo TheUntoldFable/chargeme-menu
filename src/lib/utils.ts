@@ -1,19 +1,29 @@
 import { Product } from "@/models/product"
-import { type ClassValue, clsx } from "clsx"
+import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
 
-export const calculateTotalPrice = (items: Product[], withSelection: boolean): string => {
+export const calculateTotalPrice = (
+    items: Product[],
+    withSelection: boolean,
+    tempQuantity?: {
+        [key: string]: number
+    }
+): number => {
     let totalPrice = 0
+
+    const hasTempQuantity = tempQuantity && Object.keys(tempQuantity).length > 0
+
     if (withSelection) items = items.filter((item) => item.isSelected)
+
     items.forEach((item) => {
-        totalPrice += item.quantity * item.price
+        totalPrice += (hasTempQuantity ? tempQuantity?.[item.id] : item?.quantity) * item.price
     })
 
-    return totalPrice.toFixed(2)
+    return Number(totalPrice.toFixed(2))
 }
 
 export const stringToStripeAmount = (str: string): number => Math.round(parseFloat(str) * 100)

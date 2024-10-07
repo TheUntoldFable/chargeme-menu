@@ -4,29 +4,31 @@ import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { fetchMenuItemsByCategory } from "./get-menu-items-by-category"
 
 export const fetchCategories = async (): Promise<MenuCategory[]> => {
-    const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/3`)
-    if (!res.ok) {
-        throw new Error("Network response was not ok")
-    }
-    const data: MenuCategory[] = await res.json()
+    try {
+        const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/3`)
 
-    // Fetch menu items for categories without subcategories
-    const updatedCategories = await Promise.all(
-        data.map(async (item) => {
-            if (item.subcategories.length === 0) {
-                try {
-                    const subcategories = await fetchMenuItemsByCategory(item.id)
-                    return { ...item, subcategories }
-                } catch (error) {
-                    console.error(`Failed to fetch menu items for category ${item.id}:`, error)
-                    return item
+        const data: MenuCategory[] = await res.json()
+
+        // Fetch menu items for categories without subcategories
+        const updatedCategories = await Promise.all(
+            data.map(async (item) => {
+                if (item.subcategories.length === 0) {
+                    try {
+                        const subcategories = await fetchMenuItemsByCategory(item.id)
+                        return { ...item, subcategories }
+                    } catch (error) {
+                        console.error(`Failed to fetch menu items for category ${item.id}:`, error)
+                        return item
+                    }
                 }
-            }
-            return item
-        })
-    )
+                return item
+            })
+        )
 
-    return updatedCategories
+        return updatedCategories
+    } catch (e) {
+        throw new Error(`An error occurred when fetching categories - ${e}`)
+    }
 }
 
 export const useCategories = (): UseQueryResult<MenuCategory[]> => {
