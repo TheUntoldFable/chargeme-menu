@@ -1,6 +1,7 @@
 "use client"
 
-import ProductCard from "@/components/Product/ProductCard"
+import AddProduct from "@/components/Product/AddProduct"
+import CardContainer from "@/components/Product/CardContainer"
 import Container from "@/components/common/container"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMenuItems } from "@/hooks/get-menu-items"
@@ -33,28 +34,40 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
     return (
         <Container title={params.type}>
-            <ScrollArea className='h-screen min-w-full'>
+            <ScrollArea className='h-screen min-w-full px-4'>
                 {!isLoadingMenuItems &&
                     !isLoadingMenuItems &&
                     menuItems?.length &&
                     menuItems.map((item) => (
-                        <ProductCard
+                        <CardContainer
                             key={item.id}
                             ref={productId === item.id ? productRef : null}
-                            isWine={JSON.parse(isWine)}
-                            classNames='mt-8 mb-2 mx-auto'
-                            badge='Най-поръчвано'
+                            isWine={false}
+                            classNames='mb-6 mx-auto bg-lightBg'
                             itemData={{
                                 id: item.id,
                                 title: item.name,
                                 price: item.price,
                                 weight: 120,
                                 desc: item.description,
-                                type: "yellow",
                                 isSelected: false,
                                 quantity: 0,
                             }}
-                        />
+                        >
+                            <AddProduct
+                                isWine={false}
+                                classNames='mb-6 mx-auto bg-lightBg'
+                                itemData={{
+                                    id: item.id,
+                                    title: item.name,
+                                    price: item.price,
+                                    weight: 120,
+                                    desc: item.description,
+                                    isSelected: false,
+                                    quantity: 0,
+                                }}
+                            />
+                        </CardContainer>
                     ))}
             </ScrollArea>
         </Container>

@@ -2,12 +2,13 @@
 
 import { OrderProductProps } from "@/models/product"
 import { cartState } from "@/store/cart"
-import Image from "next/image"
 import { useRecoilState } from "recoil"
+import IconMinus from "../../../public/svg/IconMinus"
 import IconPlus from "../../../public/svg/IconPlus"
 import { toast } from "../ui/use-toast"
 
-const OrderProduct = ({ title, weight, id }: OrderProductProps) => {
+const OrderProduct = ({ title, id, increment, decrement, tempQuantity, quantity, desc, price }: OrderProductProps) => {
+    console.log(quantity)
     const [cartItems, setCartItems] = useRecoilState(cartState)
 
     const handleRemoveFromCart = () => {
@@ -21,29 +22,39 @@ const OrderProduct = ({ title, weight, id }: OrderProductProps) => {
     }
 
     return (
-        <>
+        <div className='relative w-full'>
             <div
-                className='bg-yellow rounded-full p-1 cursor-pointer absolute -top-2.5 -right-2.5 rotate-45'
+                className='absolute -right-1.5 top-0 rotate-45 cursor-pointer'
                 onClick={handleRemoveFromCart}
             >
-                <IconPlus color='#880808' />
+                <IconPlus color='#fff' />
             </div>
-            <Image
-                src='/images/pizza.png'
-                width={200}
-                height={200}
-                className='w-[50%] mb-4'
-                alt='Img'
-            />
-            <div className='flex flex-1 flex-col gap-4 px-4 mb-4 justify-between'>
-                <h2 className='text-2xl text-white'>{title}</h2>
-                <div className='flex flex-row justify-between gap-1'>
+            <div>
+                <h1 className='text-base'>{title}</h1>
+                <p className='w-52 truncate text-sm text-lightGray'>{desc}</p>
+                <div className='flex h-10 w-full items-center justify-between gap-2 rounded-lg text-lg'>
                     <div className='flex gap-2'>
-                        <p>{weight}гр.</p>
+                        <p className='font-bold'>{price}лв </p>
+                        <p className='text-lightGray'>x{quantity}</p>
+                    </div>
+                    <div className='flex w-1/4 items-center justify-between text-white'>
+                        <div
+                            className='border-yellowNew flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border bg-transparent'
+                            onClick={() => decrement(id, quantity)}
+                        >
+                            <IconMinus />
+                        </div>
+                        {tempQuantity ? tempQuantity : quantity}
+                        <div
+                            className='cursor-pointer rounded-full bg-yellow p-1'
+                            onClick={() => increment(id, quantity)}
+                        >
+                            <IconPlus color='black' />
+                        </div>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

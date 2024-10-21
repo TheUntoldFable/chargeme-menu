@@ -6,36 +6,13 @@ import { CategoriesProps } from "@/models/categories"
 
 const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesProps) => {
     return (
-        <Card
-            className={`
-    ${isWine ? "bg-wine-dark" : "bg-black"}
-     relative
-     w-[85%]
-    ${isWine ? "border-wine-border-btn" : "border-defaultGray"}
-     border-[1px]
-     flex 3
-     justify-center ${classNames}`}
-        >
+        <Card className={` ${isWine ? "bg-wine-dark" : "bg-lightBg"} 3 relative flex w-[85%] justify-center border-[0px] ${classNames}`}>
             <CardHeader
-                className={`
-        z-10
-      text-xl
-      absolute
-    ${isWine ? "bg-wine-default" : "bg-black"}
-      items-center
-      justify-center
-    ${isWine ? "border-wine-border-card" : "border-defaultGray"}
-      border-[1px]
-      -top-6
-      w-32
-      py-2
-      px-4
-      w-auto
-      rounded-xl`}
+                className={`absolute z-10 text-xl ${isWine ? "bg-wine-default" : "bg-gray"} -top-6 w-32 w-auto items-center justify-center rounded-xl border-[0px] px-4 py-2`}
             >
                 <p className='font-bold capitalize'>{name ?? "Test"}</p>
             </CardHeader>
-            <CardContent className='w-full bg-black bg-opacity-55 rounded-lg pt-8 border-none'>
+            <CardContent className='w-full rounded-lg border-none bg-lightBg pt-8'>
                 {subCategories.length ? (
                     subCategories.map((subCategory, index) => (
                         <MenuItem

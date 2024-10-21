@@ -1,7 +1,7 @@
 "use client"
 
+import CardContainer from "@/components/Product/CardContainer"
 import OrderProduct from "@/components/Product/OrderProduct"
-import SelectedProduct from "@/components/Product/SelectedProduct"
 import Container from "@/components/common/container"
 import {
     AlertDialog,
@@ -24,17 +24,19 @@ export default function OrderPage() {
 
     return (
         <Container title='Избрано'>
-            <ScrollArea className='h-screen min-w-full'>
+            <ScrollArea className='h-screen min-w-full px-4 pt-4'>
                 {cartItems.map((item) => (
-                    <SelectedProduct
-                        key={item.id}
-                        classNames='mt-8 mb-2 mx-auto'
-                        increment={increment}
-                        decrement={decrement}
-                        {...item}
+                    <CardContainer
+                        itemData={item}
+                        classNames='mb-6 mx-auto bg-lightBg'
                     >
-                        <OrderProduct {...item} />
-                    </SelectedProduct>
+                        <OrderProduct
+                            key={item.id}
+                            {...item}
+                            increment={increment}
+                            decrement={decrement}
+                        />
+                    </CardContainer>
                 ))}
             </ScrollArea>
             <TotalPrice
@@ -48,14 +50,7 @@ export default function OrderPage() {
                 >
                     <Button
                         disabled={!cartItems || cartItems.length < 1}
-                        className='
-            w-[60%]
-            text-lg
-            gap-2
-            mb-4
-            active:scale-75
-            transition-transform
-            ease-in-out'
+                        className='mb-4 w-[60%] gap-2 text-lg transition-transform ease-in-out active:scale-75'
                         type='button'
                         id='add'
                         variant='secondary'
@@ -79,15 +74,6 @@ export default function OrderPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <Button
-                className='w-[60%] text-lg gap-2 mb-4'
-                type='button'
-                id='add'
-                variant='outline'
-                onClick={handleRemoveFromCart}
-            >
-                <p>Изчисти моят избор</p>
-            </Button>
         </Container>
     )
 }
