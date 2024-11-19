@@ -20,18 +20,20 @@ import TotalPrice from "@/components/ui/total-price"
 import { useOrder } from "@/hooks/useOrder"
 
 export default function OrderPage() {
-    const { createOrder, cartItems, handleRemoveFromCart, increment, decrement } = useOrder()
+    const { createOrder, cartItems, increment, decrement } = useOrder()
 
     return (
         <Container title='Избрано'>
             <ScrollArea className='h-screen min-w-full px-4 pt-4'>
                 {cartItems.map((item) => (
                     <CardContainer
-                        itemData={item}
+                        productId={item.id.toString()}
                         classNames='mb-6 mx-auto bg-lightBg'
+                        isWine={false}
+                        key={`${item.id}-container`}
                     >
                         <OrderProduct
-                            key={item.id}
+                            children={undefined}
                             {...item}
                             increment={increment}
                             decrement={decrement}

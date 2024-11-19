@@ -36,7 +36,6 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         <Container title={params.type}>
             <ScrollArea className='h-screen min-w-full px-4'>
                 {!isLoadingMenuItems &&
-                    !isLoadingMenuItems &&
                     menuItems?.length &&
                     menuItems.map((item) => (
                         <CardContainer
@@ -44,28 +43,12 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                             ref={productId === item.id ? productRef : null}
                             isWine={false}
                             classNames='mb-6 mx-auto bg-lightBg'
-                            itemData={{
-                                id: item.id,
-                                title: item.name,
-                                price: item.price,
-                                weight: 120,
-                                desc: item.description,
-                                isSelected: false,
-                                quantity: 0,
-                            }}
+                            productId={item.id}
                         >
                             <AddProduct
                                 isWine={false}
                                 classNames='mb-6 mx-auto bg-lightBg'
-                                itemData={{
-                                    id: item.id,
-                                    title: item.name,
-                                    price: item.price,
-                                    weight: 120,
-                                    desc: item.description,
-                                    isSelected: false,
-                                    quantity: 0,
-                                }}
+                                itemData={item}
                             />
                         </CardContainer>
                     ))}

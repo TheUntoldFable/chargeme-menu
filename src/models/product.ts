@@ -1,7 +1,7 @@
 export interface Product {
     id: string | number
-    title: string
-    desc: string
+    name: string
+    description: string
     weight: number
     price: number
     isSelected: boolean
@@ -9,7 +9,7 @@ export interface Product {
 }
 
 export interface CartProductProps {
-    title: string
+    name: string
     weight: number
     id: string | number
     isSelected: boolean
@@ -17,7 +17,7 @@ export interface CartProductProps {
 }
 
 export interface OrderProductProps {
-    title: string
+    name: string
     id: string | number
     quantity: number
     tempQuantity?: number
@@ -25,6 +25,6 @@ export interface OrderProductProps {
     decrement: (id: string | number, quantity: number) => void
     increment: (id: string | number, quantity: number) => void
     children: React.ReactNode
-    desc: string
+    description: string
     price: number
 }

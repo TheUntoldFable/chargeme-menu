@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { cartState } from "@/store/cart"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useMemo } from "react"
+import { useEffect, useState } from "react"
 import { useRecoilValue } from "recoil"
 import IconMenu from "../../../public/svg/IconMenu"
 import IconSoup from "../../../public/svg/IconSoup"
@@ -16,8 +16,13 @@ interface BottomNavigationProps {
 
 export default function BottomNavigation({ classNames }: BottomNavigationProps) {
     const cartItems = useRecoilValue(cartState)
-    const cartItemsLength = useMemo(() => cartItems.length, [cartItems.length])
+    const [isHydrated, setIsHydrated] = useState(false)
+    const cartItemsLength = cartItems.length
     const currentPath = usePathname()
+
+    useEffect(() => {
+        setIsHydrated(true)
+    }, [])
 
     const getLinkClasses = (path: string) => {
         return currentPath === path ? "text-yellow" : "text-white"
@@ -25,6 +30,10 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
 
     const getIconColor = (path: string) => {
         return currentPath === path ? "#E9C500" : "#FFF"
+    }
+
+    if (!isHydrated) {
+        return null
     }
 
     return (

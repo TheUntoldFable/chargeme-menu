@@ -6,7 +6,7 @@ import { orderState } from "@/store/order"
 import Image from "next/image"
 import { useRecoilState } from "recoil"
 
-const CartProduct = ({ title, quantity, weight, id, isSelected }: CartProductProps) => {
+const CartProduct = ({ name, quantity, weight, id, isSelected }: CartProductProps) => {
     const [orderItems, setOrderItems] = useRecoilState(orderState)
 
     const onTap = () => {
@@ -37,7 +37,7 @@ const CartProduct = ({ title, quantity, weight, id, isSelected }: CartProductPro
                 alt='Img'
             />
             <div className='mb-4 flex flex-1 flex-col justify-between gap-4 px-4'>
-                <h2 className='text-2xl text-white'>{title}</h2>
+                <h2 className='text-2xl text-white'>{name}</h2>
                 <div className='flex flex-row justify-between gap-1'>
                     <div className='flex gap-2'>
                         <p>{weight}гр.</p>
