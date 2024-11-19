@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { ProductCardProps } from "@/models/product"
+import { OrderProductProps } from "@/models/product"
 import IconMinus from "../../../public/svg/IconMinus"
 import IconPlus from "../../../public/svg/IconPlus"
 
-const ProductCard = ({ children, id, price, quantity, tempQuantity, classNames, decrement, increment }: ProductCardProps) => {
+const ProductCard = ({ children, id, price, quantity, tempQuantity, classNames, decrement, increment }: OrderProductProps) => {
     return (
         <Card
             className={`relative flex w-[85%] flex-col justify-center border-[1px] border-defaultGray bg-black bg-transparent bg-opacity-55 ${classNames}`}
