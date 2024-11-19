@@ -1,13 +1,13 @@
 {
-  "singleAttributePerLine": true,
-  "endOfLine": "auto",
-  "printWidth": 140,
-  "trailingComma": "es5",
-  "semi": false,
-  "doubleQuote": true,
-  "jsxSingleQuote": true,
-  "singleQuote": false,
-  "useTabs": false,
-  "tabWidth": 4,
-  "plugins": ["prettier-plugin-organize-imports"]
+    "singleAttributePerLine": true,
+    "endOfLine": "auto",
+    "printWidth": 140,
+    "trailingComma": "es5",
+    "semi": false,
+    "doubleQuote": true,
+    "jsxSingleQuote": true,
+    "singleQuote": false,
+    "useTabs": false,
+    "tabWidth": 4,
+    "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
 }
