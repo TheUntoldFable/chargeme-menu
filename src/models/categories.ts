@@ -1,4 +1,6 @@
-export interface MenuItem {
+import { Product } from "./product"
+
+export interface MenuItem extends Product {
     id: string
     barsyId: number
     name: string
