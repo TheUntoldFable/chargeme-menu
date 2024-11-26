@@ -23,7 +23,7 @@ export default function OrderPage() {
     const { createOrder, cartItems, handleRemoveFromCart, increment, decrement } = useOrder()
 
     return (
-        <Container title='Избрано'>
+        <Container>
             <ScrollArea className='h-screen min-w-full'>
                 {cartItems.map((item) => (
                     <SelectedProduct
@@ -49,7 +49,7 @@ export default function OrderPage() {
                     <Button
                         disabled={!cartItems || cartItems.length < 1}
                         className='
-            w-[60%]
+                        w-[90%]
             text-lg
             gap-2
             mb-4
@@ -58,14 +58,14 @@ export default function OrderPage() {
             ease-in-out'
                         type='button'
                         id='add'
-                        variant='secondary'
+                        variant='select'
                     >
                         Поръчай
                     </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='max-w-[90%]'>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Сигурни ли сте, че искате да продължите?</AlertDialogTitle>
+                        <AlertDialogTitle className='text-black'>Сигурни ли сте, че искате да продължите?</AlertDialogTitle>
                         <AlertDialogDescription>Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -80,13 +80,13 @@ export default function OrderPage() {
                 </AlertDialogContent>
             </AlertDialog>
             <Button
-                className='w-[60%] text-lg gap-2 mb-4'
+                className='w-[90%] text-lg gap-2 mb-4'
                 type='button'
                 id='add'
                 variant='outline'
                 onClick={handleRemoveFromCart}
             >
-                <p>Изчисти моят избор</p>
+                <p className='text-lighterGray'>Изчисти моят избор</p>
             </Button>
         </Container>
     )

@@ -9,8 +9,8 @@ import Image from "next/image"
 import { LegacyRef, forwardRef } from "react"
 import { useRecoilState } from "recoil"
 import Circle from "../../../public/svg/Circle"
-import IconMinus from "../../../public/svg/IconMinus"
-import IconPlus from "../../../public/svg/IconPlus"
+import IconMinus from "../../../public/svg/icons/IconMinus"
+import IconPlus from "../../../public/svg/icons/IconPlus"
 
 interface ProductCardProps {
     badge?: string
@@ -115,14 +115,14 @@ const ProductCard = ({ badge, itemData, classNames, isWine }: ProductCardProps, 
       border-defaultGray'
             >
                 <Button
-                    className={`w-[60%] text-lg gap-2 ${isWine ? "bg-wine-default text-white border-wine-border-btn border-[1px]" : "text-black"}`}
+                    className={`text-lg gap-2 ${isWine ? "bg-wine-default text-white border-wine-border-btn border-[1px]" : "text-black"}`}
                     type='button'
                     id='add'
-                    variant={isInCart ? "destructive" : "default"}
+                    variant={isInCart ? "destructive" : "select"}
                     onClick={isInCart ? handleRemoveFromCart : handleAddToCart}
                 >
-                    {isInCart ? <IconMinus color={isWine ? "#fff" : "#000"} /> : <IconPlus color={isWine ? "#fff" : "#000"} />}
-                    {isInCart ? "Премахни" : "Добави"}
+                    {isInCart ? <IconMinus color='#fff' /> : <IconPlus color='#fff' />}
+                    {isInCart ? <p>Премахни</p> : <p>Добави</p>}
                 </Button>
             </CardFooter>
         </Card>

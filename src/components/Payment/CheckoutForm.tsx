@@ -99,8 +99,7 @@ export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
             />
 
             <Button
-                className='bg-yellow hover:bg-yellow/70 text-white transition-all ease-in-out w-full mt-6'
-                variant='default'
+                variant='select'
                 disabled={isLoading || !stripe || !elements}
                 id='submit'
             >
