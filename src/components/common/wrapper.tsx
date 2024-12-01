@@ -3,28 +3,28 @@
 import { PropsWithChildren } from "react"
 
 export type WrapperProps = {
-  className?: string
+    className?: string
 } & PropsWithChildren
 
 const Wrapper = ({ children, className }: WrapperProps) => {
-  return (
-    <div
-      className={`
+    return (
+        <div
+            className={`
     flex
     flex-1
     flex-col
     items-center
+    h-screen
     max-h-screen
     max-w-mobile
-    bg-cover
-    bg-default
+    bg-darkBg
     bg-no-repeat
     mx-auto
     ${className}`}
-    >
-      {children}
-    </div>
-  )
+        >
+            {children}
+        </div>
+    )
 }
 
 export default Wrapper

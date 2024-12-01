@@ -16,12 +16,19 @@ import { ChangeEvent, useEffect, useRef, useState } from "react"
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
 export default function Cart() {
-    const { orderItems } = useOrder()
+    const { orderItems, setPrice, price } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
-
     const [tempQuantity, setTempQuantity] = useState<{ [key: string]: number }>({})
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
+
+    useEffect(() => {
+        setPrice(
+            !inputTip
+                ? tip * Number(calculateTotalPrice(orderItems, true)) + Number(calculateTotalPrice(orderItems, true))
+                : tip + Number(calculateTotalPrice(orderItems, true))
+        )
+    }, [tip, inputTip, orderItems])
 
     const cartIncrement = (id: string | number, quantity: number) => {
         setTempQuantity((prev) => {
@@ -47,7 +54,7 @@ export default function Cart() {
     }, [])
 
     return (
-        <Container title='Плащане'>
+        <Container>
             <ScrollArea className='h-screen min-w-full'>
                 {orderItems.map((item, index) => (
                     <SelectedProduct
@@ -116,15 +123,13 @@ export default function Cart() {
                 href={{
                     pathname: "/payment",
                     query: {
-                        totalAmount: !inputTip
-                            ? tip * Number(calculateTotalPrice(orderItems, true)) + Number(calculateTotalPrice(orderItems, true))
-                            : tip + Number(calculateTotalPrice(orderItems, true)),
+                        totalAmount: price,
                     },
                 }}
             >
                 <Button
                     disabled={!orderItems || orderItems.length < 1}
-                    className='w-[60%]
+                    className='w-[90%]
            text-lg
            gap-2
            mb-4
@@ -133,7 +138,7 @@ export default function Cart() {
            ease-in-out'
                     type='button'
                     id='add'
-                    variant='secondary'
+                    variant='select'
                 >
                     Плати
                 </Button>

@@ -1,7 +1,7 @@
 import { toast } from "@/components/ui/use-toast"
 import { Product } from "@/models/product"
 import { cartState } from "@/store/cart"
-import { orderState } from "@/store/order"
+import { orderPrice, orderState } from "@/store/order"
 import { useRouter } from "next/navigation"
 import { useRecoilState } from "recoil"
 
@@ -9,6 +9,7 @@ export function useOrder() {
     const router = useRouter()
     const [cartItems, setCartItems] = useRecoilState<Product[] | []>(cartState)
     const [orderItems, setOrderItems] = useRecoilState<Product[] | []>(orderState)
+    const [price, setPrice] = useRecoilState<number>(orderPrice)
 
     const handleRemoveFromCart = (): void => {
         setCartItems([])
@@ -78,6 +79,8 @@ export function useOrder() {
     }
 
     return {
+        price,
+        setPrice,
         decrement,
         increment,
         cartItems,

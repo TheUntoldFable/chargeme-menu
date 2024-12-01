@@ -7,18 +7,21 @@ import BottomNavigation from "@/components/common/navigation"
 import { PropsWithChildren } from "react"
 
 interface ContainerProps {
-  title: string
+    title?: string
+    headerClassname?: string
+    wrapperClassname?: string
 }
 
-const Container = ({ title, children }: PropsWithChildren<ContainerProps>) => {
-  return (
-    <Wrapper>
-      <Header classNames='mb-6' />
-      <h1 className='mb-6'>{title}</h1>
-      {children}
-      <BottomNavigation />
-    </Wrapper>
-  )
+// TODO: The structure is thrash, should refactor
+const Container = ({ title, headerClassname, wrapperClassname, children }: PropsWithChildren<ContainerProps>) => {
+    return (
+        <Wrapper className={wrapperClassname}>
+            <Header className={headerClassname} />
+            {/*<h1 className='mb-6'>{title}</h1>*/}
+            {children}
+            <BottomNavigation />
+        </Wrapper>
+    )
 }
 
 export default Container

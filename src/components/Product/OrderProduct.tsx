@@ -4,7 +4,7 @@ import { OrderProductProps } from "@/models/product"
 import { cartState } from "@/store/cart"
 import Image from "next/image"
 import { useRecoilState } from "recoil"
-import IconPlus from "../../../public/svg/IconPlus"
+import IconPlus from "../../../public/svg/icons/IconPlus"
 import { toast } from "../ui/use-toast"
 
 const OrderProduct = ({ title, weight, id }: OrderProductProps) => {

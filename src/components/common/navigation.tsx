@@ -6,10 +6,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useMemo } from "react"
 import { useRecoilValue } from "recoil"
-import IconFeedback from "../../../public/svg/IconFeedback"
-import IconMenu from "../../../public/svg/IconMenu"
-import IconSoup from "../../../public/svg/IconSoup"
-import IconWallet from "../../../public/svg/IconWallet"
+import IconFeedback from "../../../public/svg/icons/IconFeedback"
+import IconMenu from "../../../public/svg/icons/IconMenu"
+import IconSoup from "../../../public/svg/icons/IconSoup"
+import IconWallet from "../../../public/svg/icons/IconWallet"
 
 interface BottomNavigationProps {
     classNames?: string
@@ -29,7 +29,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
     }
 
     return (
-        <div className={`flex min-w-full justify-between items-center h-20 bg-black px-8 py-4  ${classNames}`}>
+        <div className={`flex mt-auto mb-0 min-w-full justify-between items-center h-20 bg-black px-2 py-4  ${classNames}`}>
             <Link href='/'>
                 <div className='flex flex-col items-center'>
                     <IconMenu color={getIconColor("/")} />
