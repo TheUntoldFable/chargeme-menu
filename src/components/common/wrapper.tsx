@@ -8,7 +8,9 @@ export type WrapperProps = {
 
 const Wrapper = ({ children, className }: WrapperProps) => {
     return (
-        <div className={`bg-default mx-auto flex max-w-mobile flex-1 flex-col items-center bg-cover bg-no-repeat ${className}`}>
+        <div
+            className={`bg-default mx-auto flex max-h-screen max-w-mobile flex-1 flex-col items-center bg-cover bg-no-repeat ${className}`}
+        >
             {children}
         </div>
     )

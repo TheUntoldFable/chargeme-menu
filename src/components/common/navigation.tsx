@@ -6,9 +6,9 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useRecoilValue } from "recoil"
-import IconMenu from "../../../public/svg/IconMenu"
-import IconSoup from "../../../public/svg/IconSoup"
-import IconWallet from "../../../public/svg/IconWallet"
+import IconMenu from "../../../public/svg/icons/IconMenu"
+import IconSoup from "../../../public/svg/icons/IconSoup"
+import IconWallet from "../../../public/svg/icons/IconWallet"
 
 interface BottomNavigationProps {
     classNames?: string
@@ -37,7 +37,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
     }
 
     return (
-        <div className={`flex h-20 min-w-full items-center justify-between bg-black px-8 py-4 ${classNames}`}>
+        <div className={`mb-0 mt-auto flex h-20 min-w-full items-center justify-between bg-black px-2 py-4 ${classNames}`}>
             <Link href='/'>
                 <div className='flex flex-col items-center'>
                     <IconMenu color={getIconColor("/")} />

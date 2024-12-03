@@ -32,7 +32,7 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
         <>
             <div>
                 <h1 className='text-base'>{name}</h1>
-                <p className='w-52 truncate text-sm text-lightGray'>{description}</p>
+                <p className='truncate-text truncate text-sm text-lightGray'>{description}</p>
                 <div className='flex gap-2'>
                     <p className='font-bold'>{price}лв</p>
                     <span className='text-white'>|</span>

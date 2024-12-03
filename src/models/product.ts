@@ -22,8 +22,8 @@ export interface OrderProductProps {
     quantity: number
     tempQuantity?: number
     classNames?: string
-    decrement: (id: string | number, quantity: number) => void
-    increment: (id: string | number, quantity: number) => void
+    decrement?: (id: string | number, quantity: number) => void
+    increment?: (id: string | number, quantity: number) => void
     children: React.ReactNode
     description: string
     price: number

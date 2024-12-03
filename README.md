@@ -1,10 +1,16 @@
 ## Requirements
+
 ```javascript
-- Node ===> 18 or newer.
-- NPM ===> 8 or newer.
+-Node === > 18
+or
+newer.
+- NPM === > 8
+or
+newer.
 ```
 
 ## Getting Started
+
 Make sure all packages are installed:
 
 ```bash
@@ -26,12 +32,13 @@ Open [http://localhost:1337](http://localhost:1337) with your browser to see the
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation related changes
-- `refactor`: A code that neither fix bug nor adds a feature. (eg: You can use this when there is semantic changes like renaming a variable/ function name)
+- `refactor`: A code that neither fix bug nor adds a feature. (eg: You can use this when there is semantic changes like
+  renaming a variable/ function name)
 - `perf`: A code that improves performance
 - `style`: A code that is related to styling
 - `test`: Adding new test or making changes to existing test
 
-> A typical git commit message will look like  
+> A typical git commit message will look like
 
 ```
 <type>(<scope>): <subject>
@@ -46,6 +53,15 @@ To learn more about Next.js, take a look at the following resources:
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The easiest way to deploy your Next.js app is to use
+the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
+from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Icons
+
+1) Before importing SVG's, it's necessary to optimize through [SVGOMG](https://jakearchibald.github.io/svgomg/)
+   to decrease the file size
+2) Next step is to paste the optimized SVG in the [SVGR Playground](https://react-svgr.com/playground/)
+3) That's it, now you can use it in the code!

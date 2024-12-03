@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { OrderProductProps } from "@/models/product"
-import IconMinus from "../../../public/svg/IconMinus"
-import IconPlus from "../../../public/svg/IconPlus"
+import IconMinus from "../../../public/svg/icons/IconMinus"
+import IconPlus from "../../../public/svg/icons/IconPlus"
 
 const ProductCard = ({ children, id, price, quantity, tempQuantity, classNames, decrement, increment }: OrderProductProps) => {
     return (

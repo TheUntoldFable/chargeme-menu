@@ -13,7 +13,7 @@
         --popover: 0 0% 100%;
         --popover-foreground: 222.2 84% 4.9%;
 
-        --primary: 222.2 47.4% 11.2%;
+        --primary: white;
         --primary-foreground: 210 40% 98%;
 
         --secondary: 210 40% 96.1%;
@@ -84,6 +84,7 @@
     }
 
     body {
+        overflow: hidden;
         @apply bg-black text-foreground;
     }
 
@@ -178,5 +179,37 @@
 
     .c-plus-to-check.active::after {
         transform: translate(-25%, 0.175em) rotate(45deg) scale(0.43, 1);
+    }
+
+    h2 {
+        @apply text-white;
+        @apply text-lg font-bold;
+    }
+
+    h3 {
+        @apply text-white;
+        @apply text-sm font-bold;
+    }
+
+    @layer components {
+        .button-default {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: theme("colors.lightBg");
+            height: theme("height.14");
+        }
+
+        .button-select {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: theme("colors.yellow");
+            height: theme("height.14");
+        }
+
+        .truncate-text {
+            width: calc(100vw - 13.25rem);
+        }
     }
 }

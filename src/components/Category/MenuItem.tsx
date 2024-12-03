@@ -1,5 +1,5 @@
 import Link from "next/link"
-import IconArrowRight from "../../../public/svg/IconArrowRight"
+import IconArrowRight from "../../../public/svg/icons/IconArrowRight"
 
 interface MenuItemProps {
     name: string

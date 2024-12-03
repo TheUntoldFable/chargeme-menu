@@ -15,3 +15,10 @@ export const orderState = atom<Product[] | []>({
     // eslint-disable-next-line camelcase
     effects_UNSTABLE: [persistAtom],
 })
+
+export const orderPrice = atom<number>({
+    key: "OrderPrice",
+    default: 0,
+    // eslint-disable-next-line camelcase
+    effects_UNSTABLE: [persistAtom],
+})

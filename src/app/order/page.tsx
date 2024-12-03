@@ -55,14 +55,14 @@ export default function OrderPage() {
                         className='mb-4 w-[60%] gap-2 text-lg transition-transform ease-in-out active:scale-75'
                         type='button'
                         id='add'
-                        variant='secondary'
+                        variant='select'
                     >
                         Поръчай
                     </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='max-w-[90%]'>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Сигурни ли сте, че искате да продължите?</AlertDialogTitle>
+                        <AlertDialogTitle className='text-black'>Сигурни ли сте, че искате да продължите?</AlertDialogTitle>
                         <AlertDialogDescription>Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

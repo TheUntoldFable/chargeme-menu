@@ -5,16 +5,17 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     {
         variants: {
             variant: {
-                default: "bg-white rounded-lg bold hover:bg-white/70",
-                destructive: "bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/70",
-                outline: "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
-                secondary: "bg-yellow bold",
-                ghost: "hover:bg-accent hover:text-accent-foreground",
-                link: "text-primary underline-offset-4 hover:underline",
+                select: "bg-yellow text-white rounded-xl hover:bg-yellow/60",
+                default: "bg-lightBg rounded-xl text-primary-foreground hover:bg-primary/90",
+                destructive: "bg-destructive rounded-2xl text-destructive-foreground hover:bg-destructive/90",
+                outline: "rounded-xl border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+                secondary: "bg-secondary rounded-xl text-secondary-foreground hover:bg-secondary/80",
+                ghost: "hover:bg-accent rounded-xl hover:text-accent-foreground",
+                link: "text-primary rounded-2xl underline-offset-4 hover:underline",
             },
             size: {
                 default: "h-10 px-4 py-2",
