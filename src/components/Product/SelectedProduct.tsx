@@ -16,14 +16,14 @@ const ProductCard = ({ children, id, price, quantity, tempQuantity, classNames, 
                 <div className='flex h-10 w-full flex-1 items-center justify-around gap-2 rounded-lg bg-white p-1 px-4 text-lg'>
                     <div
                         className='cursor-pointer rounded-full bg-yellow p-1'
-                        onClick={() => decrement(id, quantity)}
+                        onClick={() => decrement && decrement(id, quantity)}
                     >
                         <IconMinus color='black' />
                     </div>
                     {tempQuantity ? tempQuantity : quantity}
                     <div
                         className='cursor-pointer rounded-full bg-yellow p-1'
-                        onClick={() => increment(id, quantity)}
+                        onClick={() => increment && increment(id, quantity)}
                     >
                         <IconPlus color='black' />
                     </div>
