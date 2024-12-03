@@ -23,7 +23,7 @@ export default function PaymentPage() {
     const [paymentMethod, setPaymentMethod] = useState("card")
 
     return (
-        <Container>
+        <Container title={""}>
             <DialogPopUp
                 icon={<IconSuccess />}
                 title='Успешно плащане!'
@@ -40,7 +40,7 @@ export default function PaymentPage() {
                 isOpen={isUnSuccessful}
                 onPress={() => setIsUnsuccessful(false)}
             />
-            <div className='flex flex-1 gap-2 flex-col px-4 mt-2 h-screen w-full'>
+            <div className='mt-2 flex h-screen w-full flex-1 flex-col gap-2 px-4'>
                 <Button variant='default'>
                     <div className='flex items-center gap-1'>
                         <Image
@@ -51,10 +51,10 @@ export default function PaymentPage() {
                         <p>Pay</p>
                     </div>
                 </Button>
-                <div className='flex flex-row justify-between gap-2 items-center'>
-                    <div className='bg-lightGray h-[1px] w-full' />
+                <div className='flex flex-row items-center justify-between gap-2'>
+                    <div className='h-[1px] w-full bg-lightGray' />
                     <p className='text-lightGray'>или</p>
-                    <div className='bg-lightGray h-[1px] w-full' />
+                    <div className='h-[1px] w-full bg-lightGray' />
                 </div>
                 <h3>Изберете начин на плащане:</h3>
                 <RadioGroup
@@ -63,7 +63,7 @@ export default function PaymentPage() {
                 >
                     <div
                         onClick={() => setPaymentMethod("card")}
-                        className='flex rounded-xl px-2 py-4 bg-lightBg items-center justify-between space-x-2'
+                        className='flex items-center justify-between space-x-2 rounded-xl bg-lightBg px-2 py-4'
                     >
                         <RadioGroupItem
                             checked={paymentMethod === "card"}
@@ -87,7 +87,7 @@ export default function PaymentPage() {
                     </div>
                     <div
                         onClick={() => setPaymentMethod("pos")}
-                        className='flex rounded-xl px-2 py-4 bg-lightBg items-center space-x-2'
+                        className='flex items-center space-x-2 rounded-xl bg-lightBg px-2 py-4'
                     >
                         <RadioGroupItem
                             checked={paymentMethod === "pos"}
@@ -99,7 +99,7 @@ export default function PaymentPage() {
                     </div>
                     <div
                         onClick={() => setPaymentMethod("cash")}
-                        className='flex rounded-xl px-2 py-4 bg-lightBg items-center space-x-2'
+                        className='flex items-center space-x-2 rounded-xl bg-lightBg px-2 py-4'
                     >
                         <RadioGroupItem
                             checked={paymentMethod === "cash"}
@@ -119,7 +119,7 @@ export default function PaymentPage() {
                             setIsUnsuccessful(true)
                         }
                     }}
-                    className='mt-auto mb-0'
+                    className='mb-0 mt-auto'
                     variant='select'
                 >
                     <p className='text-darkBg'>Плати {price.toFixed(2)} BGN</p>

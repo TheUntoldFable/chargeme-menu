@@ -11,7 +11,7 @@ export default function Home() {
 
     return (
         <main>
-            <Container title='Добре дошли!'>
+            <Container title=''>
                 <ScrollArea className='h-screen min-w-full'>
                     {!isLoading ? (
                         categories?.length &&

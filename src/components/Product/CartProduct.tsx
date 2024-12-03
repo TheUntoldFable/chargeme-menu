@@ -6,7 +6,7 @@ import { orderState } from "@/store/order"
 import Image from "next/image"
 import { useRecoilState } from "recoil"
 
-const CartProduct = ({ title, quantity, weight, id, isSelected }: CartProductProps) => {
+const CartProduct = ({ name, quantity, weight, id, isSelected }: CartProductProps) => {
     const [orderItems, setOrderItems] = useRecoilState(orderState)
 
     const onTap = () => {
@@ -25,19 +25,19 @@ const CartProduct = ({ title, quantity, weight, id, isSelected }: CartProductPro
         <>
             <Checkbox
                 onClick={onTap}
-                className='mx-2 bg-transparent border-[2px] border-white text-black w-6 h-6'
+                className='mx-2 h-6 w-6 border-[2px] border-white bg-transparent text-black'
                 checked={isSelected}
             />
-            <div className='bg-white w-6 h-6 rounded-full text-center cursor-pointer absolute -top-2.5 -right-2.5'>{quantity}</div>
+            <div className='absolute -right-2.5 -top-2.5 h-6 w-6 cursor-pointer rounded-full bg-white text-center'>{quantity}</div>
             <Image
                 src='/images/pizza.png'
                 width={200}
                 height={200}
-                className='w-[50%] mb-4'
+                className='mb-4 w-[50%]'
                 alt='Img'
             />
-            <div className='flex flex-1 flex-col gap-4 px-4 mb-4 justify-between'>
-                <h2 className='text-2xl text-white'>{title}</h2>
+            <div className='mb-4 flex flex-1 flex-col justify-between gap-4 px-4'>
+                <h2 className='text-2xl text-white'>{name}</h2>
                 <div className='flex flex-row justify-between gap-1'>
                     <div className='flex gap-2'>
                         <p>{weight}гр.</p>

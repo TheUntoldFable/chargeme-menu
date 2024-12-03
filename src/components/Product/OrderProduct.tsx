@@ -2,48 +2,69 @@
 
 import { OrderProductProps } from "@/models/product"
 import { cartState } from "@/store/cart"
-import Image from "next/image"
+import React from "react"
 import { useRecoilState } from "recoil"
+import IconMinus from "../../../public/svg/icons/IconMinus"
 import IconPlus from "../../../public/svg/icons/IconPlus"
 import { toast } from "../ui/use-toast"
 
-const OrderProduct = ({ title, weight, id }: OrderProductProps) => {
+const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, increment, decrement }: OrderProductProps) => {
     const [cartItems, setCartItems] = useRecoilState(cartState)
 
-    const handleRemoveFromCart = () => {
+    const handleRemoveFromCart = (e: React.MouseEvent) => {
+        e.preventDefault()
         const filteredItems = cartItems.filter((i) => i.id !== id)
         setCartItems(filteredItems)
         toast({
             variant: "destructive",
             title: "Премахване от количка",
-            description: `Продуктът ${title} е успешно премахнат от вашата количка!`,
+            description: `Продуктът ${name} е успешно премахнат от вашата количка!`,
         })
     }
 
+    const actionsDisabled = increment && decrement
+
+    const preventDefaultBehavior = (event: React.MouseEvent<HTMLDivElement>, cb: (id: string | number, quantity: number) => void) => {
+        event.preventDefault()
+        cb(id, quantity)
+    }
+
     return (
-        <>
+        <div className='relative w-full'>
             <div
-                className='bg-yellow rounded-full p-1 cursor-pointer absolute -top-2.5 -right-2.5 rotate-45'
+                className='absolute -right-1.5 top-0 rotate-45 cursor-pointer'
                 onClick={handleRemoveFromCart}
             >
-                <IconPlus color='#880808' />
+                <IconPlus color='#fff' />
             </div>
-            <Image
-                src='/images/pizza.png'
-                width={200}
-                height={200}
-                className='w-[50%] mb-4'
-                alt='Img'
-            />
-            <div className='flex flex-1 flex-col gap-4 px-4 mb-4 justify-between'>
-                <h2 className='text-2xl text-white'>{title}</h2>
-                <div className='flex flex-row justify-between gap-1'>
+            <div>
+                <h1 className='text-base'>{name}</h1>
+                <p className='w-52 truncate text-sm text-lightGray'>{description}</p>
+                <div className='flex h-10 w-full items-center justify-between gap-2 rounded-lg text-lg'>
                     <div className='flex gap-2'>
-                        <p>{weight}гр.</p>
+                        <p className='font-bold'>{price}лв </p>
+                        <p className='text-lightGray'>x{quantity}</p>
+                    </div>
+                    <div className='flex w-1/3 items-center justify-between text-white'>
+                        <div
+                            className={`flex h-6 w-6 items-center justify-center rounded-full border ${
+                                decrement ? "cursor-pointer border-yellowNew bg-transparent" : "border-lightGray"
+                            }`}
+                            onClick={(event) => decrement && preventDefaultBehavior(event, decrement)}
+                        >
+                            <IconMinus />
+                        </div>
+                        <span className={`${!actionsDisabled ? "text-lightGray" : ""}`}> {tempQuantity ? tempQuantity : quantity}</span>
+                        <div
+                            className={`rounded-full p-1 ${increment ? "cursor-pointer bg-yellow" : "cursor-not-allowed bg-lightGray"}`}
+                            onClick={(event) => increment && preventDefaultBehavior(event, increment)}
+                        >
+                            <IconPlus color='black' />
+                        </div>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 
