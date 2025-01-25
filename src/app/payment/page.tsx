@@ -6,13 +6,12 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useOrder } from "@/hooks/useOrder"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import DialogPopUp from "@/components/common/DialogPopUp"
 import IconFailed from "../../../public/svg/icons/IconFailed"
 import IconSuccess from "../../../public/svg/icons/IconSuccess"
 
-import appleLogo from "@/../public/svg/logos/apple.svg"
 import mastercardLogo from "@/../public/svg/logos/mastercard.svg"
 import visaLogo from "@/../public/svg/logos/visa.svg"
 
@@ -21,6 +20,71 @@ export default function PaymentPage() {
     const [isUnSuccessful, setIsUnsuccessful] = useState<boolean>(false)
     const { price } = useOrder()
     const [paymentMethod, setPaymentMethod] = useState("card")
+
+    const iframeAddress = "https://sdkframe.infn.dev"
+    const paymentIframeSrc = `${iframeAddress}/#/new`
+
+    const documentRef = useRef(window)
+    const iframeRef = useRef<HTMLIFrameElement>(null)
+
+    const sendPaymentDataToIframe = () => {
+        const paymentData = {
+            bankHashes: "",
+            description: "test",
+            amount: 20,
+            currency: "BGN",
+            publichash: "f75fa38d-ca1b-4241-a01a-58965d444aba",
+            toiban: "BG85IORT80947826532954",
+            lang: "BG",
+            redirectUrl: "/",
+        }
+        const iframeInitObj = {
+            payload: paymentData,
+            contentDescription: "payment-init-data",
+        }
+
+        if (iframeRef.current && iframeRef.current.contentWindow) {
+            console.log("LOG")
+            iframeRef?.current?.contentWindow.postMessage(iframeInitObj, iframeAddress)
+        }
+    }
+
+    const handleMessage = (e) => {
+        if (e?.origin !== iframeAddress) {
+            console.log("unexpected message")
+            return
+        }
+    }
+
+    const afterPaymentFinished = (payload) => {
+        documentRef.current.location.href = payload.redirectUrl
+    }
+
+    useEffect(() => {
+        if (!documentRef.current) return
+        documentRef.current.addEventListener("message", (e) => {
+            handleMessage(e)
+            const passedObj = e?.data
+            if (!passedObj || !passedObj.messageType) {
+                return
+            }
+
+            switch (passedObj.messageType) {
+                case "on_init_completed": {
+                    console.log("on_init_completed detected")
+                    sendPaymentDataToIframe()
+                    break
+                }
+                case "on_payment_finished": {
+                    console.log("on_payment_finished detected")
+                    afterPaymentFinished(passedObj.payload)
+                    break
+                }
+                default:
+                    console.log("message not recognised")
+            }
+        })
+    }, [])
 
     return (
         <Container>
@@ -41,21 +105,21 @@ export default function PaymentPage() {
                 onPress={() => setIsUnsuccessful(false)}
             />
             <div className='flex flex-1 gap-2 flex-col px-4 mt-2 h-screen w-full'>
-                <Button variant='default'>
-                    <div className='flex items-center gap-1'>
-                        <Image
-                            width={20}
-                            src={appleLogo}
-                            alt='appleLogo'
-                        />
-                        <p>Pay</p>
-                    </div>
-                </Button>
-                <div className='flex flex-row justify-between gap-2 items-center'>
-                    <div className='bg-lightGray h-[1px] w-full' />
-                    <p className='text-lightGray'>или</p>
-                    <div className='bg-lightGray h-[1px] w-full' />
-                </div>
+                {/*<Button variant='default'>*/}
+                {/*    <div className='flex items-center gap-1'>*/}
+                {/*        <Image*/}
+                {/*            width={20}*/}
+                {/*            src={appleLogo}*/}
+                {/*            alt='appleLogo'*/}
+                {/*        />*/}
+                {/*        <p>Pay</p>*/}
+                {/*    </div>*/}
+                {/*</Button>*/}
+                {/*<div className='flex flex-row justify-between gap-2 items-center'>*/}
+                {/*    <div className='bg-lightGray h-[1px] w-full' />*/}
+                {/*    <p className='text-lightGray'>или</p>*/}
+                {/*    <div className='bg-lightGray h-[1px] w-full' />*/}
+                {/*</div>*/}
                 <h3>Изберете начин на плащане:</h3>
                 <RadioGroup
                     className='text-lightGray'
@@ -110,6 +174,13 @@ export default function PaymentPage() {
                         <Label htmlFor='option-one'>В брой</Label>
                     </div>
                 </RadioGroup>
+                {/*               <div className='text-yellow'>
+                    <iframe
+                        className='h-96 bg-white w-full'
+                        ref={iframeRef}
+                        src={paymentIframeSrc}
+                    ></iframe>
+                </div>*/}
                 <Button
                     onClick={() => {
                         if (paymentMethod === "card") {
