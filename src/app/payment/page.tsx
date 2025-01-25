@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useOrder } from "@/hooks/useOrder"
 import Image from "next/image"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 
 import DialogPopUp from "@/components/common/DialogPopUp"
 import IconFailed from "../../../public/svg/icons/IconFailed"
@@ -14,77 +14,15 @@ import IconSuccess from "../../../public/svg/icons/IconSuccess"
 
 import mastercardLogo from "@/../public/svg/logos/mastercard.svg"
 import visaLogo from "@/../public/svg/logos/visa.svg"
+import { useSendPayment } from "@/hooks/send-payment-data"
 
 export default function PaymentPage() {
     const [isSuccessful, setIsSuccessfull] = useState<boolean>(false)
     const [isUnSuccessful, setIsUnsuccessful] = useState<boolean>(false)
-    const { price } = useOrder()
+    const { price, orderItems } = useOrder()
     const [paymentMethod, setPaymentMethod] = useState("card")
-
-    const iframeAddress = "https://sdkframe.infn.dev"
-    const paymentIframeSrc = `${iframeAddress}/#/new`
-
-    const documentRef = useRef(window)
-    const iframeRef = useRef<HTMLIFrameElement>(null)
-
-    const sendPaymentDataToIframe = () => {
-        const paymentData = {
-            bankHashes: "",
-            description: "test",
-            amount: 20,
-            currency: "BGN",
-            publichash: "f75fa38d-ca1b-4241-a01a-58965d444aba",
-            toiban: "BG85IORT80947826532954",
-            lang: "BG",
-            redirectUrl: "/",
-        }
-        const iframeInitObj = {
-            payload: paymentData,
-            contentDescription: "payment-init-data",
-        }
-
-        if (iframeRef.current && iframeRef.current.contentWindow) {
-            console.log("LOG")
-            iframeRef?.current?.contentWindow.postMessage(iframeInitObj, iframeAddress)
-        }
-    }
-
-    const handleMessage = (e) => {
-        if (e?.origin !== iframeAddress) {
-            console.log("unexpected message")
-            return
-        }
-    }
-
-    const afterPaymentFinished = (payload) => {
-        documentRef.current.location.href = payload.redirectUrl
-    }
-
-    useEffect(() => {
-        if (!documentRef.current) return
-        documentRef.current.addEventListener("message", (e) => {
-            handleMessage(e)
-            const passedObj = e?.data
-            if (!passedObj || !passedObj.messageType) {
-                return
-            }
-
-            switch (passedObj.messageType) {
-                case "on_init_completed": {
-                    console.log("on_init_completed detected")
-                    sendPaymentDataToIframe()
-                    break
-                }
-                case "on_payment_finished": {
-                    console.log("on_payment_finished detected")
-                    afterPaymentFinished(passedObj.payload)
-                    break
-                }
-                default:
-                    console.log("message not recognised")
-            }
-        })
-    }, [])
+    const isDisabled = orderItems.length <= 0 || price <= 0
+    const { mutateAsync: sendPayment } = useSendPayment()
 
     return (
         <Container>
@@ -182,8 +120,11 @@ export default function PaymentPage() {
                     ></iframe>
                 </div>*/}
                 <Button
-                    onClick={() => {
+                    disabled={isDisabled}
+                    onClick={async () => {
                         if (paymentMethod === "card") {
+                            const returnUrl = await sendPayment(orderItems)
+                            window.location.replace(returnUrl)
                             setIsSuccessfull(true)
                         }
                         if (paymentMethod !== "card") {
