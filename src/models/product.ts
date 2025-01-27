@@ -28,3 +28,16 @@ export interface OrderProductProps {
     description: string
     price: number
 }
+
+export interface PaymentProductProps {
+    name: string
+    quantity: number
+    tempQuantity?: number
+    classNames?: string
+    children: React.ReactNode
+    description: string
+    price: number
+    splitBill: boolean
+    checked: boolean
+    onCheckboxToggle: () => void
+}

@@ -1,14 +1,13 @@
 "use client"
 
 import CardContainer from "@/components/Product/CardContainer"
-import OrderProduct from "@/components/Product/OrderProduct"
+import PaymentProduct from "@/components/Product/PaymentProduct"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Toggle } from "@/components/ui/toggle"
 import { useOrder } from "@/hooks/useOrder"
-import { calculateTotalPrice } from "@/lib/utils"
 import Link from "next/link"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 
@@ -17,40 +16,43 @@ const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 export default function Cart() {
     const { orderItems, setPrice, price } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
-    const [tempQuantity, setTempQuantity] = useState<{ [key: string]: number }>({})
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
+    const [splitBill, setSplitBill] = useState(false)
+    const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({})
 
     useEffect(() => {
-        setPrice(
-            !inputTip
-                ? tip * Number(calculateTotalPrice(orderItems, true)) + Number(calculateTotalPrice(orderItems, true))
-                : tip + Number(calculateTotalPrice(orderItems, true))
-        )
-    }, [tip, inputTip, orderItems])
+        const selectedTotal = orderItems.filter((item) => selectedItems[item.id]).reduce((sum, item) => sum + item.price * item.quantity, 0)
 
-    const cartIncrement = (id: string | number, quantity: number) => {
-        setTempQuantity((prev) => {
-            if (prev[id] < quantity) prev[id] += 1
-            return { ...prev }
-        })
-    }
+        const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
-    const cartDecrement = (id: string | number) => {
-        setTempQuantity((prev) => {
-            if (prev[id] > 1) prev[id] -= 1
-
-            return { ...prev }
-        })
-    }
+        setPrice(finalPrice)
+    }, [tip, inputTip, orderItems, selectedItems])
 
     useEffect(() => {
-        const mappedQuantityById: { [key: string]: number } = {}
+        const initialCheckboxState: { [key: string]: boolean } = {}
         orderItems.forEach((item) => {
-            mappedQuantityById[item.id] = item.quantity
+            initialCheckboxState[item.id] = true
         })
-        setTempQuantity(mappedQuantityById)
-    }, [])
+        setSelectedItems(initialCheckboxState)
+    }, [orderItems])
+
+    const toggleCheckbox = (id: string | number) => {
+        setSelectedItems((prevState) => {
+            const updatedState = {
+                ...prevState,
+                [id]: !prevState[id],
+            }
+            updatePrice(updatedState)
+            return updatedState
+        })
+    }
+
+    const updatePrice = (checkboxState: { [key: string]: boolean }) => {
+        const selectedTotal = orderItems.filter((item) => checkboxState[item.id]).reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+        setPrice(!inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal)
+    }
 
     return (
         <Container title={""}>
@@ -61,10 +63,14 @@ export default function Cart() {
                         classNames='mb-6 mx-auto bg-lightBg'
                         isWine={false}
                         key={`${item.id}-container`}
+                        isBlocked={true}
                     >
-                        <OrderProduct
+                        <PaymentProduct
                             children={undefined}
+                            splitBill={splitBill}
                             {...item}
+                            checked={selectedItems[item.id]}
+                            onCheckboxToggle={() => toggleCheckbox(item.id)}
                         />
                     </CardContainer>
                 ))}
@@ -118,25 +124,16 @@ export default function Cart() {
                 </label>
             </div>
             <div className='flex w-full gap-4 p-4'>
-                <Link
-                    className='flex w-full items-center justify-center'
-                    href={{
-                        pathname: "/payment",
-                        query: {
-                            totalAmount: price,
-                        },
-                    }}
+                <Button
+                    disabled={!orderItems || orderItems.length < 1}
+                    className='w-full gap-2 bg-lightBg py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
+                    type='button'
+                    id='add'
+                    variant='select'
+                    onClick={() => setSplitBill((prev) => !prev)}
                 >
-                    <Button
-                        disabled={!orderItems || orderItems.length < 1}
-                        className='w-full gap-2 bg-lightBg py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
-                        type='button'
-                        id='add'
-                        variant='select'
-                    >
-                        Радели и плати
-                    </Button>
-                </Link>
+                    {splitBill ? "Назад" : "Раздели и плати"}{" "}
+                </Button>
                 <Link
                     className='flex w-full items-center justify-center'
                     href={{
@@ -153,7 +150,7 @@ export default function Cart() {
                         id='add'
                         variant='select'
                     >
-                        Плати {price} лв
+                        Плати {price.toFixed(2)} лв
                     </Button>
                 </Link>
             </div>
