@@ -1,5 +1,6 @@
 "use client"
 
+import { API_BASE_URL } from "@/api/config"
 import CartProduct from "@/components/Product/CartProduct"
 import SelectedProduct from "@/components/Product/SelectedProduct"
 import Container from "@/components/common/container"
@@ -12,6 +13,7 @@ import { useOrder } from "@/hooks/useOrder"
 import { calculateTotalPrice } from "@/lib/utils"
 import Link from "next/link"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
+import useWebSocket from "react-use-websocket"
 
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
@@ -21,6 +23,20 @@ export default function Cart() {
     const [tempQuantity, setTempQuantity] = useState<{ [key: string]: number }>({})
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
+
+    const socketUrl = `${API_BASE_URL}/payment/status/ID`
+
+    const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket } = useWebSocket(socketUrl, {
+        onOpen: () => console.log("opened"),
+        //Will attempt to reconnect on all close events, such as server shutting down
+        shouldReconnect: (closeEvent) => true,
+    })
+
+    useEffect(() => {
+        if (lastMessage !== null) {
+            console.log(`Last Message: ${lastJsonMessage}`)
+        }
+    }, [lastMessage])
 
     useEffect(() => {
         setPrice(

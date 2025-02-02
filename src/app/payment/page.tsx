@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useOrder } from "@/hooks/useOrder"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import DialogPopUp from "@/components/common/DialogPopUp"
 import IconFailed from "../../../public/svg/icons/IconFailed"
@@ -14,7 +14,8 @@ import IconSuccess from "../../../public/svg/icons/IconSuccess"
 
 import mastercardLogo from "@/../public/svg/logos/mastercard.svg"
 import visaLogo from "@/../public/svg/logos/visa.svg"
-import { useSendPayment } from "@/hooks/send-payment-data"
+import { useInitPayment } from "@/hooks/send-payment-data"
+import useWebSocket from "react-use-websocket"
 
 export default function PaymentPage() {
     const [isSuccessful, setIsSuccessfull] = useState<boolean>(false)
@@ -22,7 +23,19 @@ export default function PaymentPage() {
     const { price, orderItems } = useOrder()
     const [paymentMethod, setPaymentMethod] = useState("card")
     const isDisabled = orderItems.length <= 0 || price <= 0
-    const { mutateAsync: sendPayment } = useSendPayment()
+    const { mutateAsync: initPayment } = useInitPayment()
+
+    const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket } = useWebSocket(socketUrl, {
+        onOpen: () => console.log("opened"),
+        //Will attempt to reconnect on all close events, such as server shutting down
+        shouldReconnect: (closeEvent) => true,
+    })
+
+    useEffect(() => {
+        if (lastMessage !== null) {
+            console.log(`Last Message: ${lastJsonMessage}`)
+        }
+    }, [lastMessage])
 
     return (
         <Container>
@@ -123,9 +136,12 @@ export default function PaymentPage() {
                     disabled={isDisabled}
                     onClick={async () => {
                         if (paymentMethod === "card") {
-                            const returnUrl = await sendPayment(orderItems)
-                            window.location.replace(returnUrl)
-                            setIsSuccessfull(true)
+                            const paymentRes = await initPayment({ restaurantId: "id", tableId: "id", data: orderItems })
+
+                            if (paymentRes) {
+                                // window.location.replace(returnUrl)
+                                setIsSuccessfull(true)
+                            }
                         }
                         if (paymentMethod !== "card") {
                             setIsUnsuccessful(true)
