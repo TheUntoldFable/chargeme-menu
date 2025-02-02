@@ -40,10 +40,10 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                     menuItems.map((item) => (
                         <CardContainer
                             key={item.id}
-                            ref={productId === item.id ? productRef : null}
                             isWine={false}
                             classNames='mb-6 mx-auto bg-lightBg'
                             productId={item.id}
+                            isBlocked={false}
                         >
                             <AddProduct
                                 isWine={false}

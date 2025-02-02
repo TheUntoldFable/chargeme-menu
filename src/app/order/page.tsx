@@ -31,6 +31,7 @@ export default function OrderPage() {
                         classNames='mb-6 mx-auto bg-lightBg'
                         isWine={false}
                         key={`${item.id}-container`}
+                        isBlocked={false}
                     >
                         <OrderProduct
                             children={undefined}
