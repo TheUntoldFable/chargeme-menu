@@ -22,14 +22,15 @@ export interface OrderProductProps {
     quantity: number
     tempQuantity?: number
     classNames?: string
-    decrement?: (id: string | number, quantity: number) => void
-    increment?: (id: string | number, quantity: number) => void
+    decrement: (id: string | number, quantity: number, source: "cart" | "order") => void
+    increment: (id: string | number, quantity: number, source: "cart" | "order") => void
     children: React.ReactNode
     description: string
     price: number
 }
 
 export interface PaymentProductProps {
+    id: string | number
     name: string
     quantity: number
     tempQuantity?: number
@@ -39,5 +40,7 @@ export interface PaymentProductProps {
     price: number
     splitBill: boolean
     checked: boolean
+    decrement: (id: string | number, quantity: number, source: "cart" | "order") => void
+    increment: (id: string | number, quantity: number, source: "cart" | "order") => void
     onCheckboxToggle: () => void
 }

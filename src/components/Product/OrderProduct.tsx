@@ -1,10 +1,10 @@
 "use client"
 
+import QuantityControl from "@/components/common/QuantityControl"
 import { OrderProductProps } from "@/models/product"
 import { cartState } from "@/store/cart"
 import React from "react"
 import { useRecoilState } from "recoil"
-import IconMinus from "../../../public/svg/icons/IconMinus"
 import IconPlus from "../../../public/svg/icons/IconPlus"
 import { toast } from "../ui/use-toast"
 
@@ -20,13 +20,6 @@ const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, in
             title: "Премахване от количка",
             description: `Продуктът ${name} е успешно премахнат от вашата количка!`,
         })
-    }
-
-    const actionsDisabled = increment && decrement
-
-    const preventDefaultBehavior = (event: React.MouseEvent<HTMLDivElement>, cb: (id: string | number, quantity: number) => void) => {
-        event.preventDefault()
-        cb(id, quantity)
     }
 
     return (
@@ -45,23 +38,14 @@ const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, in
                         <p className='font-bold'>{price}лв </p>
                         <p className='text-lightGray'>x{quantity}</p>
                     </div>
-                    <div className='flex w-1/3 items-center justify-between text-white'>
-                        <div
-                            className={`flex h-6 w-6 items-center justify-center rounded-full border ${
-                                decrement ? "cursor-pointer border-yellowNew bg-transparent" : "border-lightGray"
-                            }`}
-                            onClick={(event) => decrement && preventDefaultBehavior(event, decrement)}
-                        >
-                            <IconMinus />
-                        </div>
-                        <span className={`${!actionsDisabled ? "text-lightGray" : ""}`}> {tempQuantity ? tempQuantity : quantity}</span>
-                        <div
-                            className={`rounded-full p-1 ${increment ? "cursor-pointer bg-yellow" : "cursor-not-allowed bg-lightGray"}`}
-                            onClick={(event) => increment && preventDefaultBehavior(event, increment)}
-                        >
-                            <IconPlus color='black' />
-                        </div>
-                    </div>
+                    <QuantityControl
+                        tempQuantity={tempQuantity}
+                        quantity={quantity}
+                        increment={increment}
+                        decrement={decrement}
+                        id={id}
+                        source='cart'
+                    />
                 </div>
             </div>
         </div>

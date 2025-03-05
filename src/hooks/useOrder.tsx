@@ -54,28 +54,38 @@ export function useOrder() {
         router.push("./cart")
     }
 
-    const increment = (id: string | number, quantity: number): void => {
-        const itemIndex = cartItems.findIndex((i) => i.id === id)
-        const updatedItems = [...cartItems]
+    const increment = (id: string | number, quantity: number, source: "cart" | "order") => {
+        const items = source === "cart" ? cartItems : orderItems
+        const setItems = source === "cart" ? setCartItems : setOrderItems
 
+        const itemIndex = items.findIndex((i) => i.id === id)
+        if (itemIndex === -1) return
+
+        const updatedItems = [...items]
         updatedItems[itemIndex] = {
             ...updatedItems[itemIndex],
             quantity: quantity + 1,
         }
 
-        setCartItems(updatedItems)
+        setItems(updatedItems)
     }
 
-    const decrement = (id: string | number, quantity: number): void => {
-        const itemIndex = cartItems.findIndex((i) => i.id === id)
-        const updatedItems = [...cartItems]
-        const quantityUpdated = quantity - 1
+    const decrement = (id: string | number, quantity: number, source: "cart" | "order") => {
+        if (quantity <= 1) return
 
+        const items = source === "cart" ? cartItems : orderItems
+        const setItems = source === "cart" ? setCartItems : setOrderItems
+
+        const itemIndex = items.findIndex((i) => i.id === id)
+        if (itemIndex === -1) return
+
+        const updatedItems = [...items]
         updatedItems[itemIndex] = {
             ...updatedItems[itemIndex],
-            quantity: quantityUpdated,
+            quantity: quantity - 1,
         }
-        setCartItems(quantityUpdated > 0 ? updatedItems : cartItems)
+
+        setItems(updatedItems)
     }
 
     return {

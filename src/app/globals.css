@@ -99,6 +99,11 @@
 }
 
 @layer utilities {
+    html,
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
     .c-button-reset {
         cursor: pointer;
         padding: 0;

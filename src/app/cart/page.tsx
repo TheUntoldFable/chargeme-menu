@@ -14,7 +14,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react"
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
 export default function Cart() {
-    const { orderItems, setPrice, price } = useOrder()
+    const { orderItems, setPrice, price, increment, decrement } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
@@ -68,6 +68,8 @@ export default function Cart() {
                         <PaymentProduct
                             children={undefined}
                             splitBill={splitBill}
+                            increment={increment}
+                            decrement={decrement}
                             {...item}
                             checked={selectedItems[item.id]}
                             onCheckboxToggle={() => toggleCheckbox(item.id)}
