@@ -1,7 +1,7 @@
 "use client"
 
+import CardContainer from "@/components/Product/CardContainer"
 import OrderProduct from "@/components/Product/OrderProduct"
-import SelectedProduct from "@/components/Product/SelectedProduct"
 import Container from "@/components/common/container"
 import {
     AlertDialog,
@@ -20,21 +20,26 @@ import TotalPrice from "@/components/ui/total-price"
 import { useOrder } from "@/hooks/useOrder"
 
 export default function OrderPage() {
-    const { createOrder, cartItems, handleRemoveFromCart, increment, decrement } = useOrder()
+    const { createOrder, cartItems, increment, decrement } = useOrder()
 
     return (
-        <Container>
-            <ScrollArea className='h-screen min-w-full'>
+        <Container title='Избрано'>
+            <ScrollArea className='h-screen min-w-full px-4 pt-4'>
                 {cartItems.map((item) => (
-                    <SelectedProduct
-                        key={item.id}
-                        classNames='mt-8 mb-2 mx-auto'
-                        increment={increment}
-                        decrement={decrement}
-                        {...item}
+                    <CardContainer
+                        productId={item.id.toString()}
+                        classNames='mb-6 mx-auto bg-lightBg'
+                        isWine={false}
+                        key={`${item.id}-container`}
+                        isBlocked={false}
                     >
-                        <OrderProduct {...item} />
-                    </SelectedProduct>
+                        <OrderProduct
+                            children={undefined}
+                            {...item}
+                            increment={increment}
+                            decrement={decrement}
+                        />
+                    </CardContainer>
                 ))}
             </ScrollArea>
             <TotalPrice
@@ -48,14 +53,7 @@ export default function OrderPage() {
                 >
                     <Button
                         disabled={!cartItems || cartItems.length < 1}
-                        className='
-                        w-[90%]
-            text-lg
-            gap-2
-            mb-4
-            active:scale-75
-            transition-transform
-            ease-in-out'
+                        className='mb-4 w-[60%] gap-2 text-lg transition-transform ease-in-out active:scale-75'
                         type='button'
                         id='add'
                         variant='select'
@@ -79,15 +77,6 @@ export default function OrderPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <Button
-                className='w-[90%] text-lg gap-2 mb-4'
-                type='button'
-                id='add'
-                variant='outline'
-                onClick={handleRemoveFromCart}
-            >
-                <p className='text-lighterGray'>Изчисти моят избор</p>
-            </Button>
         </Container>
     )
 }

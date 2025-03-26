@@ -4,9 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { cartState } from "@/store/cart"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useMemo } from "react"
+import { useEffect, useState } from "react"
 import { useRecoilValue } from "recoil"
-import IconFeedback from "../../../public/svg/icons/IconFeedback"
 import IconMenu from "../../../public/svg/icons/IconMenu"
 import IconSoup from "../../../public/svg/icons/IconSoup"
 import IconWallet from "../../../public/svg/icons/IconWallet"
@@ -17,8 +16,13 @@ interface BottomNavigationProps {
 
 export default function BottomNavigation({ classNames }: BottomNavigationProps) {
     const cartItems = useRecoilValue(cartState)
-    const cartItemsLength = useMemo(() => cartItems.length, [cartItems.length])
+    const [isHydrated, setIsHydrated] = useState(false)
+    const cartItemsLength = cartItems.length
     const currentPath = usePathname()
+
+    useEffect(() => {
+        setIsHydrated(true)
+    }, [])
 
     const getLinkClasses = (path: string) => {
         return currentPath === path ? "text-yellow" : "text-white"
@@ -28,36 +32,34 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
         return currentPath === path ? "#E9C500" : "#FFF"
     }
 
+    if (!isHydrated) {
+        return null
+    }
+
     return (
-        <div className={`flex mt-auto mb-0 min-w-full justify-between items-center h-20 bg-black px-2 py-4  ${classNames}`}>
+        <div className={`mb-0 mt-auto flex h-20 min-w-full items-center justify-between bg-black px-2 py-4 ${classNames} fixed bottom-0`}>
             <Link href='/'>
                 <div className='flex flex-col items-center'>
                     <IconMenu color={getIconColor("/")} />
-                    <p className={`text-sm bold ${getLinkClasses("/")}`}>Меню</p>
+                    <p className={`bold text-sm ${getLinkClasses("/")}`}>Меню</p>
                 </div>
             </Link>
             <Link href='/order'>
                 <div className='relative flex flex-col items-center'>
                     <Badge
                         variant='destructive'
-                        className='absolute -top-2 right-1 rounded-full w-5 h-5 p-1 flex justify-center items-center'
+                        className='absolute -top-2 right-1 flex h-5 w-5 items-center justify-center rounded-full p-1'
                     >
                         {cartItemsLength}
                     </Badge>
                     <IconSoup color={getIconColor("/order")} />
-                    <p className={`text-sm bold ${getLinkClasses("/order")}`}>Моят избор</p>
+                    <p className={`bold text-sm ${getLinkClasses("/order")}`}>Моят избор</p>
                 </div>
             </Link>
             <Link href='/cart'>
                 <div className='flex flex-col items-center'>
                     <IconWallet color={getIconColor("/cart")} />
-                    <p className={`text-sm bold ${getLinkClasses("/cart")}`}>Плащане</p>
-                </div>
-            </Link>
-            <Link href='/'>
-                <div className='flex flex-col items-center'>
-                    <IconFeedback color={getIconColor("/feedback")} />
-                    <p className={`text-sm bold ${getLinkClasses("/feedback")}`}>Оценете ни</p>
+                    <p className={`bold text-sm ${getLinkClasses("/cart")}`}>Плащане</p>
                 </div>
             </Link>
         </div>

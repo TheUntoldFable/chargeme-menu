@@ -1,17 +1,19 @@
-import * as React from 'react';
-import { SVGProps } from 'react';
-const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlSpace="preserve"
-    width={props.width ?? 14}
-    height={props.height ?? 15}
-    viewBox="0 0 485.064 485.064"
-    {...props}
-  >
-    <path
-      fill={props.color ?? '#FFFFFF'}
-      d="M458.736 181.097H26.334C11.793 181.097 0 192.884 0 207.425v70.215c0 14.541 11.787 26.328 26.334 26.328h432.402c14.541 0 26.328-11.787 26.328-26.328v-70.215c.006-14.541-11.781-26.328-26.328-26.328z"
-    />
-  </svg>
-);
-export default SvgComponent;
+import { SVGProps } from "react"
+
+const CustomSvg = (props: SVGProps<SVGSVGElement>) => (
+    <svg
+        width='12'
+        height='3'
+        viewBox='0 0 12 3'
+        fill='none'
+        xmlns='http://www.w3.org/2000/svg'
+        {...props}
+    >
+        <path
+            d='M5.25 2.5H0.999824C0.447636 2.5 0 2.05236 0 1.50018C0 0.947989 0.447637 0.500352 0.999824 0.500352H5.17689H6.77723L11 0.500067C11.5523 0.50003 12 0.947741 12 1.50003C12 2.0523 11.5523 2.5 11 2.5H6.77723H5.25Z'
+            fill='#D9D9D9'
+        />
+    </svg>
+)
+
+export default CustomSvg

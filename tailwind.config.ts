@@ -20,7 +20,7 @@ const config = {
             colors: {
                 red: "#DD2F2C",
                 black: "#111111",
-                yellow: "#E9C500",
+                yellow: "#F2C83D",
                 yellowSecondary: "#EDDB75",
                 defaultGray: "#ADADAD",
                 lightBg: "#24252a",
@@ -28,6 +28,9 @@ const config = {
                 lightGray: "#8D9099",
                 darkBg: "#18181a",
                 green: "#50C878",
+                gray: "#373a43",
+                seperator: "#353841",
+                yellowNew: "#F2C83D",
                 "wine-default": "#6A1439",
                 "wine-dark": "#420F24D9",
                 "wine-light": "#E53069",
@@ -91,7 +94,6 @@ const config = {
                 mobile: "440px",
             },
             backgroundImage: {
-                default: "url('/images/background.png')",
                 "wine-gradient": "linear-gradient(90deg, rgba(255,159,189,1) 0%, rgba(218,106,146,1) 100%, rgba(255,159,189,0.5) 100%)",
             },
         },
