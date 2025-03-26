@@ -34,7 +34,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
     return (
         <Container title={params.type}>
-            <ScrollArea className='h-screen min-w-full px-4'>
+            <ScrollArea className='h-screen min-w-full p-4'>
                 {!isLoadingMenuItems &&
                     menuItems?.length &&
                     menuItems.map((item) => (

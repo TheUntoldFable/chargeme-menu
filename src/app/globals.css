@@ -99,11 +99,6 @@
 }
 
 @layer utilities {
-    html,
-    body {
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-
     .c-button-reset {
         cursor: pointer;
         padding: 0;
@@ -114,8 +109,8 @@
         position: relative;
         min-width: 40px;
         min-height: 40px;
-        width: 2.5em;
-        height: 2.5em;
+        width: 2rem;
+        height: 2rem;
     }
 
     .c-plus-to-check::before,
@@ -215,6 +210,10 @@
 
         .truncate-text {
             width: calc(100vw - 13.25rem);
+        }
+
+        .calc-height {
+            height: calc(100vh - 160px) !important;
         }
     }
 }

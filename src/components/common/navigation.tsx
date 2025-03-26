@@ -37,7 +37,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
     }
 
     return (
-        <div className={`mb-0 mt-auto flex h-20 min-w-full items-center justify-between bg-black px-2 py-4 ${classNames}`}>
+        <div className={`mb-0 mt-auto flex h-20 min-w-full items-center justify-between bg-black px-2 py-4 ${classNames} fixed bottom-0`}>
             <Link href='/'>
                 <div className='flex flex-col items-center'>
                     <IconMenu color={getIconColor("/")} />
