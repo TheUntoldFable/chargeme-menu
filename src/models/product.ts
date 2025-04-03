@@ -18,12 +18,6 @@ export interface CartProductProps {
     quantity: number
 }
 
-export interface OrderProductProps {
-    title: string
-    weight: number
-    id: string | number
-}
-
 export interface ProductCardProps {
     id: string | number
     price: number

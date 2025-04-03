@@ -1,8 +1,8 @@
 export type HeaderNameStrings = keyof typeof HeaderName
 
 export enum HeaderName {
-    "/order" = "Моят избор",
-    "/cart" = "Плащане",
+    "/cart" = "Моят избор",
+    "/order" = "Плати",
     "/payment" = "Плащане",
     "/" = "Меню",
 }

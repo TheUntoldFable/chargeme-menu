@@ -9,9 +9,12 @@ const { persistAtom } = recoilPersist({
     storage: localStorage, // configure which storage will be used to store the data
 })
 
-export const orderState = atom<Product[] | []>({
+export const orderState = atom<{ orderId: string | null; orderItems: Product[] | [] }>({
     key: "Order",
-    default: [],
+    default: {
+        orderId: null,
+        orderItems: [],
+    },
     // eslint-disable-next-line camelcase
     effects_UNSTABLE: [persistAtom],
 })

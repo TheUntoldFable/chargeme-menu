@@ -4,22 +4,20 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { CartProductProps } from "@/models/product"
 import { orderState } from "@/store/order"
 import Image from "next/image"
+import { useCallback } from "react"
 import { useRecoilState } from "recoil"
 
 const CartProduct = ({ title, quantity, weight, id, isSelected }: CartProductProps) => {
-    const [orderItems, setOrderItems] = useRecoilState(orderState)
+    const [order, setOrder] = useRecoilState(orderState)
 
-    const onTap = () => {
-        const itemIndex = orderItems.findIndex((i) => i.id === id)
-        const updatedItems = [...orderItems]
+    const onTap = useCallback(() => {
+        const tappedItem = order.orderItems.find((item) => item.id === id)
+        if (!tappedItem) throw new Error("Item not found!")
 
-        updatedItems[itemIndex] = {
-            ...updatedItems[itemIndex],
-            isSelected: !isSelected,
-        }
+        const updatedItems = order.orderItems.map((item) => (item.id === id ? { ...item, isSelected: !isSelected } : item))
 
-        setOrderItems(updatedItems)
-    }
+        setOrder({ orderId: order.orderId, orderItems: updatedItems })
+    }, [id, isSelected])
 
     return (
         <>

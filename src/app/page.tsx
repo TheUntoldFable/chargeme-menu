@@ -1,30 +1,27 @@
 "use client"
 
 import CategoriesCard from "@/components/Category/CategoriesCard"
+import Center from "@/components/common/Center"
 import Container from "@/components/common/container"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCategories } from "@/hooks/get-categories"
-import { useJoinTable } from "@/hooks/send-payment-data"
 import { restaurantState } from "@/store/restaurant"
-import { useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 import { useRecoilState } from "recoil"
 
 export default function Home() {
-    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
-    const params = useSearchParams()
     const { data: categories, isLoading } = useCategories()
-    const { mutateAsync: joinTable, status } = useJoinTable()
+    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
 
     useEffect(() => {
-        const tableId = params.get("tableId")
+        if (restaurantInfo.restaurantId || restaurantInfo.tableId) return
 
-        if (tableId) {
-            joinTable(tableId)
-            setRestaurantInfo({ restaurantId: "test", tableId })
-        }
-    }, [params])
+        setRestaurantInfo({
+            restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
+            tableId: Math.random() * 100,
+        })
+    }, [])
 
     return (
         <main>
@@ -45,7 +42,9 @@ export default function Home() {
                                 )
                         )
                     ) : (
-                        <Loader />
+                        <Center>
+                            <Loader />
+                        </Center>
                     )}
                 </ScrollArea>
             </Container>

@@ -8,19 +8,20 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import RecoilContextProvider from "@/store/recoilProvider"
 import { HydrationOverlay } from "@builder.io/react-hydration-overlay"
-
 const inter = Inter({
     subsets: ["latin"],
     variable: "--font-sans",
 })
 
 const queryClient = new QueryClient()
+
 export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
     const env = process.env.NODE_ENV
+
     return (
         <html lang='en'>
             <head>

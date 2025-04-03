@@ -2,7 +2,7 @@ export const Loader = () => {
     return (
         <div
             role='status'
-            className='text-center'
+            className='my-auto mx-auto text-center'
         >
             <svg
                 aria-hidden='true'

@@ -14,18 +14,18 @@ import IconSuccess from "../../../public/svg/icons/IconSuccess"
 
 import mastercardLogo from "@/../public/svg/logos/mastercard.svg"
 import visaLogo from "@/../public/svg/logos/visa.svg"
-import { useInitPayment } from "@/hooks/send-payment-data"
 import useWebSocket from "react-use-websocket"
+
+const SOCKET_URL = "/topic/orders/"
 
 export default function PaymentPage() {
     const [isSuccessful, setIsSuccessfull] = useState<boolean>(false)
     const [isUnSuccessful, setIsUnsuccessful] = useState<boolean>(false)
-    const { price, orderItems } = useOrder()
+    const { price, order } = useOrder()
     const [paymentMethod, setPaymentMethod] = useState("card")
-    const isDisabled = orderItems.length <= 0 || price <= 0
-    const { mutateAsync: initPayment } = useInitPayment()
+    const isDisabled = order.orderItems.length <= 0 || price <= 0
 
-    const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket } = useWebSocket(socketUrl, {
+    const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket } = useWebSocket(SOCKET_URL, {
         onOpen: () => console.log("opened"),
         //Will attempt to reconnect on all close events, such as server shutting down
         shouldReconnect: (closeEvent) => true,
@@ -51,26 +51,11 @@ export default function PaymentPage() {
                 icon={<IconFailed />}
                 title='Неуспешно плащане!'
                 description='Възникна грешка по време на плащането, моля опитайте пак.'
-                buttonTitle='Оптиай пак'
+                buttonTitle='Опитай пак'
                 isOpen={isUnSuccessful}
                 onPress={() => setIsUnsuccessful(false)}
             />
             <div className='flex flex-1 gap-2 flex-col px-4 mt-2 h-screen w-full'>
-                {/*<Button variant='default'>*/}
-                {/*    <div className='flex items-center gap-1'>*/}
-                {/*        <Image*/}
-                {/*            width={20}*/}
-                {/*            src={appleLogo}*/}
-                {/*            alt='appleLogo'*/}
-                {/*        />*/}
-                {/*        <p>Pay</p>*/}
-                {/*    </div>*/}
-                {/*</Button>*/}
-                {/*<div className='flex flex-row justify-between gap-2 items-center'>*/}
-                {/*    <div className='bg-lightGray h-[1px] w-full' />*/}
-                {/*    <p className='text-lightGray'>или</p>*/}
-                {/*    <div className='bg-lightGray h-[1px] w-full' />*/}
-                {/*</div>*/}
                 <h3>Изберете начин на плащане:</h3>
                 <RadioGroup
                     className='text-lightGray'
@@ -134,19 +119,7 @@ export default function PaymentPage() {
                 </div>*/}
                 <Button
                     disabled={isDisabled}
-                    onClick={async () => {
-                        if (paymentMethod === "card") {
-                            const paymentRes = await initPayment({ restaurantId: "id", tableId: "id", data: orderItems })
-
-                            if (paymentRes) {
-                                // window.location.replace(returnUrl)
-                                setIsSuccessfull(true)
-                            }
-                        }
-                        if (paymentMethod !== "card") {
-                            setIsUnsuccessful(true)
-                        }
-                    }}
+                    onClick={async () => {}}
                     className='mt-auto mb-0'
                     variant='select'
                 >

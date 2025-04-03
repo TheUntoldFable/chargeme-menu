@@ -36,7 +36,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
                     <p className={`text-sm bold ${getLinkClasses("/")}`}>Меню</p>
                 </div>
             </Link>
-            <Link href='/order'>
+            <Link href='/cart'>
                 <div className='relative flex flex-col items-center'>
                     <Badge
                         variant='destructive'
@@ -44,14 +44,14 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
                     >
                         {cartItemsLength}
                     </Badge>
-                    <IconSoup color={getIconColor("/order")} />
-                    <p className={`text-sm bold ${getLinkClasses("/order")}`}>Моят избор</p>
+                    <IconSoup color={getIconColor("/cart")} />
+                    <p className={`text-sm bold ${getLinkClasses("/cart")}`}>Моят избор</p>
                 </div>
             </Link>
-            <Link href='/cart'>
+            <Link href='/order'>
                 <div className='flex flex-col items-center'>
-                    <IconWallet color={getIconColor("/cart")} />
-                    <p className={`text-sm bold ${getLinkClasses("/cart")}`}>Плащане</p>
+                    <IconWallet color={getIconColor("/order")} />
+                    <p className={`text-sm bold ${getLinkClasses("/order")}`}>Плащане</p>
                 </div>
             </Link>
             <Link href='/'>

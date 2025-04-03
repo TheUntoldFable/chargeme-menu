@@ -8,7 +8,7 @@ import { useRecoilState } from "recoil"
 export function useOrder() {
     const router = useRouter()
     const [cartItems, setCartItems] = useRecoilState<Product[] | []>(cartState)
-    const [orderItems, setOrderItems] = useRecoilState<Product[] | []>(orderState)
+    const [order, setOrder] = useRecoilState(orderState)
     const [price, setPrice] = useRecoilState<number>(orderPrice)
 
     const handleRemoveFromCart = (): void => {
@@ -20,8 +20,8 @@ export function useOrder() {
         })
     }
 
-    const createOrder = (): void => {
-        const orderItemMap = new Map(orderItems?.map((item) => [item.id, item.quantity]))
+    const updateOrder = (orderId: string): void => {
+        const orderItemMap = new Map(order.orderItems?.map((item) => [item.id, item.quantity]))
 
         const updatedCartItems = cartItems.map((cartItem) => {
             const orderQuantity = orderItemMap.get(cartItem.id) || 0
@@ -34,24 +34,25 @@ export function useOrder() {
 
         const newOrderItems = Array.from(orderItemMap.entries())
             .map(([id, quantity]) => {
-                const newItem = orderItems?.find((item) => item.id === id)
+                const newItem = order.orderItems?.find((item) => item.id === id)
 
-                if (!newItem || newItem.id === undefined) {
+                if (!newItem || !newItem.id) {
                     return null
                 }
 
                 return {
+                    orderId,
                     ...newItem,
                     quantity,
                 }
             })
             .filter((item) => item !== null)
 
-        const finalCartItems = [...updatedCartItems, ...newOrderItems]
+        const finalOrderItems = [...updatedCartItems, ...newOrderItems]
 
-        setOrderItems(finalCartItems as Product[])
+        setOrder({ orderId, orderItems: finalOrderItems as Product[] })
         setCartItems([])
-        router.push("./cart")
+        router.push("./order")
     }
 
     const increment = (id: string | number, quantity: number): void => {
@@ -77,6 +78,9 @@ export function useOrder() {
         }
         setCartItems(quantityUpdated > 0 ? updatedItems : cartItems)
     }
+    const clearOrder = () => {
+        setOrder({ orderId: "", orderItems: [] })
+    }
 
     return {
         price,
@@ -84,8 +88,9 @@ export function useOrder() {
         decrement,
         increment,
         cartItems,
-        orderItems,
-        createOrder,
+        order,
+        updateOrder,
         handleRemoveFromCart,
+        clearOrder,
     }
 }

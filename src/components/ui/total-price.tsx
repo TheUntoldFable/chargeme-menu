@@ -15,9 +15,7 @@ export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0
 
     const returnPrice = () => {
         if (inputTip) return String((tip + sum()).toFixed(2))
-
         if (tip) return String((tip * sum() + sum()).toFixed(2))
-
         return String(sum())
     }
 

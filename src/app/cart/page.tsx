@@ -1,164 +1,174 @@
 "use client"
 
 import { API_BASE_URL } from "@/api/config"
-import CartProduct from "@/components/Product/CartProduct"
+import OrderProduct from "@/components/Product/OrderProduct"
 import SelectedProduct from "@/components/Product/SelectedProduct"
+import Center from "@/components/common/Center"
 import Container from "@/components/common/container"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Toggle } from "@/components/ui/toggle"
 import TotalPrice from "@/components/ui/total-price"
+import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
+import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPrice } from "@/lib/utils"
-import Link from "next/link"
-import { ChangeEvent, useEffect, useRef, useState } from "react"
-import useWebSocket from "react-use-websocket"
+import { Product } from "@/models/product"
+import { restaurantState } from "@/store/restaurant"
+import { useCallback } from "react"
+import { useRecoilState } from "recoil"
 
-const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
+export default function OrderPage() {
+    const { updateOrder, cartItems, order, handleRemoveFromCart, increment, decrement } = useOrder()
+    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
+    const { restaurantId, tableId } = restaurantInfo
 
-export default function Cart() {
-    const { orderItems, setPrice, price } = useOrder()
-    const inputRef = useRef<HTMLInputElement>(null)
-    const [tempQuantity, setTempQuantity] = useState<{ [key: string]: number }>({})
-    const [tip, setTip] = useState(0)
-    const [inputTip, setInputTip] = useState<boolean>(false)
+    const { data: tableOrder, isLoading, refetch } = useGetAllOrders(restaurantInfo)
 
-    const socketUrl = `${API_BASE_URL}/payment/status/ID`
+    console.log(tableOrder, "tableOrder")
 
-    const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket } = useWebSocket(socketUrl, {
-        onOpen: () => console.log("opened"),
-        //Will attempt to reconnect on all close events, such as server shutting down
-        shouldReconnect: (closeEvent) => true,
+    const socket = useSockJS({
+        url: `${API_BASE_URL}/ws`,
+        topic: tableOrder ? `/topic/orders/${tableOrder.id}` : `/topic/orders/${restaurantId}/${Math.round(tableId)}`,
+        onMessage: (e) => {
+            console.log(e, "e")
+            if (!e.id) return
+            updateOrder(e.id)
+        },
     })
 
-    useEffect(() => {
-        if (lastMessage !== null) {
-            console.log(`Last Message: ${lastJsonMessage}`)
+    //OnCreate subscribe to topic/orders/{restaurantid}/{tableid}
+
+    const handleAccept = useCallback(() => {
+        if (!cartItems.length || cartItems.length < 1) throw new Error("No order items in cart!")
+
+        if (socket.isConnected) {
+            if (tableOrder) {
+                //UPDATE ORDER
+                const rItems = cartItems.map((p: Product) => ({
+                    menuItemId: p.id,
+                    quantity: p.quantity,
+                    note: "string",
+                }))
+
+                const rItemsPrice = calculateTotalPrice(cartItems, false)
+
+                socket.sendMessage("/app/updateOrder", {
+                    orderItems: rItems,
+                    tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
+                    numberOfGuests: 1, // should be calculated by BE when connecting with the table.
+                    totalPrice: rItemsPrice,
+                    restaurantId: restaurantInfo.restaurantId,
+                    orderId: tableOrder.id,
+                })
+
+                updateOrder(tableOrder.id)
+            } else {
+                //CREATE NEW ORDER
+                const rItems = cartItems.map((p: Product) => ({
+                    menuItemId: p.id,
+                    quantity: p.quantity,
+                    note: "string",
+                }))
+
+                const rItemsPrice = calculateTotalPrice(cartItems, false)
+
+                socket.sendMessage("/app/createOrder", {
+                    orderItems: rItems,
+                    tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
+                    numberOfGuests: 1, // should be calculated by BE when connecting with the table.
+                    totalPrice: rItemsPrice,
+                    restaurantId: restaurantInfo.restaurantId,
+                })
+            }
+        } else {
+            throw new Error("No connection to socket!")
         }
-    }, [lastMessage])
+    }, [socket.isConnected, cartItems, tableOrder, restaurantInfo])
 
-    useEffect(() => {
-        setPrice(
-            !inputTip
-                ? tip * Number(calculateTotalPrice(orderItems, true)) + Number(calculateTotalPrice(orderItems, true))
-                : tip + Number(calculateTotalPrice(orderItems, true))
+    if (isLoading)
+        return (
+            <Container>
+                <Center>
+                    <Loader />
+                </Center>
+            </Container>
         )
-    }, [tip, inputTip, orderItems])
-
-    const cartIncrement = (id: string | number, quantity: number) => {
-        setTempQuantity((prev) => {
-            if (prev[id] < quantity) prev[id] += 1
-            return { ...prev }
-        })
-    }
-
-    const cartDecrement = (id: string | number) => {
-        setTempQuantity((prev) => {
-            if (prev[id] > 1) prev[id] -= 1
-
-            return { ...prev }
-        })
-    }
-
-    useEffect(() => {
-        const mappedQuantityById: { [key: string]: number } = {}
-        orderItems.forEach((item) => {
-            mappedQuantityById[item.id] = item.quantity
-        })
-        setTempQuantity(mappedQuantityById)
-    }, [])
 
     return (
         <Container>
             <ScrollArea className='h-screen min-w-full'>
-                {orderItems.map((item, index) => (
+                {cartItems.map((item) => (
                     <SelectedProduct
-                        key={`${item.id}-${index}`}
+                        key={item.id}
                         classNames='mt-8 mb-2 mx-auto'
-                        increment={cartIncrement}
-                        decrement={cartDecrement}
+                        increment={increment}
+                        decrement={decrement}
                         {...item}
-                        tempQuantity={tempQuantity[item.id]}
                     >
-                        <CartProduct {...item} />
+                        <OrderProduct {...item} />
                     </SelectedProduct>
                 ))}
             </ScrollArea>
             <TotalPrice
-                items={orderItems}
-                withSelection={true}
-                tempQuantity={tempQuantity}
-                tip={tip}
-                inputTip={inputTip}
+                items={cartItems}
+                withSelection={false}
             />
-            <div className='flex flex-col mb-2 gap-2'>
-                <h2 className='text-white'>Добавете бакшиш?</h2>
-                <div className='flex flex-1 gap-1 justify-between'>
-                    {TOGGLE_OPTIONS.map((option, index) => (
-                        <div
-                            className='flex'
-                            key={option}
+            <AlertDialog>
+                <AlertDialogTrigger className='w-[90%]'>
+                    <Button
+                        disabled={!cartItems || cartItems.length < 1}
+                        className='
+                          text-lg
+                          w-[100%]
+            gap-2
+            mb-4
+            active:scale-75
+            transition-transform
+            ease-in-out'
+                        type='button'
+                        id='add'
+                        variant='select'
+                    >
+                        {tableOrder ? "Добави към поръчка" : "Поръчай"}
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className='max-w-[90%]'>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className='text-black'>Сигурни ли сте, че искате да продължите?</AlertDialogTitle>
+                        <AlertDialogDescription>Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className='flex gap-3'>
+                        <AlertDialogAction
+                            onClick={handleAccept}
+                            className='flex flex-1'
                         >
-                            <Toggle
-                                pressed={tip === option && tip !== undefined}
-                                onClick={() => {
-                                    setInputTip(false)
-                                    setTip(option)
-
-                                    if (inputRef.current && inputRef.current?.value) {
-                                        inputRef.current.value = ""
-                                    }
-                                }}
-                                className={`border-[2px] bg-white data-[state=on]:bg-yellow data-[state=on]:text-white border-yellow`}
-                            >
-                                {option * 100 + "%"}
-                            </Toggle>
-                        </div>
-                    ))}
-                </div>
-                <Input
-                    ref={inputRef}
-                    type='number'
-                    placeholder='Въведете сума'
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        setInputTip(true)
-
-                        if (e?.target?.value) {
-                            setTip(Number(e.target.value))
-                        }
-
-                        if (e.target.value === "") {
-                            setTip(0)
-                        }
-                    }}
-                />
-            </div>
-            <Link
-                className='w-full flex items-center justify-center'
-                href={{
-                    pathname: "/payment",
-                    query: {
-                        totalAmount: price,
-                    },
-                }}
+                            Потвърди
+                        </AlertDialogAction>
+                        <AlertDialogCancel className='flex flex-1'>Размислих</AlertDialogCancel>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <Button
+                className='w-[90%] text-lg gap-2 mb-4'
+                type='button'
+                id='add'
+                variant='outline'
+                onClick={handleRemoveFromCart}
             >
-                <Button
-                    disabled={!orderItems || orderItems.length < 1}
-                    className='w-[90%]
-           text-lg
-           gap-2
-           mb-4
-           active:scale-75
-           transition-transform
-           ease-in-out'
-                    type='button'
-                    id='add'
-                    variant='select'
-                >
-                    Плати
-                </Button>
-            </Link>
+                <p className='text-lighterGray'>Изчисти моят избор</p>
+            </Button>
         </Container>
     )
 }
