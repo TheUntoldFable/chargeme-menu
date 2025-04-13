@@ -1,8 +1,8 @@
 "use client"
 
 import { API_BASE_URL } from "@/api/config"
+import CardContainer from "@/components/Product/CardContainer"
 import OrderProduct from "@/components/Product/OrderProduct"
-import SelectedProduct from "@/components/Product/SelectedProduct"
 import Center from "@/components/common/Center"
 import Container from "@/components/common/container"
 import {
@@ -30,19 +30,17 @@ import { useCallback } from "react"
 import { useRecoilState } from "recoil"
 
 export default function OrderPage() {
-    const { updateOrder, cartItems, order, handleRemoveFromCart, increment, decrement } = useOrder()
+    const { updateOrder, cartItems, increment, decrement } = useOrder()
     const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
+    console.log(restaurantInfo)
     const { restaurantId, tableId } = restaurantInfo
 
     const { data: tableOrder, isLoading, refetch } = useGetAllOrders(restaurantInfo)
-
-    console.log(tableOrder, "tableOrder")
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
         topic: tableOrder ? `/topic/orders/${tableOrder.id}` : `/topic/orders/${restaurantId}/${Math.round(tableId)}`,
         onMessage: (e) => {
-            console.log(e, "e")
             if (!e.id) return
             updateOrder(e.id)
         },
@@ -99,7 +97,7 @@ export default function OrderPage() {
 
     if (isLoading)
         return (
-            <Container>
+            <Container title=''>
                 <Center>
                     <Loader />
                 </Center>
@@ -107,18 +105,23 @@ export default function OrderPage() {
         )
 
     return (
-        <Container>
-            <ScrollArea className='h-screen min-w-full'>
+        <Container title='Избрано'>
+            <ScrollArea className='h-screen min-w-full px-4 pt-4'>
                 {cartItems.map((item) => (
-                    <SelectedProduct
-                        key={item.id}
-                        classNames='mt-8 mb-2 mx-auto'
-                        increment={increment}
-                        decrement={decrement}
-                        {...item}
+                    <CardContainer
+                        productId={item.id.toString()}
+                        classNames='mb-6 mx-auto bg-lightBg'
+                        isWine={false}
+                        key={`${item.id}-container`}
+                        isBlocked={false}
                     >
-                        <OrderProduct {...item} />
-                    </SelectedProduct>
+                        <OrderProduct
+                            children={undefined}
+                            {...item}
+                            increment={increment}
+                            decrement={decrement}
+                        />
+                    </CardContainer>
                 ))}
             </ScrollArea>
             <TotalPrice
@@ -126,17 +129,13 @@ export default function OrderPage() {
                 withSelection={false}
             />
             <AlertDialog>
-                <AlertDialogTrigger className='w-[90%]'>
+                <AlertDialogTrigger
+                    disabled={!cartItems || cartItems.length < 1}
+                    className='w-full'
+                >
                     <Button
                         disabled={!cartItems || cartItems.length < 1}
-                        className='
-                          text-lg
-                          w-[100%]
-            gap-2
-            mb-4
-            active:scale-75
-            transition-transform
-            ease-in-out'
+                        className='mb-4 w-[60%] gap-2 text-lg transition-transform ease-in-out active:scale-75'
                         type='button'
                         id='add'
                         variant='select'
@@ -149,26 +148,17 @@ export default function OrderPage() {
                         <AlertDialogTitle className='text-black'>Сигурни ли сте, че искате да продължите?</AlertDialogTitle>
                         <AlertDialogDescription>Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.</AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter className='flex gap-3'>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Размислих</AlertDialogCancel>
                         <AlertDialogAction
+                            className={`bg-alterGreen text-white hover:text-black`}
                             onClick={handleAccept}
-                            className='flex flex-1'
                         >
-                            Потвърди
+                            Продължи
                         </AlertDialogAction>
-                        <AlertDialogCancel className='flex flex-1'>Размислих</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <Button
-                className='w-[90%] text-lg gap-2 mb-4'
-                type='button'
-                id='add'
-                variant='outline'
-                onClick={handleRemoveFromCart}
-            >
-                <p className='text-lighterGray'>Изчисти моят избор</p>
-            </Button>
         </Container>
     )
 }

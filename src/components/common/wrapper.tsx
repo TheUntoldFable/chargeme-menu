@@ -9,18 +9,7 @@ export type WrapperProps = {
 const Wrapper = ({ children, className }: WrapperProps) => {
     return (
         <div
-            className={`
-    flex
-    flex-1
-    flex-col
-    items-center
-    h-screen
-    max-h-screen
-    max-w-mobile
-    bg-darkBg
-    bg-no-repeat
-    mx-auto
-    ${className}`}
+            className={`bg-default calc-height mx-auto flex h-screen max-h-screen max-w-mobile flex-1 flex-col items-center bg-cover bg-no-repeat ${className}`}
         >
             {children}
         </div>

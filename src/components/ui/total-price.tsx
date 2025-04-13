@@ -20,17 +20,8 @@ export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0
     }
 
     return (
-        <Card
-            className={`
-                bg-transparent
-                w-[85%]
-                border-defaultGray
-                border-[1px]
-                p-6
-                mb-8
-                bg-black bg-opacity-55`}
-        >
-            <CardContent className='flex text-white flex-row items-center p-2 w-full rounded-lg border-none bold justify-center h-11 whitespace-pre'>
+        <Card className={`mb-1 w-[85%] border-none bg-transparent`}>
+            <CardContent className='bold flex h-11 w-full flex-row items-center justify-center whitespace-pre rounded-lg border-none p-2 text-white'>
                 Обща сума:{" "}
                 <span className='text-yellow'>
                     {returnPrice()}

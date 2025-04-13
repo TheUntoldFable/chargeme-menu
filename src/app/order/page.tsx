@@ -1,8 +1,8 @@
 "use client"
 
 import { API_BASE_URL } from "@/api/config"
-import CartProduct from "@/components/Product/CartProduct"
-import SelectedProduct from "@/components/Product/SelectedProduct"
+import CardContainer from "@/components/Product/CardContainer"
+import PaymentProduct from "@/components/Product/PaymentProduct"
 import Center from "@/components/common/Center"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
@@ -10,24 +10,26 @@ import { Input } from "@/components/ui/input"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Toggle } from "@/components/ui/toggle"
-import TotalPrice from "@/components/ui/total-price"
 import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPrice } from "@/lib/utils"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { restaurantState } from "@/store/restaurant"
+import Link from "next/link"
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
 import { useRecoilState } from "recoil"
+
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
 export default function Cart() {
-    const { order, cartItems, setPrice, price, clearOrder } = useOrder()
+    const { order, cartItems, setPrice, price, increment, decrement, clearOrder } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
-    const [tempQuantity, setTempQuantity] = useState<{ [key: string]: number }>({})
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
-    const [wsMessages, setWSMessages] = useState()
+    const [splitBill, setSplitBill] = useState(false)
+    const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({})
+    const [tempQuantity, setTempQuantity] = useState<{ [key: string]: number }>({})
     const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
 
     const { data: tableOrder, isLoading, refetch } = useGetAllOrders(restaurantInfo)
@@ -69,44 +71,42 @@ export default function Cart() {
         } else console.log("No connection to socket!")
     }, [socket.isConnected, tableOrder, socket.isSubscribed])
 
-    // useEffect(() => {
-    //     if (!order.orderItems) return
+    useEffect(() => {
+        const selectedTotal = cartItems.filter((item) => selectedItems[item.id]).reduce((sum, item) => sum + item.price * item.quantity, 0)
 
-    //     setPrice(
-    //         !inputTip
-    //             ? tip * Number(calculateTotalPrice(order.orderItems, true)) + Number(calculateTotalPrice(order.orderItems, true))
-    //             : tip + Number(calculateTotalPrice(order.orderItems, true))
-    //     )
-    // }, [tip, inputTip, order.orderItems])
+        const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
-    const cartIncrement = (id: string | number, quantity: number) => {
-        setTempQuantity((prev) => {
-            if (prev[id] < quantity) prev[id] += 1
-            return { ...prev }
-        })
-    }
-
-    const cartDecrement = (id: string | number) => {
-        setTempQuantity((prev) => {
-            if (prev[id] > 1) prev[id] -= 1
-
-            return { ...prev }
-        })
-    }
+        setPrice(finalPrice)
+    }, [tip, inputTip, cartItems, selectedItems])
 
     useEffect(() => {
-        if (!order.orderItems) return
-
-        const mappedQuantityById: { [key: string]: number } = {}
-        order.orderItems.forEach((item) => {
-            mappedQuantityById[item.id] = item.quantity
+        const initialCheckboxState: { [key: string]: boolean } = {}
+        cartItems.forEach((item) => {
+            initialCheckboxState[item.id] = true
         })
-        setTempQuantity(mappedQuantityById)
-    }, [])
+        setSelectedItems(initialCheckboxState)
+    }, [cartItems])
 
-    if (!order.orderItems.length || isLoading)
+    const toggleCheckbox = (id: string | number) => {
+        setSelectedItems((prevState) => {
+            const updatedState = {
+                ...prevState,
+                [id]: !prevState[id],
+            }
+            updatePrice(updatedState)
+            return updatedState
+        })
+    }
+
+    const updatePrice = (checkboxState: { [key: string]: boolean }) => {
+        const selectedTotal = cartItems.filter((item) => checkboxState[item.id]).reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+        setPrice(!inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal)
+    }
+
+    if (!order.orderItems?.length || isLoading)
         return (
-            <Container>
+            <Container title=''>
                 <Center>
                     <Loader />
                 </Center>
@@ -114,34 +114,34 @@ export default function Cart() {
         )
 
     return (
-        <Container>
-            <ScrollArea className='h-screen min-w-full'>
-                {order.orderItems.map((item, index) => (
-                    <SelectedProduct
-                        key={`${item.id}-${index}`}
-                        classNames='mt-8 mb-2 mx-auto'
-                        increment={cartIncrement}
-                        decrement={cartDecrement}
-                        {...item}
-                        tempQuantity={tempQuantity[item.id]}
+        <Container title={""}>
+            <ScrollArea className='h-screen min-w-full p-4'>
+                {cartItems.map((item, index) => (
+                    <CardContainer
+                        productId={item.id.toString()}
+                        classNames='mb-6 mx-auto bg-lightBg'
+                        isWine={false}
+                        key={`${item.id}-container`}
+                        isBlocked={true}
                     >
-                        <CartProduct {...item} />
-                    </SelectedProduct>
+                        <PaymentProduct
+                            children={undefined}
+                            splitBill={splitBill}
+                            increment={increment}
+                            decrement={decrement}
+                            {...item}
+                            checked={selectedItems[item.id]}
+                            onCheckboxToggle={() => toggleCheckbox(item.id)}
+                        />
+                    </CardContainer>
                 ))}
             </ScrollArea>
-            <TotalPrice
-                items={order.orderItems}
-                withSelection={true}
-                tempQuantity={tempQuantity}
-                tip={tip}
-                inputTip={inputTip}
-            />
-            <div className='flex flex-col mb-2 gap-2'>
-                <h2 className='text-white'>Добавете бакшиш?</h2>
-                <div className='flex flex-1 gap-1 justify-between'>
+            <div className='mb-2 flex w-full flex-col gap-2 border-t border-lightBg p-4'>
+                <h2 className='text-base font-medium text-white'>Комплимент за сервитьора</h2>
+                <div className='flex flex-1 justify-between gap-1'>
                     {TOGGLE_OPTIONS.map((option, index) => (
                         <div
-                            className='flex'
+                            className='mb-4 flex w-full'
                             key={option}
                         >
                             <Toggle
@@ -154,56 +154,67 @@ export default function Cart() {
                                         inputRef.current.value = ""
                                     }
                                 }}
-                                className={`border-[2px] bg-white data-[state=on]:bg-yellow data-[state=on]:text-white border-yellow`}
+                                className={`h-12 w-16 bg-lightBg text-base text-white data-[state=on]:bg-yellow data-[state=on]:text-white`}
                             >
                                 {option * 100 + "%"}
                             </Toggle>
                         </div>
                     ))}
                 </div>
-                <Input
-                    ref={inputRef}
-                    type='number'
-                    placeholder='Въведете сума'
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        setInputTip(true)
+                <label className='relative'>
+                    <Input
+                        ref={inputRef}
+                        type='number'
+                        className='border-2 border-lightBg text-base text-white'
+                        placeholder='Въведете сума'
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            setInputTip(true)
 
-                        if (e?.target?.value) {
-                            setTip(Number(e.target.value))
-                        }
+                            if (e?.target?.value) {
+                                setTip(Number(e.target.value))
+                            }
 
-                        if (e.target.value === "") {
-                            setTip(0)
-                        }
-                    }}
-                />
+                            if (e.target.value === "") {
+                                setTip(0)
+                            }
+                        }}
+                    />
+                    <span className='absolute right-0 top-0 flex h-12 w-12 items-center justify-center rounded-r-2xl border-2 border-lightBg bg-lighterGray text-center text-white'>
+                        лв
+                    </span>
+                </label>
             </div>
-            {/* <Link
-                className='w-full flex items-center justify-center'
-                href={{
-                    pathname: "/payment",
-                    query: {
-                        totalAmount: price,
-                    },
-                }}
-            > */}
-            <Button
-                onClick={initPayment}
-                disabled={!order || order.orderItems.length < 1 || order.orderItems.every((item) => item.isSelected === false)}
-                className='w-[90%]
-           text-lg
-           gap-2
-           mb-4
-           active:scale-75
-           transition-transform
-           ease-in-out'
-                type='button'
-                id='add'
-                variant='select'
-            >
-                Плати
-            </Button>
-            {/* </Link> */}
+            <div className='flex w-full gap-4 p-4'>
+                <Button
+                    className='w-full gap-2 bg-lightBg py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
+                    type='button'
+                    id='add'
+                    variant='select'
+                    onClick={() => setSplitBill((prev) => !prev)}
+                >
+                    {splitBill ? "Назад" : "Раздели и плати"}{" "}
+                </Button>
+                <Link
+                    className='flex w-full items-center justify-center'
+                    href={{
+                        pathname: "/payment",
+                        query: {
+                            totalAmount: price,
+                        },
+                    }}
+                >
+                    <Button
+                        onClick={initPayment}
+                        disabled={!order || order.orderItems.length < 1 || order.orderItems.every((item) => item.isSelected === false)}
+                        className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
+                        type='button'
+                        id='add'
+                        variant='select'
+                    >
+                        Плати {price.toFixed(2)} лв
+                    </Button>
+                </Link>
+            </div>
         </Container>
     )
 }
