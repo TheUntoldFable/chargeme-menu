@@ -32,10 +32,9 @@ import { useRecoilState } from "recoil"
 export default function OrderPage() {
     const { updateOrder, cartItems, increment, decrement } = useOrder()
     const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
-    console.log(restaurantInfo)
     const { restaurantId, tableId } = restaurantInfo
 
-    const { data: tableOrder, isLoading, refetch } = useGetAllOrders(restaurantInfo)
+    const { data: tableOrder, isLoading } = useGetAllOrders(restaurantInfo)
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
@@ -81,7 +80,6 @@ export default function OrderPage() {
                 }))
 
                 const rItemsPrice = calculateTotalPrice(cartItems, false)
-
                 socket.sendMessage("/app/createOrder", {
                     orderItems: rItems,
                     tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
@@ -106,7 +104,7 @@ export default function OrderPage() {
 
     return (
         <Container title='Избрано'>
-            <ScrollArea className='h-screen min-w-full px-4 pt-4'>
+            <ScrollArea className='calc-height min-w-full px-4 pt-4'>
                 {cartItems.map((item) => (
                     <CardContainer
                         productId={item.id.toString()}

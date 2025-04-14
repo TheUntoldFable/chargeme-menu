@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useRecoilState } from "recoil"
 
 export const useAddToCart = () => {
-    const { toast } = useToast()
+    const { toast, dismiss } = useToast()
     const [cartItems, setCartItems] = useRecoilState(cartState)
     const [isAddBtnActive, setIsAddBtnActive] = useState(false)
 
@@ -21,7 +21,7 @@ export const useAddToCart = () => {
                 return [...prevCartItems, { ...item, isSelected: true, quantity: quantity }]
             }
         })
-        toast({
+        const { id: toastId } = toast({
             variant: "default",
             title: "Добавяне в количка",
             description: `Продуктът ${title} е успешно добавен във вашата количка!`,
@@ -29,6 +29,7 @@ export const useAddToCart = () => {
 
         setTimeout(() => {
             setIsAddBtnActive(false)
+            dismiss(toastId)
         }, 2000)
     }
 

@@ -16,14 +16,13 @@ import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPrice } from "@/lib/utils"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { restaurantState } from "@/store/restaurant"
-import Link from "next/link"
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
 import { useRecoilState } from "recoil"
 
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
 export default function Cart() {
-    const { order, cartItems, setPrice, price, increment, decrement, clearOrder } = useOrder()
+    const { order, setPrice, price, increment, decrement } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
@@ -72,20 +71,22 @@ export default function Cart() {
     }, [socket.isConnected, tableOrder, socket.isSubscribed])
 
     useEffect(() => {
-        const selectedTotal = cartItems.filter((item) => selectedItems[item.id]).reduce((sum, item) => sum + item.price * item.quantity, 0)
+        const selectedTotal = order.orderItems
+            .filter((item) => selectedItems[item.id])
+            .reduce((sum, item) => sum + item.price * item.quantity, 0)
 
         const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
         setPrice(finalPrice)
-    }, [tip, inputTip, cartItems, selectedItems])
+    }, [tip, inputTip, order.orderItems, selectedItems])
 
     useEffect(() => {
         const initialCheckboxState: { [key: string]: boolean } = {}
-        cartItems.forEach((item) => {
+        order.orderItems.forEach((item) => {
             initialCheckboxState[item.id] = true
         })
         setSelectedItems(initialCheckboxState)
-    }, [cartItems])
+    }, [order.orderItems])
 
     const toggleCheckbox = (id: string | number) => {
         setSelectedItems((prevState) => {
@@ -99,7 +100,9 @@ export default function Cart() {
     }
 
     const updatePrice = (checkboxState: { [key: string]: boolean }) => {
-        const selectedTotal = cartItems.filter((item) => checkboxState[item.id]).reduce((sum, item) => sum + item.price * item.quantity, 0)
+        const selectedTotal = order.orderItems
+            .filter((item) => checkboxState[item.id])
+            .reduce((sum, item) => sum + item.price * item.quantity, 0)
 
         setPrice(!inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal)
     }
@@ -115,26 +118,28 @@ export default function Cart() {
 
     return (
         <Container title={""}>
-            <ScrollArea className='h-screen min-w-full p-4'>
-                {cartItems.map((item, index) => (
-                    <CardContainer
-                        productId={item.id.toString()}
-                        classNames='mb-6 mx-auto bg-lightBg'
-                        isWine={false}
-                        key={`${item.id}-container`}
-                        isBlocked={true}
-                    >
-                        <PaymentProduct
-                            children={undefined}
-                            splitBill={splitBill}
-                            increment={increment}
-                            decrement={decrement}
-                            {...item}
-                            checked={selectedItems[item.id]}
-                            onCheckboxToggle={() => toggleCheckbox(item.id)}
-                        />
-                    </CardContainer>
-                ))}
+            <ScrollArea className='calc-height min-w-full p-4'>
+                {order.orderItems &&
+                    order.orderItems.length &&
+                    order.orderItems.map((item, index) => (
+                        <CardContainer
+                            productId={item.id.toString()}
+                            classNames='mb-6 mx-auto bg-lightBg'
+                            isWine={false}
+                            key={`${item.id}-container`}
+                            isBlocked={true}
+                        >
+                            <PaymentProduct
+                                children={undefined}
+                                splitBill={splitBill}
+                                increment={increment}
+                                decrement={decrement}
+                                {...item}
+                                checked={selectedItems[item.id]}
+                                onCheckboxToggle={() => toggleCheckbox(item.id)}
+                            />
+                        </CardContainer>
+                    ))}
             </ScrollArea>
             <div className='mb-2 flex w-full flex-col gap-2 border-t border-lightBg p-4'>
                 <h2 className='text-base font-medium text-white'>Комплимент за сервитьора</h2>
@@ -194,26 +199,16 @@ export default function Cart() {
                 >
                     {splitBill ? "Назад" : "Раздели и плати"}{" "}
                 </Button>
-                <Link
-                    className='flex w-full items-center justify-center'
-                    href={{
-                        pathname: "/payment",
-                        query: {
-                            totalAmount: price,
-                        },
-                    }}
+                <Button
+                    onClick={initPayment}
+                    disabled={!order || order?.orderItems?.length < 1 || order?.orderItems?.every((item) => item.isSelected === false)}
+                    className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
+                    type='button'
+                    id='add'
+                    variant='select'
                 >
-                    <Button
-                        onClick={initPayment}
-                        disabled={!order || order.orderItems.length < 1 || order.orderItems.every((item) => item.isSelected === false)}
-                        className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
-                        type='button'
-                        id='add'
-                        variant='select'
-                    >
-                        Плати {price.toFixed(2)} лв
-                    </Button>
-                </Link>
+                    Плати {price.toFixed(2)} лв
+                </Button>
             </div>
         </Container>
     )

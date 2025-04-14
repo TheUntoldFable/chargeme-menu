@@ -15,8 +15,7 @@ export default function Home() {
     const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
 
     useEffect(() => {
-        if (restaurantInfo.restaurantId || restaurantInfo.tableId) return
-
+        if (restaurantInfo.restaurantId && restaurantInfo.tableId) return
         setRestaurantInfo({
             restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
             tableId: Math.random() * 100,
@@ -26,7 +25,7 @@ export default function Home() {
     return (
         <main>
             <Container title=''>
-                <ScrollArea className='h-screen min-w-full'>
+                <ScrollArea className='calc-height h-full min-w-full'>
                     {!isLoading && status !== "pending" ? (
                         categories?.length &&
                         categories.map(
