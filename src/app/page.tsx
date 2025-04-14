@@ -6,13 +6,20 @@ import Container from "@/components/common/container"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCategories } from "@/hooks/get-categories"
+import { useGetOrderById } from "@/hooks/send-payment-data"
 import { restaurantState } from "@/store/restaurant"
+import { useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 import { useRecoilState } from "recoil"
 
 export default function Home() {
-    const { data: categories, isLoading } = useCategories()
+    const { data: categories, isLoading, status } = useCategories()
     const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
+
+    const params = useSearchParams()
+    const orderId = params.get("orderId")
+
+    const { data, status: orderStatus } = useGetOrderById(orderId)
 
     useEffect(() => {
         if (restaurantInfo.restaurantId && restaurantInfo.tableId) return

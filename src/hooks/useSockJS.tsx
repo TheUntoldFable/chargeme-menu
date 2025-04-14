@@ -10,7 +10,6 @@ interface UseWebSocketOptions {
     onMessage: (message: any) => void
 }
 
-/** @deprecated Use only for old browsers. */
 export const useSockJS = ({ url, topic, onMessage }: UseWebSocketOptions) => {
     const [isConnected, setIsConnected] = useState(false)
     const [isSubscribed, setIsSubscribed] = useState(false)
@@ -23,7 +22,7 @@ export const useSockJS = ({ url, topic, onMessage }: UseWebSocketOptions) => {
             webSocketFactory: () => socket,
             reconnectDelay: 5000, // Auto-reconnect after 5s if disconnected
             onConnect: (e) => {
-                console.log(e, "Connected to WebSocket")
+                console.log(`🔌 [Websocket]: Connected ${e}`)
                 setIsConnected(true)
 
                 if (topic) {
@@ -31,24 +30,24 @@ export const useSockJS = ({ url, topic, onMessage }: UseWebSocketOptions) => {
                 }
             },
             onDisconnect: () => {
-                console.log("Disconnected from WebSocket")
+                console.log("🔌 [Websocket]: Disconnected")
                 setIsConnected(false)
             },
             onWebSocketError: (e) => {
-                console.log(`Websocket error: ${JSON.stringify(e)}`)
+                console.log(`🔌 [Websocket]: Error - ${JSON.stringify(e)}`)
             },
             onChangeState: (e) => {
-                console.log(`Stated changed to ${connectionStatus[e]}`)
+                console.log(`🔌 [Websocket]: State Change - ${connectionStatus[e]}`)
             },
             onStompError: (frame) => {
-                console.error("STOMP Error:", frame)
+                console.error("🔌 [STOMP]: Error -", frame)
             },
         })
 
         const subscribeToTopic = () => {
             if (stompClient.connected && topic) {
                 setIsSubscribed(true)
-                console.log(`Subscribed to topic: ${topic}`)
+                console.log(`🔌 [Websocket]: Subscribed to topic: ${topic}`)
                 subscriptionRef.current = stompClient.subscribe(topic, (message) => {
                     onMessage(JSON.parse(message.body))
                 })
@@ -71,9 +70,9 @@ export const useSockJS = ({ url, topic, onMessage }: UseWebSocketOptions) => {
     const sendMessage = useCallback((destination: string, body: any) => {
         if (stompClientRef.current?.connected) {
             stompClientRef.current.publish({ destination, body: JSON.stringify(body) })
-            console.log(`Message sent to ${destination}:`, JSON.stringify(body))
+            console.log(`🔌 [Websocket]: Message sent to ${destination}:`, JSON.stringify(body))
         } else {
-            console.warn("WebSocket is not connected")
+            console.warn("🔌 [Websocket]: Not connected!")
         }
     }, [])
 

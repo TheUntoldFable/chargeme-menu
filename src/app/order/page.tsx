@@ -4,6 +4,7 @@ import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
 import PaymentProduct from "@/components/Product/PaymentProduct"
 import Center from "@/components/common/Center"
+import DialogPopUp from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +14,7 @@ import { Toggle } from "@/components/ui/toggle"
 import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
-import { calculateTotalPrice } from "@/lib/utils"
+import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { restaurantState } from "@/store/restaurant"
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
@@ -21,15 +22,15 @@ import { useRecoilState } from "recoil"
 
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
-export default function Cart() {
-    const { order, setPrice, price, increment, decrement } = useOrder()
+export default function OrderPage() {
+    const { order, setPrice, price, increment, decrement, clearOrder } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
     const [splitBill, setSplitBill] = useState(false)
     const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({})
-    const [tempQuantity, setTempQuantity] = useState<{ [key: string]: number }>({})
-    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
+    const [restaurantInfo] = useRecoilState(restaurantState)
+    const [openDialog, setOpenDialog] = useState(false)
 
     const { data: tableOrder, isLoading, refetch } = useGetAllOrders(restaurantInfo)
 
@@ -42,19 +43,26 @@ export default function Cart() {
         },
     })
 
+    useEffect(() => {
+        if (!tableOrder && !isLoading) {
+            clearOrder()
+        }
+    }, [tableOrder, isLoading])
+
     const initPayment = useCallback(() => {
         if (!order?.orderId || !order.orderItems.length || !tableOrder) return
 
-        //TODO: Refactor this id to be string always
-        const transactionItems: WSSendMessageItems[] = order.orderItems.map((c, index) => ({
+        const selected: Product[] = order.orderItems.filter((item) => selectedItems[item.id])
+
+        const transactionItems: WSSendMessageItems[] = selected.map((c, index) => ({
             orderItemId: tableOrder.orderItems[index].orderItemId,
-            quantity: tempQuantity[c.id] || c.quantity,
+            quantity: c.quantity,
         }))
 
         const payload: WSSendMessagePayload = {
             transactionItems,
-            totalPrice: calculateTotalPrice(order.orderItems, true, tempQuantity),
-            itemsPrice: calculateTotalPrice(order.orderItems, true, tempQuantity),
+            totalPrice: price,
+            itemsPrice: price,
             tip,
             orderId: order.orderId,
         }
@@ -68,7 +76,7 @@ export default function Cart() {
                 console.log(e, "refetched Order")
             })
         } else console.log("No connection to socket!")
-    }, [socket.isConnected, tableOrder, socket.isSubscribed])
+    }, [socket.isConnected, tableOrder, socket.isSubscribed, selectedItems, order.orderItems])
 
     useEffect(() => {
         const selectedTotal = order.orderItems
@@ -86,7 +94,7 @@ export default function Cart() {
             initialCheckboxState[item.id] = true
         })
         setSelectedItems(initialCheckboxState)
-    }, [order.orderItems])
+    }, [])
 
     const toggleCheckbox = (id: string | number) => {
         setSelectedItems((prevState) => {
@@ -118,6 +126,19 @@ export default function Cart() {
 
     return (
         <Container title={""}>
+            <DialogPopUp
+                title='Сигурни ли сте, че искате да платите?'
+                description='Това ще инициализира поръчка.'
+                defaultTitle='Да'
+                cancelTitle='Не'
+                isOpen={openDialog}
+                onConfirm={() => {
+                    initPayment()
+                    setOpenDialog(false)
+                }}
+                onCancel={() => setOpenDialog(false)}
+                shouldConfirm
+            />
             <ScrollArea className='calc-height min-w-full p-4'>
                 {order.orderItems &&
                     order.orderItems.length &&
@@ -130,7 +151,6 @@ export default function Cart() {
                             isBlocked={true}
                         >
                             <PaymentProduct
-                                children={undefined}
                                 splitBill={splitBill}
                                 increment={increment}
                                 decrement={decrement}
@@ -200,7 +220,9 @@ export default function Cart() {
                     {splitBill ? "Назад" : "Раздели и плати"}{" "}
                 </Button>
                 <Button
-                    onClick={initPayment}
+                    onClick={() => {
+                        setOpenDialog(true)
+                    }}
                     disabled={!order || order?.orderItems?.length < 1 || order?.orderItems?.every((item) => item.isSelected === false)}
                     className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
                     type='button'

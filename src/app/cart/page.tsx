@@ -4,18 +4,8 @@ import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
 import OrderProduct from "@/components/Product/OrderProduct"
 import Center from "@/components/common/Center"
+import DialogPopUp from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -26,13 +16,14 @@ import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPrice } from "@/lib/utils"
 import { Product } from "@/models/product"
 import { restaurantState } from "@/store/restaurant"
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { useRecoilState } from "recoil"
 
-export default function OrderPage() {
+export default function CartPage() {
     const { updateOrder, cartItems, increment, decrement } = useOrder()
-    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
+    const [restaurantInfo] = useRecoilState(restaurantState)
     const { restaurantId, tableId } = restaurantInfo
+    const [isOpenDialog, setIsOpenDialog] = useState(false)
 
     const { data: tableOrder, isLoading } = useGetAllOrders(restaurantInfo)
 
@@ -44,8 +35,6 @@ export default function OrderPage() {
             updateOrder(e.id)
         },
     })
-
-    //OnCreate subscribe to topic/orders/{restaurantid}/{tableid}
 
     const handleAccept = useCallback(() => {
         if (!cartItems.length || cartItems.length < 1) throw new Error("No order items in cart!")
@@ -114,7 +103,6 @@ export default function OrderPage() {
                         isBlocked={false}
                     >
                         <OrderProduct
-                            children={undefined}
                             {...item}
                             increment={increment}
                             decrement={decrement}
@@ -126,37 +114,29 @@ export default function OrderPage() {
                 items={cartItems}
                 withSelection={false}
             />
-            <AlertDialog>
-                <AlertDialogTrigger
-                    disabled={!cartItems || cartItems.length < 1}
-                    className='w-full'
-                >
-                    <Button
-                        disabled={!cartItems || cartItems.length < 1}
-                        className='mb-4 w-[60%] gap-2 text-lg transition-transform ease-in-out active:scale-75'
-                        type='button'
-                        id='add'
-                        variant='select'
-                    >
-                        {tableOrder ? "Добави към поръчка" : "Поръчай"}
-                    </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className='max-w-[90%]'>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className='text-black'>Сигурни ли сте, че искате да продължите?</AlertDialogTitle>
-                        <AlertDialogDescription>Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.</AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Размислих</AlertDialogCancel>
-                        <AlertDialogAction
-                            className={`bg-alterGreen text-white hover:text-black`}
-                            onClick={handleAccept}
-                        >
-                            Продължи
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <Button
+                onClick={() => setIsOpenDialog(true)}
+                disabled={!cartItems || cartItems.length < 1}
+                className='mb-4 w-[100%] gap-2 text-lg transition-transform ease-in-out active:scale-75'
+                type='button'
+                id='add'
+                variant='select'
+            >
+                {tableOrder ? "Добави към поръчка" : "Поръчай"}
+            </Button>
+            <DialogPopUp
+                title='Сигурни ли сте, че искате да продължите?'
+                description='Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.'
+                defaultTitle='Да'
+                cancelTitle='Не'
+                isOpen={isOpenDialog}
+                onConfirm={() => {
+                    handleAccept()
+                    setIsOpenDialog(false)
+                }}
+                onCancel={() => setIsOpenDialog(false)}
+                shouldConfirm
+            />
         </Container>
     )
 }

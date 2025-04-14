@@ -43,17 +43,17 @@ export default function PaymentPage() {
                 icon={<IconSuccess />}
                 title='Успешно плащане!'
                 description='Благодарим Ви, че избрахте нас, очакваме ви отново скоро!'
-                buttonTitle='Ok'
+                defaultTitle='Ok'
                 isOpen={isSuccessful}
-                onPress={() => setIsSuccessfull(false)}
+                onConfirm={() => setIsSuccessfull(false)}
             />
             <DialogPopUp
                 icon={<IconFailed />}
                 title='Неуспешно плащане!'
                 description='Възникна грешка по време на плащането, моля опитайте пак.'
-                buttonTitle='Оптиай пак'
+                defaultTitle='Оптиай пак'
                 isOpen={isUnSuccessful}
-                onPress={() => setIsUnsuccessful(false)}
+                onConfirm={() => setIsUnsuccessful(false)}
             />
             <div className='mt-2 flex w-full flex-1 flex-col gap-2 px-4'>
                 <Button variant='default'>

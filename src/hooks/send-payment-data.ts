@@ -34,17 +34,19 @@ export const initOrder = async (orderItems: Product[]) => {
     }
 }
 
-export const getAllOrders = async (restaurantInfo: RestaurantInfo): Promise<any> => {
+export const getAllOrders = async (restaurantInfo: RestaurantInfo): Promise<unknown> => {
     const rID = process.env.NEXT_PUBLIC_RESTAURANT_ID
     const { data } = await API.get(`/orders/restaurant/${rID}/${Math.floor(restaurantInfo.tableId)}`)
 
     return data
 }
 
-export const getOrderById = async (id: string) => {
+export const getOrderById = async (id: string | null) => {
     const url = `/orders/${id}`
 
     try {
+        if (!id) throw new Error("No orderId present")
+
         const { data } = await API.get(`/${url}`)
         return data
     } catch (e) {
@@ -77,8 +79,10 @@ export const useGetAllOrders = (restaurantInfo: RestaurantInfo): UseQueryResult<
     })
 }
 
-export const useGetOrderById = (id: string): UseQueryResult => {
+export const useGetOrderById = (id: string | null): UseQueryResult => {
     return useQuery({
+        retry: false,
+        enabled: !!id,
         queryKey: ["order-by-id", id],
         queryFn: () => getOrderById(id),
         meta: { headers },
