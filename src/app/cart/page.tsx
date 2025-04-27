@@ -110,33 +110,35 @@ export default function CartPage() {
                     </CardContainer>
                 ))}
             </ScrollArea>
-            <TotalPrice
-                items={cartItems}
-                withSelection={false}
-            />
-            <Button
-                onClick={() => setIsOpenDialog(true)}
-                disabled={!cartItems || cartItems.length < 1}
-                className='mb-4 w-[100%] gap-2 text-lg transition-transform ease-in-out active:scale-75'
-                type='button'
-                id='add'
-                variant='select'
-            >
-                {tableOrder ? "Добави към поръчка" : "Поръчай"}
-            </Button>
-            <DialogPopUp
-                title='Сигурни ли сте, че искате да продължите?'
-                description='Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.'
-                defaultTitle='Да'
-                cancelTitle='Не'
-                isOpen={isOpenDialog}
-                onConfirm={() => {
-                    handleAccept()
-                    setIsOpenDialog(false)
-                }}
-                onCancel={() => setIsOpenDialog(false)}
-                shouldConfirm
-            />
+            <div className='flex w-full flex-col items-center p-4'>
+                <TotalPrice
+                    items={cartItems}
+                    withSelection={false}
+                />
+                <Button
+                    onClick={() => setIsOpenDialog(true)}
+                    disabled={!cartItems || cartItems.length < 1}
+                    className='mb-4 w-[60%] gap-2 text-lg transition-transform ease-in-out active:scale-75'
+                    type='button'
+                    id='add'
+                    variant='select'
+                >
+                    Поръчай
+                </Button>
+                <DialogPopUp
+                    title='Сигурни ли сте, че искате да продължите?'
+                    description='Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.'
+                    defaultTitle='Да'
+                    cancelTitle='Не'
+                    isOpen={isOpenDialog}
+                    onConfirm={() => {
+                        handleAccept()
+                        setIsOpenDialog(false)
+                    }}
+                    onCancel={() => setIsOpenDialog(false)}
+                    shouldConfirm
+                />
+            </div>
         </Container>
     )
 }

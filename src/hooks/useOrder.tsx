@@ -15,8 +15,8 @@ export function useOrder() {
         setCartItems([])
         toast({
             variant: "destructive",
-            title: "Премахване от количка",
-            description: `Количката е изчистена`,
+            title: "Премахване от поръчка",
+            description: `Поръчката е изчистена`,
         })
     }
 

@@ -17,8 +17,8 @@ const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, in
         setCartItems(filteredItems)
         toast({
             variant: "destructive",
-            title: "Премахване от количка",
-            description: `Продуктът ${name} е успешно премахнат от вашата количка!`,
+            title: "Премахване от поръчка",
+            description: `Продуктът ${name} е успешно премахнат от вашата поръчка!`,
         })
     }
 

@@ -23,8 +23,8 @@ export const useAddToCart = () => {
         })
         const { id: toastId } = toast({
             variant: "default",
-            title: "Добавяне в количка",
-            description: `Продуктът ${title} е успешно добавен във вашата количка!`,
+            title: "Добавяне в поръчка",
+            description: `Продуктът ${title} е успешно добавен във вашата поръчка!`,
         })
 
         setTimeout(() => {
