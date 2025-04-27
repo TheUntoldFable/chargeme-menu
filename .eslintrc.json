@@ -1,37 +1,34 @@
 {
-  "root": true,
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./tsconfig.json",
-    "sourceType": "module",
-    "ecmaVersion": "latest",
-    "ecmaFeatures": {
-      "jsx": true
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": "./tsconfig.json",
+        "sourceType": "module",
+        "ecmaVersion": "latest",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "plugins": ["@typescript-eslint", "react", "prettier"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react/recommended",
+        "prettier"
+    ],
+    "rules": {
+        "@typescript-eslint/no-unused-vars": "warn",
+        "no-compare-neg-zero": "error",
+        "camelcase": "error",
+        "semi-style": "error",
+        "no-duplicate-imports": "error",
+        "no-dupe-keys": "error",
+        "no-unused-vars": "warn",
+        "no-unused-expressions": "warn",
+        "no-duplicate-case": "error",
+        "no-dupe-else-if": "error",
+        "react/react-in-jsx-scope": "off",
+        "prettier/prettier": 1
     }
-  },
-  "plugins": [
-    "@typescript-eslint",
-    "react",
-    "prettier"
-  ],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "prettier"
-  ],
-  "rules": {
-    "no-compare-neg-zero": "error",
-    "camelcase": "error",
-    "semi-style": "error",
-    "no-duplicate-imports": "error",
-    "no-dupe-keys": "error",
-    "no-unused-vars": "warn",
-    "no-unused-expressions": "warn",
-    "no-duplicate-case": "error",
-    "no-dupe-else-if": "error",
-    "react/react-in-jsx-scope": "off",
-    "prettier/prettier": 1
-  }
 }

@@ -213,7 +213,7 @@
         }
 
         .calc-height {
-            height: calc(100vh - 160px) !important;
+            max-height: calc(100% - 160px);
         }
     }
 }

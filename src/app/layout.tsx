@@ -8,6 +8,7 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import RecoilContextProvider from "@/store/recoilProvider"
 import { HydrationOverlay } from "@builder.io/react-hydration-overlay"
+import { Suspense } from "react"
 
 const inter = Inter({
     subsets: ["latin"],
@@ -15,12 +16,14 @@ const inter = Inter({
 })
 
 const queryClient = new QueryClient()
+
 export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
     const env = process.env.NODE_ENV
+
     return (
         <html lang='en'>
             <head>
@@ -31,7 +34,7 @@ export default function RootLayout({
                 <RecoilContextProvider>
                     <QueryClientProvider client={queryClient}>
                         {/*Detect hydration issues in dev mode*/}
-                        {env !== "production" ? <HydrationOverlay>{children}</HydrationOverlay> : children}
+                        <Suspense>{env !== "production" ? <HydrationOverlay>{children}</HydrationOverlay> : children}</Suspense>
                     </QueryClientProvider>
                 </RecoilContextProvider>
             </body>

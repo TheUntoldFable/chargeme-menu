@@ -1,19 +1,36 @@
 "use client"
 
 import CategoriesCard from "@/components/Category/CategoriesCard"
+import Center from "@/components/common/Center"
 import Container from "@/components/common/container"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCategories } from "@/hooks/get-categories"
+import { restaurantState } from "@/store/restaurant"
+import { useSearchParams } from "next/navigation"
+import { useEffect } from "react"
+import { useRecoilState } from "recoil"
 
 export default function Home() {
-    const { data: categories, isLoading } = useCategories()
+    const { data: categories, isLoading, status } = useCategories()
+    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
+
+    const params = useSearchParams()
+    const orderId = params.get("orderId")
+
+    useEffect(() => {
+        if (restaurantInfo.restaurantId && restaurantInfo.tableId) return
+        setRestaurantInfo({
+            restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
+            tableId: Math.random() * 100,
+        })
+    }, [])
 
     return (
         <main>
             <Container title=''>
-                <ScrollArea className='h-screen min-w-full'>
-                    {!isLoading ? (
+                <ScrollArea className='calc-height h-full min-w-full'>
+                    {!isLoading && status !== "pending" ? (
                         categories?.length &&
                         categories.map(
                             (item, index) =>
@@ -28,7 +45,9 @@ export default function Home() {
                                 )
                         )
                     ) : (
-                        <Loader />
+                        <Center>
+                            <Loader />
+                        </Center>
                     )}
                 </ScrollArea>
             </Container>

@@ -17,36 +17,37 @@ const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, in
         setCartItems(filteredItems)
         toast({
             variant: "destructive",
-            title: "Премахване от количка",
-            description: `Продуктът ${name} е успешно премахнат от вашата количка!`,
+            title: "Премахване от поръчка",
+            description: `Продуктът ${name} е успешно премахнат от вашата поръчка!`,
         })
     }
 
     return (
         <div className='relative w-full'>
-            <div
-                className='absolute -right-1.5 top-0 rotate-45 cursor-pointer'
-                onClick={handleRemoveFromCart}
-            >
-                <IconPlus color='#fff' />
-            </div>
-            <div>
+            <div className='flex items-center justify-between'>
                 <h1 className='text-base'>{name}</h1>
-                <p className='w-52 truncate text-sm text-lightGray'>{description}</p>
-                <div className='flex h-10 w-full items-center justify-between gap-2 rounded-lg text-lg'>
-                    <div className='flex gap-2'>
-                        <p className='font-bold'>{price}лв </p>
-                        <p className='text-lightGray'>x{quantity}</p>
-                    </div>
-                    <QuantityControl
-                        tempQuantity={tempQuantity}
-                        quantity={quantity}
-                        increment={increment}
-                        decrement={decrement}
-                        id={id}
-                        source='cart'
-                    />
+                <div
+                    className='rotate-45 cursor-pointer'
+                    onClick={handleRemoveFromCart}
+                >
+                    <IconPlus color='#fff' />
                 </div>
+            </div>
+
+            <p className='w-52 truncate text-sm text-lightGray'>{description}</p>
+            <div className='flex h-10 w-full items-center justify-between gap-2 rounded-lg text-lg'>
+                <div className='flex gap-2'>
+                    <p className='font-bold'>{price}лв </p>
+                    <p className='text-lightGray'>x{quantity}</p>
+                </div>
+                <QuantityControl
+                    tempQuantity={tempQuantity}
+                    quantity={quantity}
+                    increment={increment}
+                    decrement={decrement}
+                    id={id}
+                    source='cart'
+                />
             </div>
         </div>
     )

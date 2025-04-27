@@ -1,6 +1,10 @@
-import { Product } from "@/models/product"
 import { atom } from "recoil"
 import { recoilPersist } from "recoil-persist"
+
+export interface RestaurantInfo {
+    restaurantId: string
+    tableId: number
+}
 
 const localStorage = typeof window !== `undefined` ? window.localStorage : undefined
 
@@ -9,19 +13,12 @@ const { persistAtom } = recoilPersist({
     storage: localStorage, // configure which storage will be used to store the data
 })
 
-export const orderState = atom<{ orderId: string | null; orderItems: Product[] | [] }>({
-    key: "Order",
+export const restaurantState = atom<RestaurantInfo>({
+    key: "Restaurant",
     default: {
-        orderId: null,
-        orderItems: [],
+        restaurantId: "",
+        tableId: 0,
     },
-    // eslint-disable-next-line camelcase
-    effects_UNSTABLE: [persistAtom],
-})
-
-export const orderPrice = atom<number>({
-    key: "OrderPrice",
-    default: 0,
     // eslint-disable-next-line camelcase
     effects_UNSTABLE: [persistAtom],
 })
