@@ -10,17 +10,19 @@ export interface OrderItem {
     orderItemId: string
 }
 
-export interface Order {
-    created: string
-    guestCount: number
+//Could be the same for WS
+export interface GetOrderResponse {
     id: string
-    orderItems: OrderItem[]
-    paid: number | null
-    remainingPrice: number
     remoteVendorId: string
-    restaurantId: string
-    status: string
-    tableNumber: number
     totalPrice: number
-    updated: string
+    remainingPrice: number
+    tableNumber: number
+    status: string //TODO: Replace with actual enum
+    guestCount: number
+    created: string // ISO date string
+    updated: string // ISO date string
+    paid: string | boolean
+    restaurantId: string
+    orderItems: OrderItem[]
+    tipEnabled: boolean
 }

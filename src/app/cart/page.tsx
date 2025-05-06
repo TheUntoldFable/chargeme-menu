@@ -14,14 +14,16 @@ import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPrice } from "@/lib/utils"
+import { GetOrderResponse } from "@/models/order"
 import { Product } from "@/models/product"
 import { restaurantState } from "@/store/restaurant"
 import { useCallback, useState } from "react"
 import { useRecoilState } from "recoil"
 
 export default function CartPage() {
-    const { updateOrder, cartItems, increment, decrement } = useOrder()
     const [restaurantInfo] = useRecoilState(restaurantState)
+
+    const { updateOrder, cartItems, increment, decrement } = useOrder()
     const { restaurantId, tableId } = restaurantInfo
     const [isOpenDialog, setIsOpenDialog] = useState(false)
 
@@ -30,9 +32,10 @@ export default function CartPage() {
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
         topic: tableOrder ? `/topic/orders/${tableOrder.id}` : `/topic/orders/${restaurantId}/${Math.round(tableId)}`,
-        onMessage: (e) => {
-            if (!e.id) return
-            updateOrder(e.id)
+        onMessage: (e: GetOrderResponse) => {
+            if (e.id) {
+                updateOrder(e)
+            }
         },
     })
 
@@ -40,7 +43,7 @@ export default function CartPage() {
         if (!cartItems.length || cartItems.length < 1) throw new Error("No order items in cart!")
 
         if (socket.isConnected) {
-            if (tableOrder) {
+            if (tableOrder && tableOrder.status === "ORDERED") {
                 //UPDATE ORDER
                 const rItems = cartItems.map((p: Product) => ({
                     menuItemId: p.id,
@@ -59,7 +62,7 @@ export default function CartPage() {
                     orderId: tableOrder.id,
                 })
 
-                updateOrder(tableOrder.id)
+                updateOrder(tableOrder)
             } else {
                 //CREATE NEW ORDER
                 const rItems = cartItems.map((p: Product) => ({
@@ -69,6 +72,7 @@ export default function CartPage() {
                 }))
 
                 const rItemsPrice = calculateTotalPrice(cartItems, false)
+
                 socket.sendMessage("/app/createOrder", {
                     orderItems: rItems,
                     tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
@@ -123,7 +127,7 @@ export default function CartPage() {
                     id='add'
                     variant='select'
                 >
-                    Поръчай
+                    {tableOrder?.status === "ORDERED" ? "Добави към поръчка" : "Поръчай"}
                 </Button>
                 <DialogPopUp
                     title='Сигурни ли сте, че искате да продължите?'

@@ -1,4 +1,4 @@
-import { toast } from "@/components/ui/use-toast"
+import { GetOrderResponse } from "@/models/order"
 import { Product } from "@/models/product"
 import { cartState } from "@/store/cart"
 import { orderPrice, orderState } from "@/store/order"
@@ -11,16 +11,13 @@ export function useOrder() {
     const [order, setOrder] = useRecoilState(orderState)
     const [price, setPrice] = useRecoilState<number>(orderPrice)
 
-    const handleRemoveFromCart = (): void => {
+    const clearCart = (): void => {
         setCartItems([])
-        toast({
-            variant: "destructive",
-            title: "Премахване от поръчка",
-            description: `Поръчката е изчистена`,
-        })
     }
 
-    const updateOrder = (orderId: string): void => {
+    const updateOrder = (e: GetOrderResponse): void => {
+        const orderId = e.id
+
         const orderItemMap = new Map(order.orderItems?.map((item) => [item.id, item.quantity]))
 
         const updatedCartItems = cartItems.map((cartItem) => {
@@ -50,7 +47,7 @@ export function useOrder() {
 
         const finalOrderItems = [...updatedCartItems, ...newOrderItems]
 
-        setOrder({ orderId, orderItems: finalOrderItems as Product[] })
+        setOrder({ orderId, orderItems: finalOrderItems as Product[], paid: e.paid ?? false })
         setCartItems([])
         router.push("./order")
     }
@@ -94,7 +91,7 @@ export function useOrder() {
     }
 
     const clearOrder = () => {
-        setOrder({ orderId: "", orderItems: [] })
+        setOrder({ orderId: "", orderItems: [], paid: false })
     }
 
     return {
@@ -105,7 +102,7 @@ export function useOrder() {
         cartItems,
         order,
         updateOrder,
-        handleRemoveFromCart,
+        clearCart,
         clearOrder,
     }
 }

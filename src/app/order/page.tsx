@@ -17,13 +17,13 @@ import { useSockJS } from "@/hooks/useSockJS"
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { restaurantState } from "@/store/restaurant"
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useRecoilState } from "recoil"
 
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
 export default function OrderPage() {
-    const { order, setPrice, price, increment, decrement, clearOrder } = useOrder()
+    const { order, setPrice, price, increment, decrement, clearOrder, updateOrder } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
@@ -38,14 +38,24 @@ export default function OrderPage() {
         url: `${API_BASE_URL}/ws`,
         topic: tableOrder ? `/topic/orders/${tableOrder.id}` : null,
         onMessage: (e) => {
-            if (!e.irisPaymentLink) return
-            window.location.href = e.irisPaymentLink
+            if (e.irisPaymentLink) {
+                window.location.href = e.irisPaymentLink
+            }
+
+            if (e.id) {
+                updateOrder(e)
+            }
         },
     })
 
     useEffect(() => {
         if (!tableOrder && !isLoading) {
+            //Clear the order in the local storage if the table order is not found
             clearOrder()
+        }
+
+        if (tableOrder?.status === "ORDERED") {
+            updateOrder(tableOrder)
         }
     }, [tableOrder, isLoading])
 
@@ -72,9 +82,7 @@ export default function OrderPage() {
                 ...payload,
             })
 
-            refetch().then((e) => {
-                console.log(e, "refetched Order")
-            })
+            refetch().then()
         } else console.log("No connection to socket!")
     }, [socket.isConnected, tableOrder, socket.isSubscribed, selectedItems, order.orderItems])
 
@@ -114,6 +122,15 @@ export default function OrderPage() {
 
         setPrice(!inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal)
     }
+
+    const isPaymentDisabled = useMemo(() => {
+        if (!order) return true
+        if (order?.orderItems?.length < 1) return true
+        if (order?.orderItems?.every((item) => item.isSelected === false)) return true
+        if (order.paid) return true
+
+        return false
+    }, [order])
 
     if (!order.orderItems?.length || isLoading)
         return (
@@ -223,7 +240,7 @@ export default function OrderPage() {
                     onClick={() => {
                         setOpenDialog(true)
                     }}
-                    disabled={!order || order?.orderItems?.length < 1 || order?.orderItems?.every((item) => item.isSelected === false)}
+                    disabled={isPaymentDisabled}
                     className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
                     type='button'
                     id='add'

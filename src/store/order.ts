@@ -4,16 +4,23 @@ import { recoilPersist } from "recoil-persist"
 
 const localStorage = typeof window !== `undefined` ? window.localStorage : undefined
 
+interface OrderState {
+    orderId: string | null
+    orderItems: Product[] | []
+    paid: boolean | string
+}
+
 const { persistAtom } = recoilPersist({
     key: "recoil-persist", // this key is using to store data in local storage
     storage: localStorage, // configure which storage will be used to store the data
 })
 
-export const orderState = atom<{ orderId: string | null; orderItems: Product[] | [] }>({
+export const orderState = atom<OrderState>({
     key: "Order",
     default: {
         orderId: null,
         orderItems: [],
+        paid: false,
     },
     // eslint-disable-next-line camelcase
     effects_UNSTABLE: [persistAtom],
