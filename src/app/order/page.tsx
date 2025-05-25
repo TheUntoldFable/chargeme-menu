@@ -1,26 +1,23 @@
 "use client"
 
 import { API_BASE_URL } from "@/api/config"
+import TipDialog from "@/components/Payment/TipPopUp"
 import CardContainer from "@/components/Product/CardContainer"
 import PaymentProduct from "@/components/Product/PaymentProduct"
 import Center from "@/components/common/Center"
 import DialogPopUp from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Toggle } from "@/components/ui/toggle"
 import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { restaurantState } from "@/store/restaurant"
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useRecoilState } from "recoil"
-
-const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
 export default function OrderPage() {
     const { order, setPrice, price, increment, decrement, clearOrder } = useOrder()
@@ -30,7 +27,8 @@ export default function OrderPage() {
     const [splitBill, setSplitBill] = useState(false)
     const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({})
     const [restaurantInfo] = useRecoilState(restaurantState)
-    const [openDialog, setOpenDialog] = useState(false)
+    const [tipDialogOpen, setTipDialogOpen] = useState(false)
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
 
     const { data: tableOrder, isLoading, refetch } = useGetAllOrders(restaurantInfo)
 
@@ -126,19 +124,6 @@ export default function OrderPage() {
 
     return (
         <Container title={""}>
-            <DialogPopUp
-                title='Сигурни ли сте, че искате да платите?'
-                description='Това ще инициализира поръчка.'
-                defaultTitle='Да'
-                cancelTitle='Не'
-                isOpen={openDialog}
-                onConfirm={() => {
-                    initPayment()
-                    setOpenDialog(false)
-                }}
-                onCancel={() => setOpenDialog(false)}
-                shouldConfirm
-            />
             <ScrollArea className='calc-height min-w-full p-4'>
                 {order.orderItems &&
                     order.orderItems.length &&
@@ -161,54 +146,25 @@ export default function OrderPage() {
                         </CardContainer>
                     ))}
             </ScrollArea>
-            <div className='mb-2 flex w-full flex-col gap-2 border-t border-lightBg p-4'>
-                <h2 className='text-base font-medium text-white'>Комплимент за сервитьора</h2>
-                <div className='flex flex-1 justify-between gap-1'>
-                    {TOGGLE_OPTIONS.map((option, index) => (
-                        <div
-                            className='mb-4 flex w-full'
-                            key={option}
-                        >
-                            <Toggle
-                                pressed={tip === option && tip !== undefined}
-                                onClick={() => {
-                                    setInputTip(false)
-                                    setTip(option)
-
-                                    if (inputRef.current && inputRef.current?.value) {
-                                        inputRef.current.value = ""
-                                    }
-                                }}
-                                className={`h-12 w-16 bg-lightBg text-base text-white data-[state=on]:bg-yellow data-[state=on]:text-white`}
-                            >
-                                {option * 100 + "%"}
-                            </Toggle>
-                        </div>
-                    ))}
-                </div>
-                <label className='relative'>
-                    <Input
-                        ref={inputRef}
-                        type='number'
-                        className='border-2 border-lightBg text-base text-white'
-                        placeholder='Въведете сума'
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            setInputTip(true)
-
-                            if (e?.target?.value) {
-                                setTip(Number(e.target.value))
-                            }
-
-                            if (e.target.value === "") {
-                                setTip(0)
-                            }
-                        }}
-                    />
-                    <span className='absolute right-0 top-0 flex h-12 w-12 items-center justify-center rounded-r-2xl border-2 border-lightBg bg-lighterGray text-center text-white'>
-                        лв
-                    </span>
-                </label>
-            </div>
+            <TipDialog
+                open={tipDialogOpen}
+                onOpenChange={setTipDialogOpen}
+                onConfirm={() => setConfirmDialogOpen(true)}
+                tip={tip}
+                setTip={setTip}
+                setInputTip={setInputTip}
+                inputRef={inputRef}
+            />
+            <DialogPopUp
+                isOpen={confirmDialogOpen}
+                onConfirm={initPayment}
+                onCancel={() => setConfirmDialogOpen(false)}
+                title='Сигурни ли сте, че искате да платите?'
+                description='Това ще инициализира поръчка.'
+                defaultTitle='Да'
+                cancelTitle='Не'
+                shouldConfirm
+            />
             <div className='flex w-full gap-4 p-4'>
                 <Button
                     className='w-full gap-2 bg-lightBg py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
@@ -220,9 +176,7 @@ export default function OrderPage() {
                     {splitBill ? "Назад" : "Раздели и плати"}{" "}
                 </Button>
                 <Button
-                    onClick={() => {
-                        setOpenDialog(true)
-                    }}
+                    onClick={() => setTipDialogOpen(true)}
                     disabled={!order || order?.orderItems?.length < 1 || order?.orderItems?.every((item) => item.isSelected === false)}
                     className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
                     type='button'
