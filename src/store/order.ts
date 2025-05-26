@@ -6,8 +6,10 @@ const localStorage = typeof window !== `undefined` ? window.localStorage : undef
 
 interface OrderState {
     orderId: string | null
-    orderItems: Product[] | []
+    orderItems: Product[]
     paid: boolean | string
+    status: string
+    transactionSessionId?: string | null
 }
 
 const { persistAtom } = recoilPersist({
@@ -20,7 +22,9 @@ export const orderState = atom<OrderState>({
     default: {
         orderId: null,
         orderItems: [],
+        status: "",
         paid: false,
+        transactionSessionId: null,
     },
     // eslint-disable-next-line camelcase
     effects_UNSTABLE: [persistAtom],

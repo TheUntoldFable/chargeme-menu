@@ -17,13 +17,15 @@ import IconSuccess from "../../public/svg/icons/IconSuccess"
 import { useOrder } from "../hooks/useOrder"
 
 export default function Home() {
+    const { clearOrder, clearCart } = useOrder()
+
     const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
 
-    const { clearOrder, clearCart } = useOrder()
-    const { data: categories, isLoading, status } = useCategories()
     const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
     const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
+
     const { data: tableOrder, isLoading: isLoadingGetOrders } = useGetAllOrders(restaurantInfo)
+    const { data: categories, isLoading, status } = useCategories()
 
     const params: { isPaid?: boolean } & ReadonlyURLSearchParams = useSearchParams()
 

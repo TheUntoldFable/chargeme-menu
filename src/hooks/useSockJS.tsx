@@ -49,7 +49,7 @@ export const useSockJS = ({ url, topic, onMessage }: UseWebSocketOptions) => {
                 setIsSubscribed(true)
                 console.log(`🔌 [Websocket]: Subscribed to topic: ${topic}`)
                 subscriptionRef.current = stompClient.subscribe(topic, (message) => {
-                    console.log(`📩 [Websocket] Received message:${message}`)
+                    console.log(`📩 [Websocket] Received message:${message.body}`)
                     onMessage(JSON.parse(message.body))
                 })
             }

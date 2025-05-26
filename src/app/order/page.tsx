@@ -1,5 +1,4 @@
 "use client"
-
 import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
 import PaymentProduct from "@/components/Product/PaymentProduct"
@@ -19,16 +18,16 @@ import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { restaurantState } from "@/store/restaurant"
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useRecoilState } from "recoil"
+import { v4 as uuidv4 } from "uuid"
 
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
 export default function OrderPage() {
-    const { order, setPrice, price, increment, decrement, clearOrder, updateOrder } = useOrder()
+    const { order, setPrice, price, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
     const [splitBill, setSplitBill] = useState(false)
-    const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({})
     const [restaurantInfo] = useRecoilState(restaurantState)
     const [openDialog, setOpenDialog] = useState(false)
 
@@ -36,14 +35,14 @@ export default function OrderPage() {
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
-        topic: tableOrder ? `/topic/orders/${tableOrder.id}` : null,
+        topic: tableOrder ? `/topic/orders/${tableOrder.id}` + (order.transactionSessionId ? `/${order.transactionSessionId}` : "") : null,
         onMessage: (e) => {
-            if (e.irisPaymentLink) {
-                window.location.href = e.irisPaymentLink
-            }
-
             if (e.id) {
                 updateOrder(e)
+            }
+
+            if (e.irisPaymentLink && order.transactionSessionId) {
+                window.location.href = e.irisPaymentLink
             }
         },
     })
@@ -57,17 +56,21 @@ export default function OrderPage() {
         if (tableOrder?.status === "ORDERED") {
             updateOrder(tableOrder)
         }
-    }, [tableOrder, isLoading])
+    }, [])
 
     const initPayment = useCallback(() => {
         if (!order?.orderId || !order.orderItems.length || !tableOrder) return
 
-        const selected: Product[] = order.orderItems.filter((item) => selectedItems[item.id])
+        const selected: Product[] = order.orderItems.filter((item) => item.isSelected)
 
-        const transactionItems: WSSendMessageItems[] = selected.map((c, index) => ({
-            orderItemId: tableOrder.orderItems[index].orderItemId,
-            quantity: c.quantity,
+        const transactionItems: WSSendMessageItems[] = selected.map((c, _index) => ({
+            orderItemId: c?.orderItemId,
+            quantity: c.tempQuantity,
         }))
+
+        if (!order.transactionSessionId) {
+            attachSessionID(uuidv4())
+        }
 
         const payload: WSSendMessagePayload = {
             transactionItems,
@@ -75,6 +78,7 @@ export default function OrderPage() {
             itemsPrice: price,
             tip,
             orderId: order.orderId,
+            sessionId: order.transactionSessionId,
         }
 
         if (socket.isConnected && socket.isSubscribed) {
@@ -83,54 +87,29 @@ export default function OrderPage() {
             })
 
             refetch().then()
-        } else console.log("No connection to socket!")
-    }, [socket.isConnected, tableOrder, socket.isSubscribed, selectedItems, order.orderItems])
+        } else {
+            console.log("No connection to socket!")
+        }
+    }, [socket.isConnected, tableOrder, socket.isSubscribed, order])
 
     useEffect(() => {
         const selectedTotal = order.orderItems
-            .filter((item) => selectedItems[item.id])
-            .reduce((sum, item) => sum + item.price * item.quantity, 0)
+            .filter((item) => item.isSelected)
+            .reduce((sum, item) => sum + item.price * item.tempQuantity, 0)
 
         const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
         setPrice(finalPrice)
-    }, [tip, inputTip, order.orderItems, selectedItems])
-
-    useEffect(() => {
-        const initialCheckboxState: { [key: string]: boolean } = {}
-        order.orderItems.forEach((item) => {
-            initialCheckboxState[item.id] = true
-        })
-        setSelectedItems(initialCheckboxState)
-    }, [])
-
-    const toggleCheckbox = (id: string | number) => {
-        setSelectedItems((prevState) => {
-            const updatedState = {
-                ...prevState,
-                [id]: !prevState[id],
-            }
-            updatePrice(updatedState)
-            return updatedState
-        })
-    }
-
-    const updatePrice = (checkboxState: { [key: string]: boolean }) => {
-        const selectedTotal = order.orderItems
-            .filter((item) => checkboxState[item.id])
-            .reduce((sum, item) => sum + item.price * item.quantity, 0)
-
-        setPrice(!inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal)
-    }
+    }, [tip, inputTip, order.orderItems])
 
     const isPaymentDisabled = useMemo(() => {
         if (!order) return true
         if (order?.orderItems?.length < 1) return true
         if (order?.orderItems?.every((item) => item.isSelected === false)) return true
         if (order.paid) return true
-
+        if (price <= 0) return true
         return false
-    }, [order])
+    }, [order, price])
 
     if (!order.orderItems?.length || isLoading)
         return (
@@ -161,19 +140,24 @@ export default function OrderPage() {
                     order.orderItems.length &&
                     order.orderItems.map((item, index) => (
                         <CardContainer
-                            productId={item.id.toString()}
+                            productId={item.id}
                             classNames='mb-6 mx-auto bg-lightBg'
                             isWine={false}
                             key={`${item.id}-container`}
-                            isBlocked={true}
+                            isBlocked
                         >
                             <PaymentProduct
+                                id={item.id}
+                                name={item.name ?? ""}
+                                tempQuantity={item?.tempQuantity ?? ""}
+                                quantity={item.quantity ?? ""}
+                                description={item.description ?? ""}
+                                price={item.price ?? ""}
                                 splitBill={splitBill}
                                 increment={increment}
                                 decrement={decrement}
-                                {...item}
-                                checked={selectedItems[item.id]}
-                                onCheckboxToggle={() => toggleCheckbox(item.id)}
+                                checked={item.isSelected}
+                                onCheckboxToggle={() => toggleSelect(item.id)}
                             />
                         </CardContainer>
                     ))}

@@ -1,11 +1,14 @@
-export interface Product {
-    id: string | number
+import { OrderItem } from "./order"
+
+export interface Product extends OrderItem {
+    id: string
     name: string
     description: string
     weight: number
     price: number
     isSelected: boolean
     quantity: number
+    tempQuantity: number
 }
 
 export interface CartProductProps {
