@@ -44,7 +44,6 @@ export default function OrderPage() {
         url: `${API_BASE_URL}/ws`,
         topic: tableOrder ? `/topic/orders/${order.orderId}` : null,
         onMessage: (e) => {
-            console.log(e)
             if (e.id) {
                 updateOrder(e)
             }
@@ -71,7 +70,6 @@ export default function OrderPage() {
         }
 
         if (tableOrder?.status === "ORDERED") {
-            console.log("update")
             updateOrder(tableOrder)
         }
     }, [tableOrder])
@@ -80,7 +78,6 @@ export default function OrderPage() {
         if (!order?.orderId || !order.orderItems.length || !tableOrder) return
 
         const selected: Product[] = order.orderItems.filter((item) => item.isSelected)
-        console.log(selected, order.remainingItems)
 
         const transactionItems: WSSendMessageItems[] = selected.map((c, _index) => ({
             orderItemId: c?.orderItemId,
