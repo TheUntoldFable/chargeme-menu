@@ -8,6 +8,7 @@ export interface Product extends OrderItem {
     price: number
     isSelected: boolean
     quantity: number
+    image: string
     tempQuantity: number
 }
 

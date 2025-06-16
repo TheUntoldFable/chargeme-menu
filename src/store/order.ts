@@ -7,6 +7,7 @@ const localStorage = typeof window !== `undefined` ? window.localStorage : undef
 interface OrderState {
     orderId: string | null
     orderItems: Product[]
+    remainingItems: Product[]
     paid: boolean | string
     status: string
     transactionSessionId?: string | null
@@ -22,6 +23,7 @@ export const orderState = atom<OrderState>({
     default: {
         orderId: null,
         orderItems: [],
+        remainingItems: [],
         status: "",
         paid: false,
         transactionSessionId: null,

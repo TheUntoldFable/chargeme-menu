@@ -7,52 +7,15 @@ import Container from "@/components/common/container"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCategories } from "@/hooks/get-categories"
-import { useGetAllOrders } from "@/hooks/send-payment-data"
-import { restaurantState } from "@/store/restaurant"
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
-import { useRecoilState } from "recoil"
+import { useState } from "react"
 import IconFailed from "../../public/svg/icons/IconFailed"
 import IconSuccess from "../../public/svg/icons/IconSuccess"
-import { useOrder } from "../hooks/useOrder"
 
 export default function Home() {
-    const { clearOrder, clearCart } = useOrder()
-
-    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
-
     const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
     const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
 
-    const { data: tableOrder, isLoading: isLoadingGetOrders } = useGetAllOrders(restaurantInfo)
     const { data: categories, isLoading, status } = useCategories()
-
-    const params: { isPaid?: boolean } & ReadonlyURLSearchParams = useSearchParams()
-
-    useEffect(() => {
-        if (restaurantInfo.restaurantId && restaurantInfo.tableId) return
-        setRestaurantInfo({
-            restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
-            tableId: Math.random() * 100,
-        })
-    }, [])
-
-    useEffect(() => {
-        if (params.get("isPaid")) {
-            clearCart()
-            clearOrder()
-            setIsOpenSuccesDialog(true)
-        }
-        // if (!tableOrder) return
-
-        // if (tableOrder.status === "PAID") {
-        //     setIsOpenSuccesDialog(true)
-        // }
-
-        // if (tableOrder.status === "FAILED") {
-        //     setIsOpenFailedDialog(true)
-        // }
-    }, [tableOrder])
 
     const handleAccept = () => {
         setIsOpenSuccesDialog(false)

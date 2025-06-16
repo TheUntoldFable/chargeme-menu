@@ -36,13 +36,23 @@ export function useOrder() {
                     tempQuantity: orderItem.quantity,
                     orderItemId: orderItem.orderItemId,
                     processing: orderItem.processing,
+                    paid: orderItem.paid,
                 })
             })
         )
 
         const finalItems = Array.from(orderItemMap.values())
+            .filter((item) => item.processing < item.quantity)
+            .map((item) => {
+                // Subtract processing from quantity
+                return {
+                    ...item,
+                    quantity: item.quantity - item.processing - item.paid,
+                    tempQuantity: item.quantity - item.processing - item.paid,
+                }
+            })
 
-        setOrder({ orderId, orderItems: finalItems, paid: e.paid ?? false, status: e.status })
+        setOrder({ orderId, orderItems: finalItems, paid: e.paid ?? false, status: e.status, remainingItems: [...finalItems] })
 
         if (cartItems.length > 0) {
             setCartItems([])
@@ -103,7 +113,7 @@ export function useOrder() {
     }
 
     const clearOrder = () => {
-        setOrder({ orderId: "", status: "", orderItems: [], paid: false })
+        setOrder({ orderId: "", status: "", orderItems: [], paid: false, remainingItems: [] })
     }
 
     return {

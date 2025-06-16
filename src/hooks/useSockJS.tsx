@@ -24,7 +24,6 @@ export const useSockJS = ({ url, topic, onMessage }: UseWebSocketOptions) => {
             onConnect: (e) => {
                 console.log(`🔌 [Websocket]: Connected ${e}`)
                 setIsConnected(true)
-
                 if (topic) {
                     subscribeToTopic()
                 }

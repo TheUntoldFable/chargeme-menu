@@ -2,15 +2,13 @@
 import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
 import PaymentProduct from "@/components/Product/PaymentProduct"
-import Center from "@/components/common/Center"
 import DialogPopUp from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Toggle } from "@/components/ui/toggle"
-import { useGetAllOrders } from "@/hooks/send-payment-data"
+import { useTableOrder } from "@/context/TableOrderContext"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { Product } from "@/models/product"
@@ -22,6 +20,12 @@ import { v4 as uuidv4 } from "uuid"
 
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
 
+type SockJSConnection = {
+    isConnected: boolean
+    sendMessage: (destination: string, body: any) => void
+    isSubscribed: boolean
+}
+
 export default function OrderPage() {
     const { order, setPrice, price, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
     const inputRef = useRef<HTMLInputElement>(null)
@@ -30,38 +34,53 @@ export default function OrderPage() {
     const [splitBill, setSplitBill] = useState(false)
     const [restaurantInfo] = useRecoilState(restaurantState)
     const [openDialog, setOpenDialog] = useState(false)
+    const [shouldSubscribe, setShouldSubscribe] = useState(false)
+    const { tableOrder } = useTableOrder()
 
-    const { data: tableOrder, isLoading, refetch } = useGetAllOrders(restaurantInfo)
+    const topic = shouldSubscribe && tableOrder && order?.transactionSessionId ? `/topic/transactions/${order.transactionSessionId}` : null
+    // /topic/transactions/sessionId
+    // /topic/orders/order.orderId
+    const socketOrders = useSockJS({
+        url: `${API_BASE_URL}/ws`,
+        topic: tableOrder ? `/topic/orders/${order.orderId}` : null,
+        onMessage: (e) => {
+            console.log(e)
+            if (e.id) {
+                updateOrder(e)
+            }
+        },
+    })
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
-        topic: tableOrder ? `/topic/orders/${tableOrder.id}` + (order.transactionSessionId ? `/${order.transactionSessionId}` : "") : null,
+        topic: topic,
         onMessage: (e) => {
             if (e.id) {
                 updateOrder(e)
             }
 
-            if (e.irisPaymentLink && order.transactionSessionId) {
-                window.location.href = e.irisPaymentLink
+            if (e.paymentLink && order.transactionSessionId) {
+                window.location.href = e.paymentLink
             }
         },
     })
 
     useEffect(() => {
-        if (!tableOrder && !isLoading) {
-            //Clear the order in the local storage if the table order is not found
+        if (!tableOrder) {
             clearOrder()
         }
 
         if (tableOrder?.status === "ORDERED") {
+            console.log("update")
             updateOrder(tableOrder)
         }
-    }, [])
+    }, [tableOrder])
 
     const initPayment = useCallback(() => {
         if (!order?.orderId || !order.orderItems.length || !tableOrder) return
 
         const selected: Product[] = order.orderItems.filter((item) => item.isSelected)
+        console.log(selected, order.remainingItems)
 
         const transactionItems: WSSendMessageItems[] = selected.map((c, _index) => ({
             orderItemId: c?.orderItemId,
@@ -71,6 +90,8 @@ export default function OrderPage() {
         if (!order.transactionSessionId) {
             attachSessionID(uuidv4())
         }
+
+        setShouldSubscribe(true)
 
         const payload: WSSendMessagePayload = {
             transactionItems,
@@ -85,8 +106,6 @@ export default function OrderPage() {
             socket.sendMessage("/app/createTransaction", {
                 ...payload,
             })
-
-            refetch().then()
         } else {
             console.log("No connection to socket!")
         }
@@ -110,15 +129,6 @@ export default function OrderPage() {
         if (price <= 0) return true
         return false
     }, [order, price])
-
-    if (!order.orderItems?.length || isLoading)
-        return (
-            <Container title=''>
-                <Center>
-                    <Loader />
-                </Center>
-            </Container>
-        )
 
     return (
         <Container title={""}>
@@ -145,6 +155,7 @@ export default function OrderPage() {
                             isWine={false}
                             key={`${item.id}-container`}
                             isBlocked
+                            image={item.image}
                         >
                             <PaymentProduct
                                 id={item.id}

@@ -3,14 +3,12 @@
 import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
 import CartItem from "@/components/Product/CartItem"
-import Center from "@/components/common/Center"
 import DialogPopUp from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
-import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import TotalPrice from "@/components/ui/total-price"
-import { useGetAllOrders } from "@/hooks/send-payment-data"
+import { useTableOrder } from "@/context/TableOrderContext"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPrice } from "@/lib/utils"
@@ -29,7 +27,7 @@ export default function CartPage() {
     const { restaurantId, tableId } = restaurantInfo
     const [isOpenDialog, setIsOpenDialog] = useState(false)
 
-    const { data: tableOrder, isLoading } = useGetAllOrders(restaurantInfo)
+    const { tableOrder, setTableOrder } = useTableOrder()
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
@@ -38,6 +36,7 @@ export default function CartPage() {
             if (e.id) {
                 updateOrder(e).then(() => {
                     if (cartItems.length > 0) {
+                        setTableOrder(e)
                         router.push("/order")
                     }
                 })
@@ -97,15 +96,6 @@ export default function CartPage() {
         }
     }, [socket.isConnected, cartItems, restaurantInfo])
 
-    if (isLoading)
-        return (
-            <Container title=''>
-                <Center>
-                    <Loader />
-                </Center>
-            </Container>
-        )
-
     return (
         <Container title='Избрано'>
             <ScrollArea className='calc-height min-w-full px-4 pt-4'>
@@ -116,6 +106,7 @@ export default function CartPage() {
                         isWine={false}
                         key={`${item.id}-container`}
                         isBlocked={false}
+                        image={item.image}
                     >
                         <CartItem
                             {...item}
