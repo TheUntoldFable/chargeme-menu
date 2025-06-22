@@ -2,94 +2,99 @@
 
 import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
-import OrderProduct from "@/components/Product/OrderProduct"
-import Center from "@/components/common/Center"
+import CartItem from "@/components/Product/CartItem"
 import DialogPopUp from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
-import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import TotalPrice from "@/components/ui/total-price"
-import { useGetAllOrders } from "@/hooks/send-payment-data"
+import { useTableOrder } from "@/context/TableOrderContext"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPrice } from "@/lib/utils"
+import { GetOrderResponse } from "@/models/order"
 import { Product } from "@/models/product"
 import { restaurantState } from "@/store/restaurant"
+import { useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
 import { useRecoilState } from "recoil"
 
 export default function CartPage() {
-    const { updateOrder, cartItems, increment, decrement } = useOrder()
+    const router = useRouter()
     const [restaurantInfo] = useRecoilState(restaurantState)
+
+    const { updateOrder, order, cartItems, increment, decrement } = useOrder()
     const { restaurantId, tableId } = restaurantInfo
     const [isOpenDialog, setIsOpenDialog] = useState(false)
 
-    const { data: tableOrder, isLoading } = useGetAllOrders(restaurantInfo)
+    const { tableOrder, setTableOrder } = useTableOrder()
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
         topic: tableOrder ? `/topic/orders/${tableOrder.id}` : `/topic/orders/${restaurantId}/${Math.round(tableId)}`,
-        onMessage: (e) => {
-            if (!e.id) return
-            updateOrder(e.id)
+        onMessage: (e: GetOrderResponse) => {
+            if (e.id) {
+                updateOrder(e).then(() => {
+                    if (cartItems.length > 0) {
+                        setTableOrder(e)
+                        router.push("/order")
+                    }
+                })
+            }
         },
     })
 
-    const handleAccept = useCallback(() => {
-        if (!cartItems.length || cartItems.length < 1) throw new Error("No order items in cart!")
-
+    const handleCreate = useCallback(() => {
         if (socket.isConnected) {
-            if (tableOrder) {
-                //UPDATE ORDER
-                const rItems = cartItems.map((p: Product) => ({
-                    menuItemId: p.id,
-                    quantity: p.quantity,
-                    note: "string",
-                }))
+            //CREATE NEW ORDER
+            const rItems = cartItems.map((p: Product) => ({
+                menuItemId: p.id,
+                quantity: p.quantity,
+                note: "string",
+            }))
 
-                const rItemsPrice = calculateTotalPrice(cartItems, false)
+            const rItemsPrice = calculateTotalPrice(cartItems, false)
 
-                socket.sendMessage("/app/updateOrder", {
-                    orderItems: rItems,
-                    tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
-                    numberOfGuests: 1, // should be calculated by BE when connecting with the table.
-                    totalPrice: rItemsPrice,
-                    restaurantId: restaurantInfo.restaurantId,
-                    orderId: tableOrder.id,
-                })
+            socket.sendMessage("/app/createOrder", {
+                orderItems: rItems,
+                tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
+                numberOfGuests: 1, // should be calculated by BE when connecting with the table.
+                totalPrice: rItemsPrice,
+                restaurantId: restaurantInfo.restaurantId,
+            })
 
-                updateOrder(tableOrder.id)
-            } else {
-                //CREATE NEW ORDER
-                const rItems = cartItems.map((p: Product) => ({
-                    menuItemId: p.id,
-                    quantity: p.quantity,
-                    note: "string",
-                }))
-
-                const rItemsPrice = calculateTotalPrice(cartItems, false)
-                socket.sendMessage("/app/createOrder", {
-                    orderItems: rItems,
-                    tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
-                    numberOfGuests: 1, // should be calculated by BE when connecting with the table.
-                    totalPrice: rItemsPrice,
-                    restaurantId: restaurantInfo.restaurantId,
-                })
-            }
+            console.log("ORDER CREATED")
         } else {
             throw new Error("No connection to socket!")
         }
-    }, [socket.isConnected, cartItems, tableOrder, restaurantInfo])
+    }, [cartItems, restaurantId, socket.isConnected])
 
-    if (isLoading)
-        return (
-            <Container title=''>
-                <Center>
-                    <Loader />
-                </Center>
-            </Container>
-        )
+    const handleUpdate = useCallback(() => {
+        if (!cartItems.length || cartItems.length < 1) throw new Error("No order items in cart!")
+
+        if (socket.isConnected) {
+            //UPDATE ORDER
+            const rItems = cartItems.map((p: Product) => ({
+                menuItemId: p.id,
+                quantity: p.quantity,
+                note: "string",
+            }))
+
+            const rItemsPrice = calculateTotalPrice(cartItems, false)
+
+            socket.sendMessage("/app/updateOrder", {
+                orderItems: rItems,
+                tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
+                numberOfGuests: 1, // should be calculated by BE when connecting with the table.
+                totalPrice: rItemsPrice,
+                restaurantId: restaurantInfo.restaurantId,
+                orderId: order.orderId,
+            })
+            console.log("ORDER UPDATED")
+        } else {
+            throw new Error("No connection to socket!")
+        }
+    }, [socket.isConnected, cartItems, restaurantInfo])
 
     return (
         <Container title='Избрано'>
@@ -101,8 +106,9 @@ export default function CartPage() {
                         isWine={false}
                         key={`${item.id}-container`}
                         isBlocked={false}
+                        image={item.image}
                     >
-                        <OrderProduct
+                        <CartItem
                             {...item}
                             increment={increment}
                             decrement={decrement}
@@ -123,7 +129,7 @@ export default function CartPage() {
                     id='add'
                     variant='select'
                 >
-                    Поръчай
+                    {tableOrder?.status === "ORDERED" ? "Добави" : "Поръчай"}
                 </Button>
                 <DialogPopUp
                     title='Сигурни ли сте, че искате да продължите?'
@@ -132,8 +138,7 @@ export default function CartPage() {
                     cancelTitle='Не'
                     isOpen={isOpenDialog}
                     onConfirm={() => {
-                        handleAccept()
-                        setIsOpenDialog(false)
+                        tableOrder && tableOrder?.status === "ORDERED" ? handleUpdate() : handleCreate()
                     }}
                     onCancel={() => setIsOpenDialog(false)}
                     shouldConfirm

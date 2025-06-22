@@ -1,6 +1,6 @@
 import { API, headers } from "@/api/config"
 import { calculateTotalPrice } from "@/lib/utils"
-import { Order } from "@/models/order"
+import { GetOrderResponse } from "@/models/order"
 import { Product } from "@/models/product"
 import { RestaurantInfo } from "@/store/restaurant"
 import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query"
@@ -70,16 +70,17 @@ export const useInitOrder = () =>
         mutationFn: (data: Product[]) => initOrder(data),
     })
 
-export const useGetAllOrders = (restaurantInfo: RestaurantInfo): UseQueryResult<Order> => {
+export const useGetAllOrders = (restaurantInfo: RestaurantInfo): UseQueryResult<GetOrderResponse> => {
     return useQuery({
         queryKey: ["all-orders", restaurantInfo.tableId],
         queryFn: () => getAllOrders(restaurantInfo),
         meta: { headers },
         retry: false,
+        enabled: !!restaurantInfo.tableId,
     })
 }
 
-export const useGetOrderById = (id: string | null): UseQueryResult => {
+export const useGetOrderById = (id: string | null): UseQueryResult<GetOrderResponse> => {
     return useQuery({
         retry: false,
         enabled: !!id,

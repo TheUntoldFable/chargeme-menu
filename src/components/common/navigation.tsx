@@ -17,10 +17,10 @@ interface BottomNavigationProps {
 
 export default function BottomNavigation({ classNames }: BottomNavigationProps) {
     const cartItems = useRecoilValue(cartState)
-    const orderItems = useRecoilValue(orderState)
+    const order = useRecoilValue(orderState)
     const [isHydrated, setIsHydrated] = useState(false)
     const cartItemsLength = cartItems.length
-    const orderItemsLength = orderItems.orderItems.length
+    const orderItemsLength = order?.orderItems?.length
     const currentPath = usePathname()
 
     useEffect(() => {

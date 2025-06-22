@@ -1,11 +1,12 @@
 "use client"
 
-import { cn } from "@/lib/utils"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Inter } from "next/font/google"
 import "./globals.css"
 
+import { AppWrapper } from "@/components/common/AppWrapper"
 import { Toaster } from "@/components/ui/toaster"
+import { cn } from "@/lib/utils"
 import RecoilContextProvider from "@/store/recoilProvider"
 import { HydrationOverlay } from "@builder.io/react-hydration-overlay"
 import { Suspense } from "react"
@@ -33,8 +34,15 @@ export default function RootLayout({
                 <Toaster />
                 <RecoilContextProvider>
                     <QueryClientProvider client={queryClient}>
-                        {/*Detect hydration issues in dev mode*/}
-                        <Suspense>{env !== "production" ? <HydrationOverlay>{children}</HydrationOverlay> : children}</Suspense>
+                        <Suspense>
+                            {env !== "production" ? (
+                                <HydrationOverlay>
+                                    <AppWrapper>{children}</AppWrapper>
+                                </HydrationOverlay>
+                            ) : (
+                                <AppWrapper>{children}</AppWrapper>
+                            )}
+                        </Suspense>
                     </QueryClientProvider>
                 </RecoilContextProvider>
             </body>

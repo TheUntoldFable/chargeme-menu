@@ -3,7 +3,7 @@
 import React from "react"
 import IconMinus from "../../../public/svg/icons/IconMinus"
 import IconPlus from "../../../public/svg/icons/IconPlus"
-
+import { toast } from "../ui/use-toast"
 interface QuantityControlProps {
     tempQuantity?: number
     quantity: number
@@ -23,13 +23,20 @@ const QuantityControl: React.FC<QuantityControlProps> = ({
     actionsDisabled = true,
     source,
 }) => {
-    const preventDefaultBehavior = (
+    const handleOnClick = (
         event: React.MouseEvent<HTMLDivElement>,
-        cb?: (id: string | number, quantity: number, source: "cart" | "order") => void
+        callback?: (id: string | number, quantity: number, source: "cart" | "order") => void
     ) => {
         event.preventDefault()
-        if (cb) {
-            cb(id, quantity, source)
+        // Prevent user from increasing more than ordered
+        if (tempQuantity && tempQuantity === quantity && callback?.name === "increment") {
+            toast({
+                variant: "destructive",
+                title: "Невъзможна стъпка!",
+                description: `Това действие не може да бъде изпълнено.`,
+            })
+        } else {
+            callback?.(id, tempQuantity ? tempQuantity : quantity, source)
         }
     }
 
@@ -39,14 +46,14 @@ const QuantityControl: React.FC<QuantityControlProps> = ({
                 className={`flex h-6 w-6 items-center justify-center rounded-full border ${
                     actionsDisabled ? "cursor-pointer border-yellowNew bg-transparent" : "border-lightGray"
                 }`}
-                onClick={(event) => actionsDisabled && preventDefaultBehavior(event, decrement)}
+                onClick={(event) => actionsDisabled && handleOnClick(event, decrement)}
             >
                 <IconMinus />
             </div>
             <span className={`${!actionsDisabled ? "text-lightGray" : ""}`}>{tempQuantity ? tempQuantity : quantity}</span>
             <div
                 className={`rounded-full p-1 ${actionsDisabled ? "cursor-pointer bg-yellow" : "cursor-not-allowed bg-lightGray"}`}
-                onClick={(event) => actionsDisabled && preventDefaultBehavior(event, increment)}
+                onClick={(event) => actionsDisabled && handleOnClick(event, increment)}
             >
                 <IconPlus color='black' />
             </div>
