@@ -4,6 +4,7 @@ import { useOrder } from "@/hooks/useOrder"
 import { GetOrderResponse } from "@/models/order"
 import { restaurantState } from "@/store/restaurant"
 import { Loader } from "lucide-react"
+import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useRecoilState } from "recoil"
 import Center from "./Center"
@@ -15,12 +16,15 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     const { clearOrder, updateOrder, clearCart } = useOrder()
     const { data, isLoading, refetch } = useGetAllOrders(restaurantInfo)
     const [tableOrder, setTableOrder] = useState<GetOrderResponse | undefined>(undefined)
+    const searchParams = useSearchParams()
+    const tableParam = searchParams.get("table")
+    const table = tableParam !== null ? parseInt(tableParam, 10) : undefined
 
     useEffect(() => {
         if (restaurantInfo.restaurantId && restaurantInfo.tableId) return
         setRestaurantInfo({
             restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
-            tableId: Math.random() * 100,
+            tableId: table ?? 1,
         })
     }, [])
 

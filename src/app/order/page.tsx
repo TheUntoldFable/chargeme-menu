@@ -13,9 +13,7 @@ import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
-import { restaurantState } from "@/store/restaurant"
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { useRecoilState } from "recoil"
 import { v4 as uuidv4 } from "uuid"
 
 const TOGGLE_OPTIONS: number[] = [0, 0.05, 0.1, 0.15, 0.2]
@@ -32,23 +30,13 @@ export default function OrderPage() {
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
     const [splitBill, setSplitBill] = useState(false)
-    const [restaurantInfo] = useRecoilState(restaurantState)
     const [openDialog, setOpenDialog] = useState(false)
-    const [shouldSubscribe, setShouldSubscribe] = useState(false)
     const { tableOrder } = useTableOrder()
 
-    const topic = shouldSubscribe && tableOrder && order?.transactionSessionId ? `/topic/transactions/${order.transactionSessionId}` : null
-    // /topic/transactions/sessionId
-    // /topic/orders/order.orderId
-    const socketOrders = useSockJS({
-        url: `${API_BASE_URL}/ws`,
-        topic: tableOrder ? `/topic/orders/${order.orderId}` : null,
-        onMessage: (e) => {
-            if (e.id) {
-                updateOrder(e)
-            }
-        },
-    })
+    const topic = useMemo(() => {
+        if (!tableOrder) return null
+        return order?.transactionSessionId ? `/topic/transactions/${order.transactionSessionId}` : `/topic/orders/${order.orderId}`
+    }, [tableOrder, order])
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
@@ -58,7 +46,7 @@ export default function OrderPage() {
                 updateOrder(e)
             }
 
-            if (e.paymentLink && order.transactionSessionId) {
+            if (order.transactionSessionId && e.paymentLink) {
                 window.location.href = e.paymentLink
             }
         },
@@ -88,8 +76,6 @@ export default function OrderPage() {
             attachSessionID(uuidv4())
         }
 
-        setShouldSubscribe(true)
-
         const payload: WSSendMessagePayload = {
             transactionItems,
             totalPrice: price,
@@ -99,7 +85,7 @@ export default function OrderPage() {
             sessionId: order.transactionSessionId,
         }
 
-        if (socket.isConnected && socket.isSubscribed) {
+        if (socket.isConnected && socket.isSubscribed && order.transactionSessionId) {
             socket.sendMessage("/app/createTransaction", {
                 ...payload,
             })
