@@ -19,4 +19,5 @@ export interface WSSendMessagePayload {
     itemsPrice: number
     tip: number
     orderId: string
+    sessionId?: string | null
 }

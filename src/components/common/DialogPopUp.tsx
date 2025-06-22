@@ -43,7 +43,7 @@ const DialogPopUp = ({
                 <AlertDialogFooter className='flex-row items-center gap-2'>
                     <Button
                         onClick={onConfirm}
-                        className='w-full rounded-2xl bg-yellowNew'
+                        className={`w-full rounded-2xl ${shouldConfirm ? "bg-yellowNew" : "bg-lighterGray"}`}
                         variant='default'
                     >
                         {defaultTitle}

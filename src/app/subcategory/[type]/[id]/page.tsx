@@ -44,6 +44,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                             classNames='mb-6 mx-auto bg-lightBg'
                             productId={item.id}
                             isBlocked={false}
+                            image={item.image}
                         >
                             <AddProduct
                                 isWine={false}

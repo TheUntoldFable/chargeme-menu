@@ -8,7 +8,7 @@ import { useRecoilState } from "recoil"
 import IconPlus from "../../../public/svg/icons/IconPlus"
 import { toast } from "../ui/use-toast"
 
-const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, increment, decrement }: OrderProductProps) => {
+const CartItem = ({ name, id, tempQuantity, quantity, description, price, increment, decrement }: OrderProductProps) => {
     const [cartItems, setCartItems] = useRecoilState(cartState)
 
     const handleRemoveFromCart = (e: React.MouseEvent) => {
@@ -53,4 +53,4 @@ const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, in
     )
 }
 
-export default OrderProduct
+export default CartItem
