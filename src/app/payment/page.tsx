@@ -8,13 +8,13 @@ import { useOrder } from "@/hooks/useOrder"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
+import IconFailed from "#/public/svg/icons/IconFailed"
+import IconSuccess from "#/public/svg/icons/IconSuccess"
 import DialogPopUp from "@/components/common/DialogPopUp"
-import IconFailed from "../../../public/svg/icons/IconFailed"
-import IconSuccess from "../../../public/svg/icons/IconSuccess"
 
-import appleLogo from "@/../public/svg/logos/apple.svg"
-import mastercardLogo from "@/../public/svg/logos/mastercard.svg"
-import visaLogo from "@/../public/svg/logos/visa.svg"
+import appleLogo from "#/public/svg/logos/apple.svg"
+import mastercardLogo from "#/public/svg/logos/mastercard.svg"
+import visaLogo from "#/public/svg/logos/visa.svg"
 import useWebSocket from "react-use-websocket"
 
 const SOCKET_URL = "/topic/orders/"
