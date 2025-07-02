@@ -1,11 +1,11 @@
 "use client"
 
+import IconPlus from "#/public/svg/icons/IconPlus"
 import QuantityControl from "@/components/common/QuantityControl"
 import { OrderProductProps } from "@/models/product"
 import { cartState } from "@/store/cart"
 import React from "react"
 import { useRecoilState } from "recoil"
-import IconPlus from "../../../public/svg/icons/IconPlus"
 import { toast } from "../ui/use-toast"
 
 const CartItem = ({ name, id, tempQuantity, quantity, description, price, increment, decrement }: OrderProductProps) => {

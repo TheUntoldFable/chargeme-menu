@@ -1,5 +1,8 @@
 "use client"
 
+import IconMenu from "#/public/svg/icons/IconMenu"
+import IconSoup from "#/public/svg/icons/IconSoup"
+import IconWallet from "#/public/svg/icons/IconWallet"
 import { Badge } from "@/components/ui/badge"
 import { cartState } from "@/store/cart"
 import { orderState } from "@/store/order"
@@ -7,9 +10,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useRecoilValue } from "recoil"
-import IconMenu from "../../../public/svg/icons/IconMenu"
-import IconSoup from "../../../public/svg/icons/IconSoup"
-import IconWallet from "../../../public/svg/icons/IconWallet"
 
 interface BottomNavigationProps {
     classNames?: string

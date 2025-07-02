@@ -1,5 +1,7 @@
 "use client"
 
+import IconFailed from "#/public/svg/icons/IconFailed"
+import IconSuccess from "#/public/svg/icons/IconSuccess"
 import CategoriesCard from "@/components/Category/CategoriesCard"
 import Center from "@/components/common/Center"
 import DialogPopUp from "@/components/common/DialogPopUp"
@@ -8,8 +10,6 @@ import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCategories } from "@/hooks/get-categories"
 import { useState } from "react"
-import IconFailed from "../../public/svg/icons/IconFailed"
-import IconSuccess from "../../public/svg/icons/IconSuccess"
 
 export default function Home() {
     const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
@@ -32,7 +32,6 @@ export default function Home() {
                 isOpen={isOpenSuccessDialog}
                 onConfirm={handleAccept}
             />
-
             <DialogPopUp
                 icon={<IconFailed />}
                 title='Неуспешно плащане!'

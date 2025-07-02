@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
-export function DropdownMenuCheckboxes() {
+export const DropdownMenuCheckboxes = () => {
     const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
     const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
     const [showPanel, setShowPanel] = React.useState<Checked>(false)
@@ -35,24 +35,6 @@ export function DropdownMenuCheckboxes() {
                     onCheckedChange={setShowActivityBar}
                 >
                     Домати
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                    checked={showPanel}
-                    onCheckedChange={setShowPanel}
-                >
-                    Пилешко филе
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                    checked={showPanel}
-                    onCheckedChange={setShowPanel}
-                >
-                    Пилешко филе
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                    checked={showPanel}
-                    onCheckedChange={setShowPanel}
-                >
-                    Пилешко филе
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                     checked={showPanel}

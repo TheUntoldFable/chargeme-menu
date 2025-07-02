@@ -1,8 +1,8 @@
 "use client"
 
+import IconMinus from "#/public/svg/icons/IconMinus"
+import IconPlus from "#/public/svg/icons/IconPlus"
 import React from "react"
-import IconMinus from "../../../public/svg/icons/IconMinus"
-import IconPlus from "../../../public/svg/icons/IconPlus"
 import { toast } from "../ui/use-toast"
 interface QuantityControlProps {
     tempQuantity?: number
