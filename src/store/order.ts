@@ -11,6 +11,7 @@ interface OrderState {
     paid: boolean | string
     status: string
     transactionSessionId?: string | null
+    tipEnabled: boolean
 }
 
 const { persistAtom } = recoilPersist({
@@ -27,6 +28,7 @@ export const orderState = atom<OrderState>({
         status: "",
         paid: false,
         transactionSessionId: null,
+        tipEnabled: false,
     },
     // eslint-disable-next-line camelcase
     effects_UNSTABLE: [persistAtom],

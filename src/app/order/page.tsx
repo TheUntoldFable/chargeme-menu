@@ -91,9 +91,7 @@ export default function OrderPage() {
             .filter((item) => item.isSelected)
             .reduce((sum, item) => sum + item.price * item.tempQuantity, 0)
 
-        const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
-
-        setPrice(finalPrice)
+        setPrice(selectedTotal)
     }, [tip, inputTip, order.orderItems])
 
     const isPaymentDisabled = useMemo(() => {
@@ -166,7 +164,7 @@ export default function OrderPage() {
                 </Button>
                 <Button
                     onClick={() => {
-                        setTipDialogOpen(true)
+                        order.tipEnabled ? setTipDialogOpen(true) : setConfirmDialogOpen(true)
                     }}
                     disabled={isPaymentDisabled}
                     className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
@@ -174,7 +172,7 @@ export default function OrderPage() {
                     id='add'
                     variant='select'
                 >
-                    Плати {price.toFixed(2)} лв
+                    Плати {price?.toFixed(2)} лв
                 </Button>
             </div>
         </Container>
