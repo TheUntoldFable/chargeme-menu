@@ -25,10 +25,7 @@ export default function OrderPage() {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const { tableOrder } = useTableOrder()
 
-    const topic = useMemo(() => {
-        if (!tableOrder) return null
-        return order?.transactionSessionId ? `/topic/transactions/${order.transactionSessionId}` : `/topic/orders/${order.orderId}`
-    }, [tableOrder, order])
+    const [topic, setTopic] = useState(order ? `/topic/orders/${order.orderId}` : null)
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
@@ -54,6 +51,20 @@ export default function OrderPage() {
         }
     }, [tableOrder])
 
+    const handleConfirmTip = () => {
+        //Subscribe to transaction topic
+        const sessionId = uuidv4()
+        attachSessionID(sessionId)
+        setTopic(`/topic/orders/${order.orderId}`)
+        setConfirmDialogOpen(true)
+    }
+
+    const handleCancelDialog = () => {
+        //Revert back to old topic
+        setTopic(`/topic/orders/${order.orderId}`)
+        setConfirmDialogOpen(false)
+    }
+
     const initPayment = useCallback(() => {
         if (!order?.orderId || !order.orderItems.length || !tableOrder) return
 
@@ -63,10 +74,6 @@ export default function OrderPage() {
             orderItemId: c?.orderItemId,
             quantity: c.tempQuantity,
         }))
-
-        if (!order.transactionSessionId) {
-            attachSessionID(uuidv4())
-        }
 
         const payload: WSSendMessagePayload = {
             transactionItems,
@@ -136,7 +143,7 @@ export default function OrderPage() {
             <TipDialog
                 open={tipDialogOpen}
                 onOpenChange={setTipDialogOpen}
-                onConfirm={() => setConfirmDialogOpen(true)}
+                onConfirm={handleConfirmTip}
                 tip={tip}
                 setTip={setTip}
                 setInputTip={setInputTip}
@@ -145,7 +152,7 @@ export default function OrderPage() {
             <DialogPopUp
                 isOpen={confirmDialogOpen}
                 onConfirm={initPayment}
-                onCancel={() => setConfirmDialogOpen(false)}
+                onCancel={handleCancelDialog}
                 title='Сигурни ли сте, че искате да платите?'
                 description='Това ще инициализира поръчка.'
                 defaultTitle='Да'
