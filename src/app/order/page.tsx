@@ -25,10 +25,7 @@ export default function OrderPage() {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const { tableOrder } = useTableOrder()
 
-    const topic = useMemo(() => {
-        if (!tableOrder) return null
-        return order?.transactionSessionId ? `/topic/transactions/${order.transactionSessionId}` : `/topic/orders/${order.orderId}`
-    }, [tableOrder, order])
+    const [topic, setTopic] = useState(order ? `/topic/orders/${order.orderId}` : null)
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
@@ -54,6 +51,20 @@ export default function OrderPage() {
         }
     }, [tableOrder])
 
+    const handleConfirmTip = () => {
+        //Subscribe to transaction topic
+        const sessionId = uuidv4()
+        attachSessionID(sessionId)
+        setTopic(`/topic/orders/${order.orderId}`)
+        setConfirmDialogOpen(true)
+    }
+
+    const handleCancelDialog = () => {
+        //Revert back to old topic
+        setTopic(`/topic/orders/${order.orderId}`)
+        setConfirmDialogOpen(false)
+    }
+
     const initPayment = useCallback(() => {
         if (!order?.orderId || !order.orderItems.length || !tableOrder) return
 
@@ -63,10 +74,6 @@ export default function OrderPage() {
             orderItemId: c?.orderItemId,
             quantity: c.tempQuantity,
         }))
-
-        if (!order.transactionSessionId) {
-            attachSessionID(uuidv4())
-        }
 
         const payload: WSSendMessagePayload = {
             transactionItems,
@@ -91,9 +98,7 @@ export default function OrderPage() {
             .filter((item) => item.isSelected)
             .reduce((sum, item) => sum + item.price * item.tempQuantity, 0)
 
-        const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
-
-        setPrice(finalPrice)
+        setPrice(selectedTotal)
     }, [tip, inputTip, order.orderItems])
 
     const isPaymentDisabled = useMemo(() => {
@@ -138,7 +143,7 @@ export default function OrderPage() {
             <TipDialog
                 open={tipDialogOpen}
                 onOpenChange={setTipDialogOpen}
-                onConfirm={() => setConfirmDialogOpen(true)}
+                onConfirm={handleConfirmTip}
                 tip={tip}
                 setTip={setTip}
                 setInputTip={setInputTip}
@@ -147,7 +152,7 @@ export default function OrderPage() {
             <DialogPopUp
                 isOpen={confirmDialogOpen}
                 onConfirm={initPayment}
-                onCancel={() => setConfirmDialogOpen(false)}
+                onCancel={handleCancelDialog}
                 title='Сигурни ли сте, че искате да платите?'
                 description='Това ще инициализира поръчка.'
                 defaultTitle='Да'
@@ -166,7 +171,7 @@ export default function OrderPage() {
                 </Button>
                 <Button
                     onClick={() => {
-                        setTipDialogOpen(true)
+                        order.tipEnabled ? setTipDialogOpen(true) : setConfirmDialogOpen(true)
                     }}
                     disabled={isPaymentDisabled}
                     className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
@@ -174,7 +179,7 @@ export default function OrderPage() {
                     id='add'
                     variant='select'
                 >
-                    Плати {price.toFixed(2)} лв
+                    Плати {price?.toFixed(2)} лв
                 </Button>
             </div>
         </Container>

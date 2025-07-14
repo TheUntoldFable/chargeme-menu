@@ -47,12 +47,19 @@ export function useOrder() {
                 // Subtract processing from quantity
                 return {
                     ...item,
-                    quantity: item.quantity - item.processing - item.paid,
-                    tempQuantity: item.quantity - item.processing - item.paid,
+                    quantity: item.remaining,
+                    tempQuantity: item.remaining,
                 }
             })
 
-        setOrder({ orderId, orderItems: finalItems, paid: e.paid ?? false, status: e.status, remainingItems: [...finalItems] })
+        setOrder({
+            orderId,
+            orderItems: finalItems,
+            paid: e.paid ?? false,
+            status: e.status,
+            remainingItems: [...finalItems],
+            tipEnabled: e.tipEnabled,
+        })
 
         if (cartItems.length > 0) {
             setCartItems([])
@@ -113,7 +120,7 @@ export function useOrder() {
     }
 
     const clearOrder = () => {
-        setOrder({ orderId: "", status: "", orderItems: [], paid: false, remainingItems: [] })
+        setOrder({ orderId: "", status: "", orderItems: [], paid: false, remainingItems: [], tipEnabled: false })
     }
 
     return {
