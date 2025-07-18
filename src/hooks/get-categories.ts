@@ -5,7 +5,7 @@ import { fetchMenuItemsByCategory } from "./get-menu-items-by-category"
 
 export const fetchCategories = async (): Promise<MenuCategory[]> => {
     try {
-        const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/6fe441d6-a4b9-4af7-a1e4-b052337a0f37`)
+        const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/b7718a77-2edb-42c7-be54-a078b99d1b01`)
 
         const data: MenuCategory[] = await res.json()
 
