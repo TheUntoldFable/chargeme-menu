@@ -8,6 +8,7 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import RecoilContextProvider from "@/store/recoilProvider"
 import { HydrationOverlay } from "@builder.io/react-hydration-overlay"
+import { LocationProvider } from "@/components/providers/location-provider"
 
 const inter = Inter({
     subsets: ["latin"],
@@ -30,8 +31,10 @@ export default function RootLayout({
                 <Toaster />
                 <RecoilContextProvider>
                     <QueryClientProvider client={queryClient}>
-                        {/*Detect hydration issues in dev mode*/}
-                        {env !== "production" ? <HydrationOverlay>{children}</HydrationOverlay> : children}
+                        <LocationProvider>
+                            {/*Detect hydration issues in dev mode*/}
+                            {env !== "production" ? <HydrationOverlay>{children}</HydrationOverlay> : children}
+                        </LocationProvider>
                     </QueryClientProvider>
                 </RecoilContextProvider>
             </body>
