@@ -35,11 +35,13 @@ export function useOrder() {
                     quantity: orderItem.quantity,
                     tempQuantity: orderItem.quantity,
                     orderItemId: orderItem.orderItemId,
+                    remaining: orderItem.remaining,
                     processing: orderItem.processing,
                     paid: orderItem.paid,
                 })
             })
         )
+        console.log(orderItemMap)
 
         const finalItems = Array.from(orderItemMap.values())
             .filter((item) => item.remaining > 0)
