@@ -42,13 +42,13 @@ export function useOrder() {
         )
 
         const finalItems = Array.from(orderItemMap.values())
-            .filter((item) => item.processing < item.quantity)
+            .filter((item) => item.remaining > 0)
             .map((item) => {
                 // Subtract processing from quantity
                 return {
                     ...item,
-                    quantity: item.quantity - item.processing - item.paid,
-                    tempQuantity: item.quantity - item.processing - item.paid,
+                    quantity: item.remaining,
+                    tempQuantity: item.remaining,
                 }
             })
 
