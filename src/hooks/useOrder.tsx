@@ -1,91 +1,121 @@
-import { toast } from "@/components/ui/use-toast"
+import { GetOrderResponse } from "@/models/order"
 import { Product } from "@/models/product"
 import { cartState } from "@/store/cart"
 import { orderPrice, orderState } from "@/store/order"
-import { useRouter } from "next/navigation"
 import { useRecoilState } from "recoil"
+import { fetchMenuItem } from "./get-menu-item"
 
 export function useOrder() {
-    const router = useRouter()
     const [cartItems, setCartItems] = useRecoilState<Product[] | []>(cartState)
-    const [orderItems, setOrderItems] = useRecoilState<Product[] | []>(orderState)
+    const [order, setOrder] = useRecoilState(orderState)
     const [price, setPrice] = useRecoilState<number>(orderPrice)
 
-    const handleRemoveFromCart = (): void => {
-        setCartItems([])
-        toast({
-            variant: "destructive",
-            title: "Премахване от количка",
-            description: `Количката е изчистена`,
-        })
+    const toggleSelect = (id: string) => {
+        const updatedOrderItems = order.orderItems.map((orderItem) =>
+            orderItem.id === id ? { ...orderItem, isSelected: !orderItem.isSelected } : orderItem
+        )
+        setOrder({ ...order, orderItems: updatedOrderItems })
     }
 
-    const createOrder = (): void => {
-        const orderItemMap = new Map(orderItems?.map((item) => [item.id, item.quantity]))
+    const clearCart = (): void => {
+        setCartItems([])
+    }
 
-        const updatedCartItems = cartItems.map((cartItem) => {
-            const orderQuantity = orderItemMap.get(cartItem.id) || 0
-            orderItemMap.delete(cartItem.id)
-            return {
-                ...cartItem,
-                quantity: cartItem.quantity + orderQuantity,
-            }
-        })
+    const updateOrder = async (e: GetOrderResponse): Promise<void> => {
+        const orderId = e.id
+        const orderItemMap: Map<string, Product> = new Map([])
 
-        const newOrderItems = Array.from(orderItemMap.entries())
-            .map(([id, quantity]) => {
-                const newItem = orderItems?.find((item) => item.id === id)
+        await Promise.all(
+            e.orderItems.map(async (orderItem) => {
+                const item = await fetchMenuItem(orderItem.menuItemId)
 
-                if (!newItem || newItem.id === undefined) {
-                    return null
-                }
+                orderItemMap.set(orderItem.menuItemId, {
+                    ...item,
+                    isSelected: true,
+                    quantity: orderItem.quantity,
+                    tempQuantity: orderItem.quantity,
+                    orderItemId: orderItem.orderItemId,
+                    remaining: orderItem.remaining,
+                    processing: orderItem.processing,
+                    paid: orderItem.paid,
+                })
+            })
+        )
+        console.log(orderItemMap)
 
+        const finalItems = Array.from(orderItemMap.values())
+            .filter((item) => item.remaining > 0)
+            .map((item) => {
+                // Subtract processing from quantity
                 return {
-                    ...newItem,
-                    quantity,
+                    ...item,
+                    quantity: item.remaining,
+                    tempQuantity: item.remaining,
                 }
             })
-            .filter((item) => item !== null)
 
-        const finalCartItems = [...updatedCartItems, ...newOrderItems]
+        setOrder({ orderId, orderItems: finalItems, paid: e.paid ?? false, status: e.status, remainingItems: [...finalItems] })
 
-        setOrderItems(finalCartItems as Product[])
-        setCartItems([])
-        router.push("./cart")
+        if (cartItems.length > 0) {
+            setCartItems([])
+        }
+    }
+
+    const attachSessionID = (sessionId: string) => {
+        setOrder((order) => ({ ...order, transactionSessionId: sessionId }))
     }
 
     const increment = (id: string | number, quantity: number, source: "cart" | "order") => {
-        const items = source === "cart" ? cartItems : orderItems
-        const setItems = source === "cart" ? setCartItems : setOrderItems
-
+        const items = source === "cart" ? cartItems : order.orderItems
         const itemIndex = items.findIndex((i) => i.id === id)
+
         if (itemIndex === -1) return
 
         const updatedItems = [...items]
-        updatedItems[itemIndex] = {
-            ...updatedItems[itemIndex],
-            quantity: quantity + 1,
-        }
 
-        setItems(updatedItems)
+        if (source === "cart") {
+            updatedItems[itemIndex] = {
+                ...updatedItems[itemIndex],
+                quantity: quantity + 1,
+            }
+            setCartItems(updatedItems)
+        } else {
+            updatedItems[itemIndex] = {
+                ...updatedItems[itemIndex],
+                tempQuantity: quantity + 1,
+            }
+            setOrder({ ...order, orderItems: updatedItems })
+        }
     }
 
     const decrement = (id: string | number, quantity: number, source: "cart" | "order") => {
         if (quantity <= 1) return
 
-        const items = source === "cart" ? cartItems : orderItems
-        const setItems = source === "cart" ? setCartItems : setOrderItems
-
+        const items = source === "cart" ? cartItems : order.orderItems
         const itemIndex = items.findIndex((i) => i.id === id)
+
         if (itemIndex === -1) return
 
         const updatedItems = [...items]
-        updatedItems[itemIndex] = {
-            ...updatedItems[itemIndex],
-            quantity: quantity - 1,
-        }
 
-        setItems(updatedItems)
+        if (source === "cart") {
+            updatedItems[itemIndex] = {
+                ...updatedItems[itemIndex],
+                quantity: quantity - 1,
+            }
+
+            setCartItems(updatedItems)
+        } else {
+            updatedItems[itemIndex] = {
+                ...updatedItems[itemIndex],
+                tempQuantity: quantity - 1,
+            }
+            setOrder({ ...order, orderItems: updatedItems })
+        }
+    }
+
+    const clearOrder = () => {
+        setOrder({ orderId: "", status: "", orderItems: [], paid: false, remainingItems: [] })
     }
 
     return {
@@ -94,8 +124,11 @@ export function useOrder() {
         decrement,
         increment,
         cartItems,
-        orderItems,
-        createOrder,
-        handleRemoveFromCart,
+        order,
+        updateOrder,
+        clearCart,
+        clearOrder,
+        attachSessionID,
+        toggleSelect,
     }
 }

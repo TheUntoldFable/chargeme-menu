@@ -15,14 +15,12 @@ export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0
 
     const returnPrice = () => {
         if (inputTip) return String((tip + sum()).toFixed(2))
-
         if (tip) return String((tip * sum() + sum()).toFixed(2))
-
         return String(sum())
     }
 
     return (
-        <Card className={`mb-1 w-[85%] border-none bg-transparent`}>
+        <Card className={`mb-1 w-full border-none bg-transparent`}>
             <CardContent className='bold flex h-11 w-full flex-row items-center justify-center whitespace-pre rounded-lg border-none p-2 text-white'>
                 Обща сума:{" "}
                 <span className='text-yellow'>

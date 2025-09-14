@@ -23,7 +23,7 @@ export const calculateTotalPrice = (
         totalPrice += (hasTempQuantity ? tempQuantity?.[item.id] : item?.quantity) * item.price
     })
 
-    return Number(totalPrice.toFixed(2))
+    return totalPrice
 }
 
 export const stringToStripeAmount = (str: string): number => Math.round(parseFloat(str) * 100)

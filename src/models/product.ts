@@ -1,11 +1,15 @@
-export interface Product {
-    id: string | number
+import { OrderItem } from "./order"
+
+export interface Product extends OrderItem {
+    id: string
     name: string
     description: string
     weight: number
     price: number
     isSelected: boolean
     quantity: number
+    image: string
+    tempQuantity: number
 }
 
 export interface CartProductProps {
@@ -24,7 +28,6 @@ export interface OrderProductProps {
     classNames?: string
     decrement: (id: string | number, quantity: number, source: "cart" | "order") => void
     increment: (id: string | number, quantity: number, source: "cart" | "order") => void
-    children: React.ReactNode
     description: string
     price: number
 }
@@ -35,7 +38,6 @@ export interface PaymentProductProps {
     quantity: number
     tempQuantity?: number
     classNames?: string
-    children: React.ReactNode
     description: string
     price: number
     splitBill: boolean

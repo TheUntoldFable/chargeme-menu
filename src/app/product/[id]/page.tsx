@@ -1,5 +1,7 @@
 "use client"
 
+import IconMinus from "#/public/svg/icons/IconMinus"
+import IconPlus from "#/public/svg/icons/IconPlus"
 import Container from "@/components/common/container"
 import { DropdownMenuCheckboxes } from "@/components/common/dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -9,8 +11,6 @@ import { useAddToCart } from "@/hooks/useAddToCart"
 import { Product } from "@/models/product"
 import Image from "next/image"
 import { useState } from "react"
-import IconMinus from "../../../../public/svg/icons/IconMinus"
-import IconPlus from "../../../../public/svg/icons/IconPlus"
 
 interface ProductPageProps {
     params: { id: string }
@@ -28,7 +28,7 @@ export default function Page({ params }: ProductPageProps) {
             <Container title={item?.name || ""}>
                 <ScrollArea className='h-screen min-w-full px-4 pt-4'>
                     <Image
-                        src='/images/pizza.png'
+                        src={item?.image ?? "/images/pizza.png"}
                         width={393}
                         height={248}
                         className='mb-6 h-60 w-full rounded'
