@@ -6,6 +6,7 @@ export interface Product extends OrderItem {
     description: string
     weight: number
     price: number
+    priceInEur: number
     isSelected: boolean
     quantity: number
     image: string
@@ -30,6 +31,7 @@ export interface OrderProductProps {
     increment: (id: string | number, quantity: number, source: "cart" | "order") => void
     description: string
     price: number
+    priceInEur?: number
 }
 
 export interface PaymentProductProps {

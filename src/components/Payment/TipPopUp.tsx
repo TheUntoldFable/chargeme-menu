@@ -3,6 +3,8 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Toggle } from "@/components/ui/toggle"
+import { calculateTotalPriceEur } from "@/lib/utils"
+import { Product } from "@/models/product"
 import { ChangeEvent, RefObject } from "react"
 import { Button } from "../ui/button"
 
@@ -15,9 +17,46 @@ interface TipDialogProps {
     setInputTip: (value: boolean) => void
     inputRef: RefObject<HTMLInputElement>
     toggleOptions?: number[]
+    basePrice: number
+    orderItems: Product[]
 }
 
 const DEFAULT_OPTIONS = [0, 0.05, 0.1, 0.15, 0.2]
+
+// Helper functions for tip calculations
+const isPercentageTip = (tip: number): boolean => {
+    return tip > 0 && tip <= 1
+}
+
+const calculateTipAmount = (basePrice: number, tip: number): number => {
+    if (tip === 0) return 0
+    return isPercentageTip(tip) ? tip * basePrice : tip
+}
+
+const calculateTotalWithTip = (basePrice: number, tip: number): number => {
+    return basePrice + calculateTipAmount(basePrice, tip)
+}
+
+const calculateTipAmountEur = (baseEur: number, tip: number): number => {
+    if (tip === 0) return 0
+    return isPercentageTip(tip) ? tip * baseEur : tip * 0.51 // Approximate conversion for fixed amount
+}
+
+const calculateTotalWithTipEur = (baseEur: number, tip: number): number => {
+    return baseEur + calculateTipAmountEur(baseEur, tip)
+}
+
+// Additional calculation functions for order processing
+const calculateItemsPrice = (totalPrice: number, tip: number, inputTip: boolean): number => {
+    return inputTip ? totalPrice - tip : totalPrice - tip * totalPrice
+}
+
+const calculateTipForOrder = (totalPrice: number, tip: number, inputTip: boolean): number => {
+    return inputTip ? tip : tip * totalPrice
+}
+
+// Export calculation functions for use in other components
+export { calculateItemsPrice, calculateTipForOrder }
 
 export default function TipDialog({
     open,
@@ -28,6 +67,8 @@ export default function TipDialog({
     setInputTip,
     inputRef,
     toggleOptions = DEFAULT_OPTIONS,
+    basePrice,
+    orderItems,
 }: TipDialogProps) {
     return (
         <Dialog
@@ -81,6 +122,17 @@ export default function TipDialog({
                             лв
                         </span>
                     </label>
+
+                    {/* Total Price Display */}
+                    <div className='mt-4 rounded-lg bg-lightBg p-4'>
+                        <h3 className='mb-2 text-sm font-medium text-white'>Обща сума с бакшиш:</h3>
+                        <div className='flex items-center justify-between'>
+                            <span className='text-lg font-bold text-white'>{calculateTotalWithTip(basePrice, tip).toFixed(2)} лв</span>
+                            <span className='text-sm text-lightGray'>
+                                / €{calculateTotalWithTipEur(calculateTotalPriceEur(orderItems, false), tip).toFixed(2)}
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <DialogFooter>
                     <Button

@@ -1,6 +1,6 @@
 "use client"
 import { API_BASE_URL } from "@/api/config"
-import TipDialog from "@/components/Payment/TipPopUp"
+import TipDialog, { calculateItemsPrice, calculateTipForOrder } from "@/components/Payment/TipPopUp"
 import CardContainer from "@/components/Product/CardContainer"
 import PaymentProduct from "@/components/Product/PaymentProduct"
 import DialogPopUp from "@/components/common/DialogPopUp"
@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTableOrder } from "@/context/TableOrderContext"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
+import { calculateTotalPriceEur } from "@/lib/utils"
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -78,8 +79,8 @@ export default function OrderPage() {
         const payload: WSSendMessagePayload = {
             transactionItems,
             totalPrice: price,
-            itemsPrice: price,
-            tip,
+            itemsPrice: calculateItemsPrice(price, tip, inputTip),
+            tip: calculateTipForOrder(price, tip, inputTip),
             orderId: order.orderId,
             sessionId: order.transactionSessionId,
         }
@@ -102,6 +103,11 @@ export default function OrderPage() {
 
         setPrice(finalPrice)
     }, [tip, inputTip, order.orderItems])
+
+    // Calculate base price without tip for the tip dialog
+    const basePriceWithoutTip = order.orderItems
+        .filter((item) => item.isSelected)
+        .reduce((sum, item) => sum + item.price * item.tempQuantity, 0)
 
     const isPaymentDisabled = useMemo(() => {
         if (!order) return true
@@ -150,6 +156,8 @@ export default function OrderPage() {
                 setTip={setTip}
                 setInputTip={setInputTip}
                 inputRef={inputRef}
+                basePrice={basePriceWithoutTip}
+                orderItems={order?.orderItems || []}
             />
             <DialogPopUp
                 isOpen={confirmDialogOpen}
@@ -161,9 +169,9 @@ export default function OrderPage() {
                 cancelTitle='Не'
                 shouldConfirm
             />
-            <div className='flex w-full gap-4 p-4'>
+            <div className='w-full gap-4 p-4'>
                 <Button
-                    className='w-full gap-2 bg-lightBg py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
+                    className='mb-4 w-full gap-2 bg-lightBg py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
                     type='button'
                     id='add'
                     variant='select'
@@ -181,7 +189,10 @@ export default function OrderPage() {
                     id='add'
                     variant='select'
                 >
-                    Плати {price ? price.toFixed(2) : 0} лв
+                    Плати {price ? price.toFixed(2) : 0} лв{" "}
+                    {order?.orderItems && (
+                        <span className='text-gray'>/ €{calculateTotalPriceEur(order.orderItems, false).toFixed(2)}</span>
+                    )}
                 </Button>
             </div>
         </Container>

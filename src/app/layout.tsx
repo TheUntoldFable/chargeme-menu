@@ -5,6 +5,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 
 import { AppWrapper } from "@/components/common/AppWrapper"
+import { LocationProvider } from "@/components/providers/location-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
 import RecoilContextProvider from "@/store/recoilProvider"
@@ -34,15 +35,17 @@ export default function RootLayout({
                 <Toaster />
                 <RecoilContextProvider>
                     <QueryClientProvider client={queryClient}>
-                        <Suspense>
-                            {env !== "production" ? (
-                                <HydrationOverlay>
+                        <LocationProvider>
+                            <Suspense>
+                                {env !== "production" ? (
+                                    <HydrationOverlay>
+                                        <AppWrapper>{children}</AppWrapper>
+                                    </HydrationOverlay>
+                                ) : (
                                     <AppWrapper>{children}</AppWrapper>
-                                </HydrationOverlay>
-                            ) : (
-                                <AppWrapper>{children}</AppWrapper>
-                            )}
-                        </Suspense>
+                                )}
+                            </Suspense>
+                        </LocationProvider>
                     </QueryClientProvider>
                 </RecoilContextProvider>
             </body>
