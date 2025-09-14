@@ -28,18 +28,20 @@ export function useLocation(): LocationContextType {
 export function LocationProvider({
     children,
     showNotifications = true,
-    enableAutoCheck = false,
-    enableNavigation = false,
+    enableAutoCheck = true,
+    enableNavigation = true,
 }: LocationProviderProps) {
+    // Check if location checking is enabled via environment variable
+    const isLocationCheckEnabled = process.env.NEXT_PUBLIC_ENABLE_LOCATION_CHECKER === "true"
     const restaurantId = process.env.NEXT_PUBLIC_RESTAURANT_ID
     const { data: restaurantDetails } = useRestaurantDetails(restaurantId)
     const restaurantLocation = restaurantDetails
         ? { latitude: restaurantDetails.latitude, longitude: restaurantDetails.longitude }
         : undefined
 
-    const navigation = useLocationNavigation({ enabled: enableNavigation })
+    const navigation = useLocationNavigation({ enabled: enableNavigation && isLocationCheckEnabled })
     const notifications = useLocationNotifications({
-        enabled: showNotifications,
+        enabled: showNotifications && isLocationCheckEnabled,
         showDistanceNotifications: true,
     })
 
@@ -60,30 +62,31 @@ export function LocationProvider({
     )
 
     const locationCheck = useLocationCheck({
-        autoCheck: enableAutoCheck && !navigation.isOnErrorPage && Boolean(restaurantLocation),
+        autoCheck: enableAutoCheck && isLocationCheckEnabled && !navigation.isOnErrorPage && Boolean(restaurantLocation),
         onSuccess: handleLocationSuccess,
         onError: handleLocationError,
         restaurantLocation,
     })
 
     useEffect(() => {
-        if (restaurantLocation && navigation.shouldCheckLocation()) {
+        if (isLocationCheckEnabled && restaurantLocation && navigation.shouldCheckLocation()) {
             locationCheck.checkLocation()
         }
-    }, [navigation.currentPath, restaurantLocation])
+    }, [isLocationCheckEnabled, navigation.currentPath, restaurantLocation])
 
     // Re-check when coordinates load from API
     useEffect(() => {
-        if (restaurantLocation && enableAutoCheck && !navigation.isOnErrorPage) {
+        if (isLocationCheckEnabled && restaurantLocation && enableAutoCheck && !navigation.isOnErrorPage) {
             locationCheck.checkLocation()
         }
-    }, [restaurantLocation, enableAutoCheck, navigation.isOnErrorPage])
+    }, [isLocationCheckEnabled, restaurantLocation, enableAutoCheck, navigation.isOnErrorPage])
 
     const contextValue = useMemo<LocationContextType>(
         () => ({
             ...locationCheck,
+            isEnabled: isLocationCheckEnabled,
         }),
-        [locationCheck]
+        [locationCheck, isLocationCheckEnabled]
     )
 
     return <LocationContext.Provider value={contextValue}>{children}</LocationContext.Provider>

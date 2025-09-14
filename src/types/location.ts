@@ -10,6 +10,7 @@ export interface LocationContextType {
     permissionStatus: PermissionState | null
     restaurantLocation: LocationCoordinates | null
     radiusInMeters: number
+    isEnabled: boolean
 }
 
 /**

@@ -26,11 +26,19 @@ interface UseLocationCheckReturn {
 export function useLocationCheck(options: UseLocationCheckOptions = {}): UseLocationCheckReturn {
     const { autoCheck = true, onSuccess, onError, restaurantLocation, radius } = options
 
+    // Check if location checking is enabled via environment variable
+    const isLocationCheckEnabled = process.env.NEXT_PUBLIC_ENABLE_LOCATION_CHECKER === "true"
+
     const [isChecking, setIsChecking] = useState(false)
     const [result, setResult] = useState<LocationCheckResult | null>(null)
     const [permissionStatus, setPermissionStatus] = useState<PermissionState | null>(null)
 
     const checkLocation = useCallback(async () => {
+        // Return early if location checking is disabled
+        if (!isLocationCheckEnabled) {
+            return
+        }
+
         setIsChecking(true)
 
         try {
@@ -88,10 +96,10 @@ export function useLocationCheck(options: UseLocationCheckOptions = {}): UseLoca
 
     // Auto-check on mount if enabled
     useEffect(() => {
-        if (autoCheck) {
+        if (autoCheck && isLocationCheckEnabled) {
             checkLocation()
         }
-    }, [autoCheck, checkLocation])
+    }, [autoCheck, isLocationCheckEnabled, checkLocation])
 
     return {
         checkLocation,
