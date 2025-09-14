@@ -1,14 +1,16 @@
 "use client"
 
-import { cn } from "@/lib/utils"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Inter } from "next/font/google"
 import "./globals.css"
 
+import { AppWrapper } from "@/components/common/AppWrapper"
+import { LocationProvider } from "@/components/providers/location-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { cn } from "@/lib/utils"
 import RecoilContextProvider from "@/store/recoilProvider"
 import { HydrationOverlay } from "@builder.io/react-hydration-overlay"
-import { LocationProvider } from "@/components/providers/location-provider"
+import { Suspense } from "react"
 
 const inter = Inter({
     subsets: ["latin"],
@@ -16,12 +18,14 @@ const inter = Inter({
 })
 
 const queryClient = new QueryClient()
+
 export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
     const env = process.env.NODE_ENV
+
     return (
         <html lang='en'>
             <head>
@@ -32,8 +36,15 @@ export default function RootLayout({
                 <RecoilContextProvider>
                     <QueryClientProvider client={queryClient}>
                         <LocationProvider>
-                            {/*Detect hydration issues in dev mode*/}
-                            {env !== "production" ? <HydrationOverlay>{children}</HydrationOverlay> : children}
+                            <Suspense>
+                                {env !== "production" ? (
+                                    <HydrationOverlay>
+                                        <AppWrapper>{children}</AppWrapper>
+                                    </HydrationOverlay>
+                                ) : (
+                                    <AppWrapper>{children}</AppWrapper>
+                                )}
+                            </Suspense>
                         </LocationProvider>
                     </QueryClientProvider>
                 </RecoilContextProvider>

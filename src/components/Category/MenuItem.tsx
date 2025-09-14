@@ -1,5 +1,5 @@
+import IconArrowRight from "#/public/svg/icons/IconArrowRight"
 import Link from "next/link"
-import IconArrowRight from "../../../public/svg/icons/IconArrowRight"
 
 interface MenuItemProps {
     name: string
@@ -18,7 +18,7 @@ const MenuItem = ({ name, catQuantity, id, type, productId, isWine }: MenuItemPr
 
     return (
         <Link href={buildUrl()}>
-            <div className='border-b-seperator flex flex-1 justify-between border-b-[1px] py-1'>
+            <div className='flex flex-1 justify-between border-b-[1px] border-b-seperator py-1'>
                 <p className='capitalize'>{name ?? "[Empty]"}</p>
                 <div className='flex items-center gap-3'>
                     <p className={`${isWine ? "text-wine-light" : "text-yellow"}`}>{catQuantity}</p>

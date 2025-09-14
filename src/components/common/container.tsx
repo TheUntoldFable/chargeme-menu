@@ -14,7 +14,7 @@ const Container = ({ children }: PropsWithChildren<ContainerProps>) => {
     return (
         <Wrapper className='bg-darkBg'>
             <Header />
-            {children}
+            <div className='h-full max-h-screen w-full flex-1'>{children}</div>
             <BottomNavigation />
         </Wrapper>
     )
