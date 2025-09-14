@@ -124,7 +124,7 @@ export default function PaymentPage() {
                         className='mb-0 mt-auto'
                         variant='select'
                     >
-                        <p className='text-darkBg'>Плати {price.toFixed(2)} BGN</p>
+                        <p className='text-darkBg'>Плати {price.toFixed(2)} лв</p>
                     </Button>
                 </div>
             </ScrollArea>

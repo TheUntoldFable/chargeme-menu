@@ -8,7 +8,7 @@ import { useRecoilState } from "recoil"
 import IconPlus from "../../../public/svg/icons/IconPlus"
 import { toast } from "../ui/use-toast"
 
-const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, increment, decrement }: OrderProductProps) => {
+const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, priceInEur, increment, decrement }: OrderProductProps) => {
     const [cartItems, setCartItems] = useRecoilState(cartState)
 
     const handleRemoveFromCart = (e: React.MouseEvent) => {
@@ -35,7 +35,9 @@ const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, in
                 <p className='w-52 truncate text-sm text-lightGray'>{description}</p>
                 <div className='flex h-10 w-full items-center justify-between gap-2 rounded-lg text-lg'>
                     <div className='flex gap-2'>
-                        <p className='font-bold'>{price}лв </p>
+                        <p className='font-bold'>
+                            {price.toFixed(2)} лв{typeof priceInEur === "number" ? ` / €${priceInEur.toFixed(2)}` : ""}
+                        </p>
                         <p className='text-lightGray'>x{quantity}</p>
                     </div>
                     <QuantityControl

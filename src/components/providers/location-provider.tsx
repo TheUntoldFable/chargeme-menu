@@ -1,5 +1,6 @@
 "use client"
 
+import { useRestaurantDetails } from "@/hooks/get-restaurant"
 import { useLocationCheck } from "@/hooks/use-location-check"
 import { useLocationNavigation } from "@/hooks/use-location-navigation"
 import { useLocationNotifications } from "@/hooks/use-location-notifications"
@@ -7,7 +8,6 @@ import type { LocationCheckResult } from "@/lib/location-utils"
 import type { LocationContextType, LocationProviderProps } from "@/types/location"
 import { createContext, useCallback, useContext, useEffect, useMemo } from "react"
 
-// Create context with undefined default
 const LocationContext = createContext<LocationContextType | undefined>(undefined)
 
 /**
@@ -28,18 +28,21 @@ export function useLocation(): LocationContextType {
 export function LocationProvider({
     children,
     showNotifications = true,
-    enableAutoCheck = true,
-    enableNavigation = true,
+    enableAutoCheck = false,
+    enableNavigation = false,
 }: LocationProviderProps) {
-    // Hooks for different concerns
+    const restaurantId = process.env.NEXT_PUBLIC_RESTAURANT_ID
+    const { data: restaurantDetails } = useRestaurantDetails(restaurantId)
+    const restaurantLocation = restaurantDetails
+        ? { latitude: restaurantDetails.latitude, longitude: restaurantDetails.longitude }
+        : undefined
+
     const navigation = useLocationNavigation({ enabled: enableNavigation })
-    // Enable notifications including distance notifications for testing
     const notifications = useLocationNotifications({
         enabled: showNotifications,
-        showDistanceNotifications: true, // Show distance notifications to see toast messages
+        showDistanceNotifications: true,
     })
 
-    // Handle location success
     const handleLocationSuccess = useCallback(
         (result: LocationCheckResult) => {
             navigation.handleLocationResult(result)
@@ -48,7 +51,6 @@ export function LocationProvider({
         [navigation, notifications]
     )
 
-    // Handle location error
     const handleLocationError = useCallback(
         (error: string) => {
             navigation.handleLocationError()
@@ -57,21 +59,26 @@ export function LocationProvider({
         [navigation, notifications]
     )
 
-    // Initialize location checking with callbacks
     const locationCheck = useLocationCheck({
-        autoCheck: enableAutoCheck && !navigation.isOnErrorPage,
+        autoCheck: enableAutoCheck && !navigation.isOnErrorPage && Boolean(restaurantLocation),
         onSuccess: handleLocationSuccess,
         onError: handleLocationError,
+        restaurantLocation,
     })
 
-    // Check location when pathname changes (except on error page)
     useEffect(() => {
-        if (navigation.shouldCheckLocation()) {
+        if (restaurantLocation && navigation.shouldCheckLocation()) {
             locationCheck.checkLocation()
         }
-    }, [navigation.currentPath]) // Only re-run when path changes
+    }, [navigation.currentPath, restaurantLocation])
 
-    // Memoize context value to prevent unnecessary re-renders
+    // Re-check when coordinates load from API
+    useEffect(() => {
+        if (restaurantLocation && enableAutoCheck && !navigation.isOnErrorPage) {
+            locationCheck.checkLocation()
+        }
+    }, [restaurantLocation, enableAutoCheck, navigation.isOnErrorPage])
+
     const contextValue = useMemo<LocationContextType>(
         () => ({
             ...locationCheck,

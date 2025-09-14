@@ -37,7 +37,12 @@ export default function Page({ params }: ProductPageProps) {
                     <div className='w-full px-4 pb-4'>
                         <div className='mb-6 flex items-center justify-between rounded-2xl bg-lightBg py-2 pl-4 pr-2'>
                             <p className='text-lightGray'>
-                                Крайна цена: <span className='text-white'>{item?.price}лв</span>
+                                Крайна цена:{" "}
+                                <span className='block text-white'>
+                                    {item
+                                        ? `${item.price.toFixed(2)} лв${item.priceInEur !== undefined ? ` / €${item.priceInEur.toFixed(2)}` : ""}`
+                                        : ""}
+                                </span>
                             </p>
                             <div className='flex w-1/3 items-center justify-between rounded-xl bg-gray px-3 py-2 text-white'>
                                 <div className='flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-yellowNew bg-transparent'>

@@ -4,6 +4,7 @@ export interface Product {
     description: string
     weight: number
     price: number
+    priceInEur: number
     isSelected: boolean
     quantity: number
 }
@@ -27,6 +28,7 @@ export interface OrderProductProps {
     children: React.ReactNode
     description: string
     price: number
+    priceInEur?: number
 }
 
 export interface PaymentProductProps {

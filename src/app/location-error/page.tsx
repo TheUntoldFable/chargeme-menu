@@ -22,7 +22,7 @@ export default function LocationError() {
 
     return (
         <Container title=''>
-            <div className='flex h-screen flex-col items-center justify-center px-4'>
+            <div className='flex h-full w-full flex-col items-center justify-center px-4'>
                 <div className='flex flex-col items-center gap-6 text-center'>
                     <div className='rounded-full bg-lightBg p-6'>
                         <MapPin className='h-12 w-12 text-white' />

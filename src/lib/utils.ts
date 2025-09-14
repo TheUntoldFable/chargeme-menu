@@ -26,6 +26,28 @@ export const calculateTotalPrice = (
     return Number(totalPrice.toFixed(2))
 }
 
+export const calculateTotalPriceEur = (
+    items: Product[],
+    withSelection: boolean,
+    tempQuantity?: {
+        [key: string]: number
+    }
+): number => {
+    let totalPrice = 0
+
+    const hasTempQuantity = tempQuantity && Object.keys(tempQuantity).length > 0
+
+    if (withSelection) items = items.filter((item) => item.isSelected)
+
+    items.forEach((item) => {
+        const qty = hasTempQuantity ? tempQuantity?.[item.id as string] : item?.quantity
+        const unitPriceEur = (item as any).priceInEur
+        totalPrice += (qty || 0) * unitPriceEur
+    })
+
+    return Number(totalPrice.toFixed(2))
+}
+
 export const stringToStripeAmount = (str: string): number => Math.round(parseFloat(str) * 100)
 
 export const formatAmount = (amount: number): string =>
