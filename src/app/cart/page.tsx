@@ -1,5 +1,6 @@
 "use client"
 
+import IconFailed from "#/public/svg/icons/IconFailed"
 import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
 import CartItem from "@/components/Product/CartItem"
@@ -29,6 +30,7 @@ export default function CartPage() {
     const { updateOrder, order, cartItems, increment, decrement } = useOrder()
     const { restaurantId, tableId } = restaurantInfo
     const [isOpenDialog, setIsOpenDialog] = useState(false)
+    const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
 
     const { tableOrder, setTableOrder } = useTableOrder()
     const { mutateAsync: prePayOrder } = usePrePayOrder()
@@ -72,6 +74,8 @@ export default function CartPage() {
                 router.replace(res.paymentLink)
             } catch (error) {
                 console.log(error)
+                setIsOpenDialog(false)
+                setIsOpenFailedDialog(true)
             }
         } else {
             if (socket.isConnected) {
@@ -186,6 +190,14 @@ export default function CartPage() {
                     onConfirm={handleOrderAction}
                     onCancel={() => setIsOpenDialog(false)}
                     shouldConfirm
+                />
+                <DialogPopUp
+                    icon={<IconFailed />}
+                    title='Неуспешно плащане!'
+                    description={"Възникна грешка по време на плащането, моля опитайте пак."}
+                    defaultTitle='Продължи'
+                    isOpen={isOpenFailedDialog}
+                    onConfirm={() => setIsOpenFailedDialog(false)}
                 />
             </div>
         </Container>
