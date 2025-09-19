@@ -1,9 +1,11 @@
+import { GetRestaurantResponse } from "@/models/restaurant"
 import { atom } from "recoil"
 import { recoilPersist } from "recoil-persist"
 
 export interface RestaurantInfo {
     restaurantId: string
     tableId: number
+    restaurantData: GetRestaurantResponse | null
 }
 
 const localStorage = typeof window !== `undefined` ? window.localStorage : undefined
@@ -18,6 +20,7 @@ export const restaurantState = atom<RestaurantInfo>({
     default: {
         restaurantId: "",
         tableId: 0,
+        restaurantData: null,
     },
     // eslint-disable-next-line camelcase
     effects_UNSTABLE: [persistAtom],

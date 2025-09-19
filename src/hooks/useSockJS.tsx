@@ -8,15 +8,18 @@ interface UseWebSocketOptions {
     topic: string | null
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onMessage: (message: any) => void
+    disabled?: boolean
 }
 
-export const useSockJS = ({ url, topic, onMessage }: UseWebSocketOptions) => {
+export const useSockJS = ({ url, topic, onMessage, disabled }: UseWebSocketOptions) => {
     const [isConnected, setIsConnected] = useState(false)
     const [isSubscribed, setIsSubscribed] = useState(false)
     const stompClientRef = useRef<Client | null>(null)
     const subscriptionRef = useRef<StompSubscription | null>(null)
 
     useEffect(() => {
+        if (disabled) return
+
         const socket = new SockJS(url)
         const stompClient = new Client({
             webSocketFactory: () => socket,
