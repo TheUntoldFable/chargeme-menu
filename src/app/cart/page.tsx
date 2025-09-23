@@ -1,5 +1,6 @@
 "use client"
 
+import IconFailed from "#/public/svg/icons/IconFailed"
 import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
 import CartItem from "@/components/Product/CartItem"
@@ -8,11 +9,13 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import TotalPrice from "@/components/ui/total-price"
+import { usePrePay } from "@/context/PrePayContext"
 import { useTableOrder } from "@/context/TableOrderContext"
+import { usePrePayOrder } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPrice } from "@/lib/utils"
-import { GetOrderResponse } from "@/models/order"
+import { CreateOrderItem, GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
 import { restaurantState } from "@/store/restaurant"
 import { useRouter } from "next/navigation"
@@ -22,59 +25,90 @@ import { useRecoilState } from "recoil"
 export default function CartPage() {
     const router = useRouter()
     const [restaurantInfo] = useRecoilState(restaurantState)
+    const { restaurantData } = usePrePay()
 
     const { updateOrder, order, cartItems, increment, decrement } = useOrder()
     const { restaurantId, tableId } = restaurantInfo
     const [isOpenDialog, setIsOpenDialog] = useState(false)
+    const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
 
     const { tableOrder, setTableOrder } = useTableOrder()
+    const { mutateAsync: prePayOrder } = usePrePayOrder()
+
+    // Check if this restaurant uses pre-payment
+    const isPrePayMode = restaurantData?.paymentInAdvance ?? false
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
         topic: tableOrder ? `/topic/orders/${tableOrder.id}` : `/topic/orders/${restaurantId}/${Math.round(tableId)}`,
-        onMessage: (e: GetOrderResponse) => {
+        onMessage: (e: GetOrderRes) => {
             if (e.id) {
                 updateOrder(e).then(() => {
                     if (cartItems.length > 0) {
                         setTableOrder(e)
-                        router.push("/order")
                     }
                 })
             }
         },
+        disabled: isPrePayMode,
     })
 
-    const handleCreate = useCallback(() => {
-        if (socket.isConnected) {
-            //CREATE NEW ORDER
-            const rItems = cartItems.map((p: Product) => ({
-                menuItemId: p.id,
-                quantity: p.quantity,
-                note: "string",
-            }))
+    const handleCreate = useCallback(async () => {
+        if (isPrePayMode) {
+            // TODO: Implement pre-pay mode
+            try {
+                const res = await prePayOrder({
+                    orderItems: cartItems.map((p: Product) => ({
+                        menuItemId: p.id,
+                        quantity: p.quantity,
+                        note: "This is a note!",
+                    })),
+                    tableNumber: restaurantInfo.tableId,
+                    numberOfGuests: 1,
+                    totalPrice: calculateTotalPrice(cartItems, false),
+                    restaurantId: restaurantInfo.restaurantId,
+                    itemsPrice: cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
+                    tip: 0,
+                })
 
-            const rItemsPrice = calculateTotalPrice(cartItems, false)
-
-            socket.sendMessage("/app/createOrder", {
-                orderItems: rItems,
-                tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
-                numberOfGuests: 1, // should be calculated by BE when connecting with the table.
-                totalPrice: rItemsPrice,
-                restaurantId: restaurantInfo.restaurantId,
-            })
-
-            console.log("ORDER CREATED")
+                router.replace(res.paymentLink)
+            } catch (error) {
+                console.log(error)
+                setIsOpenDialog(false)
+                setIsOpenFailedDialog(true)
+            }
         } else {
-            throw new Error("No connection to socket!")
+            if (socket.isConnected) {
+                //CREATE NEW ORDER
+                const rItems: CreateOrderItem[] = cartItems.map((p: Product) => ({
+                    menuItemId: p.id,
+                    quantity: p.quantity,
+                    note: "string",
+                }))
+
+                const rItemsPrice = calculateTotalPrice(cartItems, false)
+
+                socket.sendMessage("/app/createOrder", {
+                    orderItems: rItems,
+                    tableNumber: restaurantInfo.tableId, //Should be defined by restaurant
+                    numberOfGuests: 1, // should be calculated by BE when connecting with the table.
+                    totalPrice: rItemsPrice,
+                    restaurantId: restaurantInfo.restaurantId,
+                })
+
+                console.log("ORDER CREATED")
+            } else {
+                throw new Error("No connection to socket!")
+            }
         }
-    }, [cartItems, restaurantId, socket.isConnected])
+    }, [cartItems, restaurantId, socket.isConnected, isPrePayMode])
 
     const handleUpdate = useCallback(() => {
         if (!cartItems.length || cartItems.length < 1) throw new Error("No order items in cart!")
 
         if (socket.isConnected) {
             //UPDATE ORDER
-            const rItems = cartItems.map((p: Product) => ({
+            const rItems: CreateOrderItem[] = cartItems.map((p: Product) => ({
                 menuItemId: p.id,
                 quantity: p.quantity,
                 note: "string",
@@ -94,7 +128,19 @@ export default function CartPage() {
         } else {
             throw new Error("No connection to socket!")
         }
-    }, [socket.isConnected, cartItems, restaurantInfo])
+    }, [socket.isConnected, cartItems, restaurantInfo, isPrePayMode])
+
+    const handleOrderAction = () => {
+        tableOrder && tableOrder?.status === "ORDERED" ? handleUpdate() : handleCreate()
+    }
+
+    // Get button text based on pre-pay mode
+    const getButtonText = () => {
+        if (isPrePayMode) {
+            return tableOrder?.status === "ORDERED" ? "Добави и плати" : "Поръчай и плати"
+        }
+        return tableOrder?.status === "ORDERED" ? "Добави" : "Поръчай"
+    }
 
     return (
         <Container title='Избрано'>
@@ -129,19 +175,29 @@ export default function CartPage() {
                     id='add'
                     variant='select'
                 >
-                    {tableOrder?.status === "ORDERED" ? "Добави" : "Поръчай"}
+                    {getButtonText()}
                 </Button>
                 <DialogPopUp
                     title='Сигурни ли сте, че искате да продължите?'
-                    description='Това ще запази поръчката ви и ще ви изпрати на следващата стъпка.'
+                    description={
+                        isPrePayMode
+                            ? "Това ще запази поръчката ви и ще ви изпрати към плащането."
+                            : "Това ще запази поръчката ви и ще ви изпрати на следващата стъпка."
+                    }
                     defaultTitle='Да'
                     cancelTitle='Не'
                     isOpen={isOpenDialog}
-                    onConfirm={() => {
-                        tableOrder && tableOrder?.status === "ORDERED" ? handleUpdate() : handleCreate()
-                    }}
+                    onConfirm={handleOrderAction}
                     onCancel={() => setIsOpenDialog(false)}
                     shouldConfirm
+                />
+                <DialogPopUp
+                    icon={<IconFailed />}
+                    title='Неуспешно плащане!'
+                    description={"Възникна грешка по време на плащането, моля опитайте пак."}
+                    defaultTitle='Продължи'
+                    isOpen={isOpenFailedDialog}
+                    onConfirm={() => setIsOpenFailedDialog(false)}
                 />
             </div>
         </Container>

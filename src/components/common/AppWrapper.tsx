@@ -1,39 +1,37 @@
+import { PrePayProvider } from "@/context/PrePayContext"
 import { TableOrderContext } from "@/context/TableOrderContext"
 import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
-import { GetOrderResponse } from "@/models/order"
+import { useRestaurant } from "@/hooks/useRestaurant"
+import { GetOrderRes } from "@/models/order"
 import { restaurantState } from "@/store/restaurant"
-import { Loader } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useRecoilState } from "recoil"
+import { Loader } from "../ui/loader"
 import Center from "./Center"
-import Container from "./container"
 
-export function AppWrapper({ children }: { children: React.ReactNode }) {
-    const [hasMounted, setHasMounted] = useState(false)
-    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
-    const { clearOrder, updateOrder, clearCart } = useOrder()
-    const { data, isLoading, refetch } = useGetAllOrders(restaurantInfo)
-    const [tableOrder, setTableOrder] = useState<GetOrderResponse | undefined>(undefined)
+export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     const searchParams = useSearchParams()
     const tableParam = searchParams.get("table")
+    const isPaidParam = searchParams.get("isPaid")
     const table = tableParam !== null ? parseInt(tableParam, 10) : undefined
+    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
+
+    const { clearOrder, updateOrder, clearCart } = useOrder()
+
+    const {
+        data: restaurantData,
+        isLoading: isLoadingRestaurantData,
+        refetch: refetchRestaurantData,
+        //! This should come from a conifg
+    } = useRestaurant(process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "")
+
+    const { data, isLoading: isLoadingOrders, refetch } = useGetAllOrders(restaurantInfo)
+    const [tableOrder, setTableOrder] = useState<GetOrderRes | undefined>(undefined)
 
     useEffect(() => {
-        if (restaurantInfo.restaurantId && restaurantInfo.tableId) return
-        setRestaurantInfo({
-            restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
-            tableId: table ?? 1,
-        })
-    }, [])
-
-    useEffect(() => {
-        setHasMounted(true)
-    }, [])
-
-    useEffect(() => {
-        if (!data && !isLoading) {
+        if (!data && !isLoadingOrders) {
             clearOrder()
         }
 
@@ -41,23 +39,34 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
             updateOrder(data)
         }
 
-        if (data?.paid) {
+        if (data?.paid || isPaidParam) {
             clearCart()
             clearOrder()
         }
 
         setTableOrder(data)
-    }, [data])
+    }, [data, isPaidParam])
 
-    if (!hasMounted || isLoading) {
+    useEffect(() => {
+        if (!isLoadingRestaurantData) {
+            setRestaurantInfo({
+                restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
+                tableId: table ?? 1,
+                restaurantData: restaurantData ?? null,
+            })
+        }
+    }, [restaurantData, isLoadingRestaurantData])
+
+    if (isLoadingRestaurantData || isLoadingOrders)
         return (
-            <Container title=''>
-                <Center>
-                    <Loader />
-                </Center>
-            </Container>
+            <Center className='h-screen w-full flex-1 bg-[#111111]'>
+                <Loader />
+            </Center>
         )
-    }
 
-    return <TableOrderContext.Provider value={{ setTableOrder, tableOrder, refetch }}>{children}</TableOrderContext.Provider>
+    return (
+        <PrePayProvider restaurantData={restaurantInfo.restaurantData ?? undefined}>
+            <TableOrderContext.Provider value={{ setTableOrder, tableOrder, refetch }}>{children}</TableOrderContext.Provider>
+        </PrePayProvider>
+    )
 }

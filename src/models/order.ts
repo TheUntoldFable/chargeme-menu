@@ -11,7 +11,7 @@ export interface OrderItem {
 }
 
 //Could be the same for WS
-export interface GetOrderResponse {
+export interface GetOrderRes {
     id: string
     remoteVendorId: string
     totalPrice: number
@@ -25,4 +25,41 @@ export interface GetOrderResponse {
     restaurantId: string
     orderItems: OrderItem[]
     tipEnabled: boolean
+}
+
+export interface CreateOrderItem {
+    menuItemId: string
+    quantity: number
+    note: string
+}
+
+export interface CreateOrderRequest {
+    orderItems: CreateOrderItem[]
+    tableNumber: number
+    numberOfGuests: number
+    itemsPrice: number
+    tip: number
+    totalPrice: number
+    restaurantId: string
+}
+
+export interface PrePayOrder {
+    id: string
+    remoteVendorId: string
+    totalPrice: number
+    remainingPrice: number
+    tableNumber: number
+    status: "NEW" | "ORDERED" | "COMPLETED" | "CANCELLED"
+    guestCount: number
+    created: string
+    updated: string
+    paid: string
+    restaurantId: string
+    orderItems: OrderItem[]
+    tipEnabled: boolean
+}
+
+export interface PrePayOrderResponse {
+    order: PrePayOrder
+    paymentLink: string
 }

@@ -9,18 +9,32 @@ import Container from "@/components/common/container"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCategories } from "@/hooks/get-categories"
-import { useState } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function Home() {
+    const searchParams = useSearchParams()
+    const isPaidParam = searchParams.get("isPaid")
     const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
     const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
 
+    const router = useRouter()
+    const pathname = usePathname()
+    const nextSearchParams = new URLSearchParams(searchParams.toString())
     const { data: categories, isLoading, status } = useCategories()
 
     const handleAccept = () => {
         setIsOpenSuccesDialog(false)
         setIsOpenFailedDialog(false)
     }
+
+    useEffect(() => {
+        if (isPaidParam === "true") {
+            setIsOpenSuccesDialog(true)
+            nextSearchParams.delete("isPaid")
+            router.replace(`${pathname}?${nextSearchParams}`)
+        }
+    }, [isPaidParam])
 
     return (
         <main>

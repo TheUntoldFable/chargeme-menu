@@ -1,8 +1,8 @@
-import { GetOrderResponse } from "@/models/order"
+import { GetOrderRes } from "@/models/order"
 import { createContext, useContext } from "react"
 
 export const TableOrderContext = createContext<{
-    tableOrder: GetOrderResponse | undefined
+    tableOrder: GetOrderRes | undefined
     setTableOrder: (order: any) => void
     refetch: () => void
 } | null>(null)

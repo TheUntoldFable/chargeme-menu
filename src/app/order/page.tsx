@@ -173,7 +173,7 @@ export default function OrderPage() {
                 </Button>
                 <Button
                     onClick={() => {
-                        setTipDialogOpen(true)
+                        handleConfirmTip()
                     }}
                     disabled={isPaymentDisabled}
                     className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'

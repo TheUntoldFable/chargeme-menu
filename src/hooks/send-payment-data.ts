@@ -1,38 +1,7 @@
 import { API, headers } from "@/api/config"
-import { calculateTotalPrice } from "@/lib/utils"
-import { GetOrderResponse } from "@/models/order"
-import { Product } from "@/models/product"
+import { CreateOrderRequest, GetOrderRes, PrePayOrderResponse } from "@/models/order"
 import { RestaurantInfo } from "@/store/restaurant"
 import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query"
-
-export const initOrder = async (orderItems: Product[]) => {
-    const url = `/orders`
-    const rID = process.env.NEXT_PUBLIC_RESTAURANT_ID
-
-    try {
-        if (!orderItems.length || orderItems.length < 1) throw new Error("No order items in cart!")
-
-        const rItems = orderItems.map((p: Product) => ({
-            menuItemId: p.id,
-            quantity: p.quantity,
-            note: "string",
-        }))
-
-        const rItemsPrice = calculateTotalPrice(orderItems, false)
-
-        const { data } = await API.post(`${url}`, {
-            orderItems: rItems,
-            tableNumber: Math.random() * 10 * (Math.random() * 10), //Should be defined by restaurant
-            numberOfGuests: 1, // should be calculated by BE when connecting with the table.
-            totalPrice: rItemsPrice,
-            restaurantId: rID,
-        })
-
-        return data
-    } catch (e) {
-        throw new Error(`An error occurred when sending payment: ${e}`)
-    }
-}
 
 export const getAllOrders = async (restaurantInfo: RestaurantInfo): Promise<unknown> => {
     const rID = process.env.NEXT_PUBLIC_RESTAURANT_ID
@@ -65,12 +34,16 @@ export const updateOrder = async (orderId: string) => {
     }
 }
 
-export const useInitOrder = () =>
+export const usePrePayOrder = () =>
     useMutation({
-        mutationFn: (data: Product[]) => initOrder(data),
+        mutationFn: async (order: CreateOrderRequest): Promise<PrePayOrderResponse> => {
+            const { data } = await API.post(`/orders/pre-paid`, order)
+            return data
+        },
+        meta: { headers },
     })
 
-export const useGetAllOrders = (restaurantInfo: RestaurantInfo): UseQueryResult<GetOrderResponse> => {
+export const useGetAllOrders = (restaurantInfo: RestaurantInfo): UseQueryResult<GetOrderRes> => {
     return useQuery({
         queryKey: ["all-orders", restaurantInfo.tableId],
         queryFn: () => getAllOrders(restaurantInfo),
@@ -80,7 +53,7 @@ export const useGetAllOrders = (restaurantInfo: RestaurantInfo): UseQueryResult<
     })
 }
 
-export const useGetOrderById = (id: string | null): UseQueryResult<GetOrderResponse> => {
+export const useGetOrderById = (id: string | null): UseQueryResult<GetOrderRes> => {
     return useQuery({
         retry: false,
         enabled: !!id,
