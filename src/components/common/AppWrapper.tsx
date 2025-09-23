@@ -52,7 +52,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
             setRestaurantInfo({
                 restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
                 tableId: table ?? 1,
-                restaurantData,
+                restaurantData: restaurantData ?? null,
             })
         }
     }, [restaurantData, isLoadingRestaurantData])
