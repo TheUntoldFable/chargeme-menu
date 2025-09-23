@@ -1,4 +1,4 @@
-import { GetOrderResponse } from "@/models/order"
+import { GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
 import { cartState } from "@/store/cart"
 import { orderPrice, orderState } from "@/store/order"
@@ -21,7 +21,7 @@ export function useOrder() {
         setCartItems([])
     }
 
-    const updateOrder = async (e: GetOrderResponse): Promise<void> => {
+    const updateOrder = async (e: GetOrderRes): Promise<void> => {
         const orderId = e.id
         const orderItemMap: Map<string, Product> = new Map([])
 
