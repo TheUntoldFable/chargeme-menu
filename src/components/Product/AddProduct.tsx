@@ -17,7 +17,7 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
     const [cartItems] = useRecoilState(cartState)
     if (!itemData) return null
 
-    const { name, price, weight, id, description } = itemData
+    const { name, price, weight, id, description, priceInEur } = itemData
 
     const isInCart = cartItems.find((c) => c.id === id)
 
@@ -34,7 +34,9 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
                 <h1 className='text-base'>{name}</h1>
                 <p className='truncate-text truncate text-sm text-lightGray'>{description}</p>
                 <div className='flex gap-2'>
-                    <p className='font-bold'>{price}лв</p>
+                    <p className='font-bold'>
+                        {price.toFixed(2)} лв {priceInEur ? `/ €${priceInEur.toFixed(2)}` : ""}
+                    </p>
                     <span className='text-white'>|</span>
                     {weight && <p className='text-lightGray'>{weight}гр.</p>}
                 </div>

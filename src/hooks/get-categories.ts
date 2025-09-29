@@ -5,7 +5,9 @@ import { fetchMenuItemsByCategory } from "./get-menu-items-by-category"
 
 export const fetchCategories = async (): Promise<MenuCategory[]> => {
     try {
-        const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/6fe441d6-a4b9-4af7-a1e4-b052337a0f37`)
+        const restaurantId = process.env.NEXT_PUBLIC_RESTAURANT_ID
+        if (!restaurantId) throw new Error("Missing NEXT_PUBLIC_RESTAURANT_ID")
+        const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/${restaurantId}`)
 
         const data: MenuCategory[] = await res.json()
 
