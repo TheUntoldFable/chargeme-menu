@@ -15,7 +15,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     const searchParams = useSearchParams()
     const tableParam = searchParams.get("table")
     const isPaidParam = searchParams.get("isPaid")
-    const table = tableParam !== null ? parseInt(tableParam, 10) : undefined
+    const table = tableParam !== null ? tableParam : undefined
     const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
 
     const { clearOrder, updateOrder, clearCart } = useOrder()
@@ -27,7 +27,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         //! This should come from a conifg
     } = useRestaurant(process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "")
 
-    const { data, isLoading: isLoadingOrders, refetch } = useGetAllOrders(restaurantInfo)
+    const { data, isLoading: isLoadingOrders, refetch } = useGetAllOrders(restaurantInfo.tableId)
     const [tableOrder, setTableOrder] = useState<GetOrderRes | undefined>(undefined)
 
     useEffect(() => {
@@ -51,7 +51,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         if (!isLoadingRestaurantData) {
             setRestaurantInfo({
                 restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
-                tableId: table ?? 1,
+                tableId: table ?? "",
                 restaurantData: restaurantData ?? null,
             })
         }

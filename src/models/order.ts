@@ -35,7 +35,7 @@ export interface CreateOrderItem {
 
 export interface CreateOrderRequest {
     orderItems: CreateOrderItem[]
-    tableNumber: number
+    tableNumber: string
     numberOfGuests: number
     itemsPrice: number
     tip: number

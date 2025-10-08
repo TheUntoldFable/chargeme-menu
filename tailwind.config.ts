@@ -23,6 +23,7 @@ const config = {
                 yellow: "#F2C83D",
                 yellowSecondary: "#EDDB75",
                 defaultGray: "#ADADAD",
+                darkGray: "#24252A",
                 lightBg: "#24252a",
                 lighterGray: "#373A43",
                 lightGray: "#8D9099",
@@ -95,6 +96,11 @@ const config = {
             },
             backgroundImage: {
                 "wine-gradient": "linear-gradient(90deg, rgba(255,159,189,1) 0%, rgba(218,106,146,1) 100%, rgba(255,159,189,0.5) 100%)",
+            },
+            boxShadow: {
+                top: "0 -4px 6px -1px rgba(0, 0, 0, 0.1)",
+                "top-md": "0 -10px 15px -3px rgba(0, 0, 0, 0.1)",
+                "top-lg": "0 -20px 25px -5px rgba(0, 0, 0, 0.1)",
             },
         },
     },

@@ -4,7 +4,7 @@ import { recoilPersist } from "recoil-persist"
 
 export interface RestaurantInfo {
     restaurantId: string
-    tableId: number
+    tableId: string
     restaurantData: GetRestaurantResponse | null
 }
 
@@ -19,7 +19,7 @@ export const restaurantState = atom<RestaurantInfo>({
     key: "Restaurant",
     default: {
         restaurantId: "",
-        tableId: 0,
+        tableId: "",
         restaurantData: null,
     },
     // eslint-disable-next-line camelcase
