@@ -35,8 +35,8 @@ export default function RootLayout({
                 <Toaster />
                 <RecoilContextProvider>
                     <QueryClientProvider client={queryClient}>
-                        <LocationProvider>
-                            <Suspense>
+                        <Suspense>
+                            <LocationProvider>
                                 {env !== "production" ? (
                                     <HydrationOverlay>
                                         <AppWrapper>{children}</AppWrapper>
@@ -44,8 +44,8 @@ export default function RootLayout({
                                 ) : (
                                     <AppWrapper>{children}</AppWrapper>
                                 )}
-                            </Suspense>
-                        </LocationProvider>
+                            </LocationProvider>
+                        </Suspense>
                     </QueryClientProvider>
                 </RecoilContextProvider>
             </body>

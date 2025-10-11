@@ -40,7 +40,7 @@ export default function CartPage() {
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
-        topic: tableOrder ? `/topic/orders/${tableOrder.id}` : `/topic/orders/${restaurantId}/${Math.round(tableId)}`,
+        topic: tableOrder ? `/topic/orders/${tableOrder.id}` : `/topic/orders/${restaurantId}/${tableId}`,
         onMessage: (e: GetOrderRes) => {
             if (e.id) {
                 updateOrder(e).then(() => {
@@ -65,9 +65,9 @@ export default function CartPage() {
                     })),
                     tableNumber: restaurantInfo.tableId,
                     numberOfGuests: 1,
-                    totalPrice: calculateTotalPrice(cartItems, false),
+                    totalPrice: Number(calculateTotalPrice(cartItems, false).toFixed(2)),
                     restaurantId: restaurantInfo.restaurantId,
-                    itemsPrice: cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
+                    itemsPrice: Number(cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)),
                     tip: 0,
                 })
 

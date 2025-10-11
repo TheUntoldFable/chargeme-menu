@@ -92,18 +92,17 @@ export default function Page({ params }: ProductPageProps) {
                                 alt='Img'
                             />
                         </div>
-
-                        <Button
-                            className='w-full flex-1 gap-2 rounded-xl bg-yellowNew py-4 text-lg'
-                            type='button'
-                            id='price'
-                            variant='default'
-                            onClick={() => addToCart(item as Product, item?.name, quantity)}
-                        >
-                            Добави
-                        </Button>
                     </div>
                 </ScrollArea>
+                <Button
+                    className='w-full flex-1 gap-2 rounded-xl bg-yellowNew py-4 text-lg'
+                    type='button'
+                    id='price'
+                    variant='default'
+                    onClick={() => addToCart(item as Product, item?.name, quantity)}
+                >
+                    Добави
+                </Button>
             </Container>
         )
     )

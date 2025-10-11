@@ -3,8 +3,8 @@
 import Header from "@/components/common/header"
 import Wrapper from "@/components/common/wrapper"
 
-import BottomNavigation from "@/components/common/navigation"
 import { PropsWithChildren } from "react"
+import BottomNavigation from "./navigation"
 
 interface ContainerProps {
     title: string

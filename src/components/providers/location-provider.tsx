@@ -6,6 +6,7 @@ import { useLocationNavigation } from "@/hooks/use-location-navigation"
 import { useLocationNotifications } from "@/hooks/use-location-notifications"
 import type { LocationCheckResult } from "@/lib/location-utils"
 import type { LocationContextType, LocationProviderProps } from "@/types/location"
+import { useSearchParams } from "next/navigation"
 import { createContext, useCallback, useContext, useEffect, useMemo } from "react"
 
 const LocationContext = createContext<LocationContextType | undefined>(undefined)
@@ -33,7 +34,8 @@ export function LocationProvider({
 }: LocationProviderProps) {
     // Check if location checking is enabled via environment variable
     const isLocationCheckEnabled = process.env.NEXT_PUBLIC_ENABLE_LOCATION_CHECKER === "true"
-    const restaurantId = process.env.NEXT_PUBLIC_RESTAURANT_ID
+    const searchParams = useSearchParams()
+    const restaurantId = searchParams.get("restaurantId") ?? undefined
     const { data: restaurantDetails } = useRestaurantDetails(restaurantId)
     const restaurantLocation = restaurantDetails
         ? { latitude: restaurantDetails.latitude, longitude: restaurantDetails.longitude }

@@ -14,7 +14,7 @@ const Header = ({ className }: { className?: string }) => {
     const onBack = () => router?.back()
 
     return (
-        <div className={`flex max-h-12 min-w-full items-center justify-between bg-lightBg p-4 ${className}`}>
+        <div className={`flex max-h-12 min-w-full items-center justify-between bg-lightBg p-4 shadow-md ${className}`}>
             <div
                 onClick={onBack}
                 className='text-white hover:cursor-pointer'

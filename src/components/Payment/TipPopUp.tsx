@@ -136,6 +136,7 @@ export default function TipDialog({
                 </div>
                 <DialogFooter>
                     <Button
+                        variant='select'
                         className='mt-4 w-full'
                         onClick={() => {
                             onOpenChange(false)

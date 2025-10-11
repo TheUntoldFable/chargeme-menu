@@ -1,12 +1,9 @@
 import { API, headers } from "@/api/config"
 import { CreateOrderRequest, GetOrderRes, PrePayOrderResponse } from "@/models/order"
-import { RestaurantInfo } from "@/store/restaurant"
 import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query"
 
-export const getAllOrders = async (restaurantInfo: RestaurantInfo): Promise<unknown> => {
-    const rID = process.env.NEXT_PUBLIC_RESTAURANT_ID
-    const { data } = await API.get(`/orders/restaurant/${rID}/${Math.floor(restaurantInfo.tableId)}`)
-
+export const getAllOrders = async (tableId: string): Promise<unknown> => {
+    const { data } = await API.get("/orders/active", { params: { tableNumber: tableId } })
     return data
 }
 
@@ -43,13 +40,12 @@ export const usePrePayOrder = () =>
         meta: { headers },
     })
 
-export const useGetAllOrders = (restaurantInfo: RestaurantInfo): UseQueryResult<GetOrderRes> => {
+export const useGetAllOrders = (tableId: string): UseQueryResult<GetOrderRes> => {
     return useQuery({
-        queryKey: ["all-orders", restaurantInfo.tableId],
-        queryFn: () => getAllOrders(restaurantInfo),
+        queryKey: ["all-orders"],
+        queryFn: () => getAllOrders(tableId),
         meta: { headers },
         retry: false,
-        enabled: !!restaurantInfo.tableId,
     })
 }
 

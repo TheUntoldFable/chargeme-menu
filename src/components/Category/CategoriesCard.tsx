@@ -12,7 +12,7 @@ const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesP
             >
                 <p className='font-bold capitalize'>{name ?? "Test"}</p>
             </CardHeader>
-            <CardContent className='w-full rounded-lg border-none bg-lightBg pt-8'>
+            <CardContent className='w-full rounded-lg border-none bg-lightBg pt-8 shadow-lg'>
                 {subCategories.length ? (
                     subCategories.map((subCategory) => (
                         <MenuItem
