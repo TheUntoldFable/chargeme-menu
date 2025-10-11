@@ -79,8 +79,8 @@ export default function OrderPage() {
         const payload: WSSendMessagePayload = {
             transactionItems,
             totalPrice: price,
-            itemsPrice: calculateItemsPrice(price, tip, inputTip),
-            tip: calculateTipForOrder(price, tip, inputTip),
+            itemsPrice: Number(calculateItemsPrice(price, tip, inputTip).toFixed(2)),
+            tip: Number(calculateTipForOrder(price, tip, inputTip).toFixed(2)),
             orderId: order.orderId,
             sessionId: order.transactionSessionId,
         }
@@ -135,10 +135,10 @@ export default function OrderPage() {
                             <PaymentProduct
                                 id={item.id}
                                 name={item.name ?? ""}
-                                tempQuantity={item?.tempQuantity ?? ""}
-                                quantity={item.quantity ?? ""}
+                                tempQuantity={item?.tempQuantity ?? 0}
+                                quantity={item.quantity ?? 0}
                                 description={item.description ?? ""}
-                                price={item.price ?? ""}
+                                price={item.price ?? 0}
                                 splitBill={splitBill}
                                 increment={increment}
                                 decrement={decrement}
@@ -164,7 +164,7 @@ export default function OrderPage() {
                 onConfirm={initPayment}
                 onCancel={handleCancelDialog}
                 title='Сигурни ли сте, че искате да платите?'
-                description='Това ще инициализира поръчка.'
+                description='Изберете вашата банка, за да платите'
                 defaultTitle='Да'
                 cancelTitle='Не'
                 shouldConfirm

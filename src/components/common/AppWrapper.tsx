@@ -13,6 +13,7 @@ import Center from "./Center"
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     const searchParams = useSearchParams()
+    const restaurantIdParam = searchParams.get("restaurantId")
     const tableParam = searchParams.get("table")
     const isPaidParam = searchParams.get("isPaid")
     const table = tableParam !== null ? tableParam : undefined
@@ -24,8 +25,8 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         data: restaurantData,
         isLoading: isLoadingRestaurantData,
         refetch: refetchRestaurantData,
-        //! This should come from a conifg
-    } = useRestaurant(process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "")
+        //! This should come from a config
+    } = useRestaurant(restaurantIdParam ?? "")
 
     const { data, isLoading: isLoadingOrders, refetch } = useGetAllOrders(restaurantInfo.tableId)
     const [tableOrder, setTableOrder] = useState<GetOrderRes | undefined>(undefined)
@@ -50,12 +51,12 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (!isLoadingRestaurantData) {
             setRestaurantInfo({
-                restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID ?? "",
+                restaurantId: restaurantIdParam ?? "",
                 tableId: table ?? "",
                 restaurantData: restaurantData ?? null,
             })
         }
-    }, [restaurantData, isLoadingRestaurantData])
+    }, [restaurantData, isLoadingRestaurantData, restaurantIdParam, table])
 
     if (isLoadingRestaurantData || isLoadingOrders)
         return (

@@ -14,6 +14,7 @@ import { useEffect, useState } from "react"
 
 export default function Home() {
     const searchParams = useSearchParams()
+    const restaurantIdParam = searchParams.get("restaurantId") ?? ""
     const isPaidParam = searchParams.get("isPaid")
     const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
     const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
@@ -21,7 +22,7 @@ export default function Home() {
     const router = useRouter()
     const pathname = usePathname()
     const nextSearchParams = new URLSearchParams(searchParams.toString())
-    const { data: categories, isLoading, status } = useCategories()
+    const { data: categories, isLoading, status } = useCategories(restaurantIdParam)
 
     const handleAccept = () => {
         setIsOpenSuccesDialog(false)

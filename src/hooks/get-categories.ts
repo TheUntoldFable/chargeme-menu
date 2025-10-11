@@ -3,10 +3,9 @@ import { MenuCategory } from "@/models/categories"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { fetchMenuItemsByCategory } from "./get-menu-items-by-category"
 
-export const fetchCategories = async (): Promise<MenuCategory[]> => {
+export const fetchCategories = async (restaurantId: string): Promise<MenuCategory[]> => {
     try {
-        const restaurantId = process.env.NEXT_PUBLIC_RESTAURANT_ID
-        if (!restaurantId) throw new Error("Missing NEXT_PUBLIC_RESTAURANT_ID")
+        if (!restaurantId) throw new Error("Missing restaurantId")
         const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/${restaurantId}`)
 
         const data: MenuCategory[] = await res.json()
@@ -33,6 +32,11 @@ export const fetchCategories = async (): Promise<MenuCategory[]> => {
     }
 }
 
-export const useCategories = (): UseQueryResult<MenuCategory[]> => {
-    return useQuery({ queryKey: ["categories"], queryFn: fetchCategories, meta: { headers } })
+export const useCategories = (restaurantId: string): UseQueryResult<MenuCategory[]> => {
+    return useQuery({
+        queryKey: ["categories", restaurantId],
+        queryFn: () => fetchCategories(restaurantId),
+        meta: { headers },
+        enabled: !!restaurantId,
+    })
 }
