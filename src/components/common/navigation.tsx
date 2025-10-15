@@ -5,6 +5,7 @@ import IconSoup from "#/public/svg/icons/IconSoup"
 import IconWallet from "#/public/svg/icons/IconWallet"
 import { Badge } from "@/components/ui/badge"
 import { usePrePay } from "@/context/PrePayContext"
+import { useRestaurantId, withRestaurantId } from "@/lib/navigation-utils"
 import { cartState } from "@/store/cart"
 import { orderState } from "@/store/order"
 import Link from "next/link"
@@ -22,6 +23,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
     const orderItemsLength = order?.orderItems?.length
     const currentPath = usePathname()
     const { restaurantData } = usePrePay()
+    const restaurantId = useRestaurantId()
 
     const isPrePayMode = restaurantData?.paymentInAdvance || false
 
@@ -35,15 +37,15 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
 
     return (
         <div
-            className={`shadow-top-lg mb-0 mt-auto flex h-20 min-w-full items-center ${!isPrePayMode ? "justify-between" : "justify-around"} bg-darkGray px-4 py-4 ${classNames} fixed bottom-0`}
+            className={`mb-0 mt-auto flex h-20 min-w-full items-center shadow-top-lg ${!isPrePayMode ? "justify-between" : "justify-around"} bg-darkGray px-4 py-4 ${classNames} fixed bottom-0`}
         >
-            <Link href='/'>
+            <Link href={withRestaurantId("/", restaurantId)}>
                 <div className='flex flex-col items-center'>
                     <IconMenu color={getIconColor("/")} />
                     <p className={`bold text-sm ${getLinkClasses("/")}`}>Меню</p>
                 </div>
             </Link>
-            <Link href='/cart'>
+            <Link href={withRestaurantId("/cart", restaurantId)}>
                 <div className='relative flex flex-col items-center'>
                     {!!cartItemsLength && (
                         <Badge
@@ -58,7 +60,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
                 </div>
             </Link>
             {!isPrePayMode && (
-                <Link href='/order'>
+                <Link href={withRestaurantId("/order", restaurantId)}>
                     <div className='relative flex flex-col items-center'>
                         {!!orderItemsLength && (
                             <Badge

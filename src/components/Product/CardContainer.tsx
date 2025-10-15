@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { getRestaurantIdFromWindow, withRestaurantId } from "@/lib/navigation-utils"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -22,7 +23,7 @@ const ProductCard = ({ productId, classNames, children, isBlocked, image }: Prod
                     className='h-24 w-24 rounded-s-2xl'
                     alt='Img'
                 />
-                <div className='p2 flex flex-1 flex-row items-center justify-between gap-4 px-4'>{children}</div>
+                <div className='p2 flex min-w-0 flex-1 flex-row items-center justify-between px-4'>{children}</div>
             </CardContent>
         </Card>
     )
@@ -33,7 +34,7 @@ const ProductCard = ({ productId, classNames, children, isBlocked, image }: Prod
                 <RenderCard />
             ) : (
                 <Link
-                    href={`/product/${productId}`}
+                    href={withRestaurantId(`/product/${productId}`, getRestaurantIdFromWindow())}
                     passHref
                 >
                     <RenderCard />

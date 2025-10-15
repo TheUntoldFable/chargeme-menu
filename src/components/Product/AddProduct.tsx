@@ -30,7 +30,7 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
 
     return (
         <>
-            <div>
+            <div className='min-w-0'>
                 <h1 className='text-base'>{name}</h1>
                 <p className='truncate-text truncate text-sm text-lightGray'>{description}</p>
                 <div className='flex gap-2'>
@@ -42,7 +42,7 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
                 </div>
             </div>
             <Button
-                className={`${isAddBtnActive ? "active" : ""} btn-check icon-container c-button-reset c-plus-to-check h-9 w-9 gap-2 rounded-full p-0 text-lg ${isWine ? "bg-wine-default text-white" : "bg-gray text-black"}`}
+                className={`${isAddBtnActive ? "active" : ""} btn-check icon-container c-button-reset c-plus-to-check h-9 w-9 flex-shrink-0 gap-2 rounded-full p-0 text-lg ${isWine ? "bg-wine-default text-white" : "bg-gray text-black"}`}
                 type='button'
                 id='add'
                 variant={isInCart ? "destructive" : "default"}
