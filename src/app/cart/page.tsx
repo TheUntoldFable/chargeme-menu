@@ -37,6 +37,7 @@ export default function CartPage() {
 
     // Check if this restaurant uses pre-payment
     const isPrePayMode = restaurantData?.paymentInAdvance ?? false
+    console.log(restaurantInfo)
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
