@@ -1,5 +1,5 @@
 import IconArrowRight from "#/public/svg/icons/IconArrowRight"
-import { buildUrlWithParams, useRestaurantId } from "@/lib/navigation-utils"
+import { buildUrlWithParams, useRestaurantParams } from "@/lib/navigation-utils"
 import Link from "next/link"
 
 interface MenuItemProps {
@@ -12,7 +12,7 @@ interface MenuItemProps {
 }
 
 const MenuItem = ({ name, catQuantity, id, type, productId, isWine }: MenuItemProps) => {
-    const restaurantId = useRestaurantId()
+    const { restaurantId, table } = useRestaurantParams()
     const buildUrl = () => {
         return buildUrlWithParams(
             `/subcategory/${type}/${id}`,
@@ -20,7 +20,8 @@ const MenuItem = ({ name, catQuantity, id, type, productId, isWine }: MenuItemPr
                 isWine,
                 productId: productId || null,
             },
-            restaurantId
+            restaurantId,
+            table
         )
     }
 
