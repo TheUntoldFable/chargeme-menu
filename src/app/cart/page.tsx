@@ -14,6 +14,7 @@ import { useTableOrder } from "@/context/TableOrderContext"
 import { usePrePayOrder } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
+import { withRestaurantParams } from "@/lib/navigation-utils"
 import { calculateTotalPrice } from "@/lib/utils"
 import { CreateOrderItem, GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
@@ -97,6 +98,7 @@ export default function CartPage() {
                     restaurantId: restaurantInfo.restaurantId,
                 })
 
+                router.push(withRestaurantParams("/order", restaurantId, tableId))
                 console.log("ORDER CREATED")
             } else {
                 throw new Error("No connection to socket!")
