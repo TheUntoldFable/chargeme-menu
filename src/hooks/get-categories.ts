@@ -1,12 +1,15 @@
 import { API_BASE_URL, headers } from "@/api/config"
 import { MenuCategory } from "@/models/categories"
+import { languageState, getApiLanguage, type LanguageCode } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
+import { useRecoilValue } from "recoil"
 import { fetchMenuItemsByCategory } from "./get-menu-items-by-category"
 
-export const fetchCategories = async (restaurantId: string): Promise<MenuCategory[]> => {
+export const fetchCategories = async (restaurantId: string, language: LanguageCode): Promise<MenuCategory[]> => {
     try {
         if (!restaurantId) throw new Error("Missing restaurantId")
-        const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/${restaurantId}`)
+        const apiLang = getApiLanguage(language)
+        const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/${restaurantId}?lang=${apiLang}`)
 
         const data: MenuCategory[] = await res.json()
 
@@ -15,7 +18,7 @@ export const fetchCategories = async (restaurantId: string): Promise<MenuCategor
             data.map(async (item) => {
                 if (item.subcategories.length === 0) {
                     try {
-                        const subcategories = await fetchMenuItemsByCategory(item.id)
+                        const subcategories = await fetchMenuItemsByCategory(item.id, language)
                         return { ...item, subcategories }
                     } catch (error) {
                         console.error(`Failed to fetch menu items for category ${item.id}:`, error)
@@ -33,9 +36,10 @@ export const fetchCategories = async (restaurantId: string): Promise<MenuCategor
 }
 
 export const useCategories = (restaurantId: string): UseQueryResult<MenuCategory[]> => {
+    const language = useRecoilValue(languageState)
     return useQuery({
-        queryKey: ["categories", restaurantId],
-        queryFn: () => fetchCategories(restaurantId),
+        queryKey: ["categories", restaurantId, language],
+        queryFn: () => fetchCategories(restaurantId, language),
         meta: { headers },
         enabled: !!restaurantId,
     })
