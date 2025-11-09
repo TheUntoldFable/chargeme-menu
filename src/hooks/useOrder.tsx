@@ -2,13 +2,15 @@ import { GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
 import { cartState } from "@/store/cart"
 import { orderPrice, orderState } from "@/store/order"
-import { useRecoilState } from "recoil"
+import { languageState } from "@/store/language"
+import { useRecoilState, useRecoilValue } from "recoil"
 import { fetchMenuItem } from "./get-menu-item"
 
 export function useOrder() {
     const [cartItems, setCartItems] = useRecoilState<Product[] | []>(cartState)
     const [order, setOrder] = useRecoilState(orderState)
     const [price, setPrice] = useRecoilState<number>(orderPrice)
+    const language = useRecoilValue(languageState)
 
     const toggleSelect = (id: string) => {
         const updatedOrderItems = order.orderItems.map((orderItem) =>
@@ -27,7 +29,7 @@ export function useOrder() {
 
         await Promise.all(
             e.orderItems.map(async (orderItem) => {
-                const item = await fetchMenuItem(orderItem.menuItemId)
+                const item = await fetchMenuItem(orderItem.menuItemId, language)
 
                 orderItemMap.set(orderItem.menuItemId, {
                     ...item,
