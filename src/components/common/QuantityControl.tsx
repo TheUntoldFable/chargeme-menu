@@ -2,6 +2,7 @@
 
 import IconMinus from "#/public/svg/icons/IconMinus"
 import IconPlus from "#/public/svg/icons/IconPlus"
+import { useTranslations } from "next-intl"
 import React from "react"
 import { toast } from "../ui/use-toast"
 interface QuantityControlProps {
@@ -23,6 +24,8 @@ const QuantityControl: React.FC<QuantityControlProps> = ({
     actionsDisabled = true,
     source,
 }) => {
+    const t = useTranslations("common.impossibleStep")
+
     const handleOnClick = (
         event: React.MouseEvent<HTMLDivElement>,
         callback?: (id: string | number, quantity: number, source: "cart" | "order") => void
@@ -32,8 +35,8 @@ const QuantityControl: React.FC<QuantityControlProps> = ({
         if (tempQuantity && tempQuantity === quantity && callback?.name === "increment") {
             toast({
                 variant: "destructive",
-                title: "Невъзможна стъпка!",
-                description: `Това действие не може да бъде изпълнено.`,
+                title: t("title"),
+                description: t("description"),
             })
         } else {
             callback?.(id, tempQuantity ? tempQuantity : quantity, source)

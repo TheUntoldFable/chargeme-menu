@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { formatAmount } from "@/lib/utils"
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions } from "@stripe/stripe-js"
+import { useTranslations } from "next-intl"
 import { FormEvent, useEffect, useState } from "react"
 
 interface CheckoutFormProps {
@@ -14,6 +15,7 @@ export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
     const stripe = useStripe()
     const elements = useElements()
     const [paymentAmount, setPaymentAmount] = useState<number>(0)
+    const t = useTranslations("payment.stripe")
 
     const [message, setMessage] = useState<string | null | undefined>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -34,16 +36,16 @@ export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
 
             switch (paymentIntent?.status) {
                 case "succeeded":
-                    setMessage("Payment succeeded!")
+                    setMessage(t("succeeded"))
                     break
                 case "processing":
-                    setMessage("Your create-payment-intent is processing.")
+                    setMessage(t("processing"))
                     break
                 case "requires_payment_method":
-                    setMessage("Your create-payment-intent was not successful, please try again.")
+                    setMessage(t("requiresPaymentMethod"))
                     break
                 default:
-                    setMessage("Something went wrong.")
+                    setMessage(t("error"))
                     break
             }
         })
@@ -77,7 +79,7 @@ export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
         if (error.type === "card_error" || error.type === "validation_error") {
             setMessage(error?.message)
         } else {
-            setMessage("An unexpected error occurred.")
+            setMessage(t("unexpectedError"))
         }
 
         setIsLoading(false)
@@ -110,7 +112,7 @@ export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
                             id='spinner'
                         ></div>
                     ) : (
-                        `Плати ${formatAmount(paymentAmount)}`
+                        `${t("payButton")} ${formatAmount(paymentAmount)}`
                     )}
                 </span>
             </Button>

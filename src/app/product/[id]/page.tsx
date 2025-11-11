@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMenuItem } from "@/hooks/get-menu-item"
 import { useAddToCart } from "@/hooks/useAddToCart"
 import { Product } from "@/models/product"
+import { useTranslations } from "next-intl"
 import Image from "next/image"
 import { useState } from "react"
 
@@ -22,6 +23,8 @@ export default function Page({ params }: ProductPageProps) {
     const { data: item, isLoading } = useMenuItem(id)
     const [quantity, setQuantity] = useState(1)
     const { addToCart, isAddBtnActive } = useAddToCart()
+    const t = useTranslations("product")
+    const tCommon = useTranslations("common")
 
     return (
         !isLoading && (
@@ -37,10 +40,10 @@ export default function Page({ params }: ProductPageProps) {
                     <div className='w-full px-4 pb-4'>
                         <div className='mb-6 flex items-center justify-between rounded-2xl bg-lightBg py-2 pl-4 pr-2'>
                             <p className='text-lightGray'>
-                                Крайна цена:{" "}
+                                {t("finalPrice")}{" "}
                                 <span className='block text-white'>
                                     {item
-                                        ? `${item.price.toFixed(2)} лв${item.priceInEur !== undefined ? ` / €${item.priceInEur.toFixed(2)}` : ""}`
+                                        ? `${item.price.toFixed(2)} ${tCommon("currency")}${item.priceInEur !== undefined ? ` / €${item.priceInEur.toFixed(2)}` : ""}`
                                         : ""}
                                 </span>
                             </p>
@@ -57,11 +60,11 @@ export default function Page({ params }: ProductPageProps) {
                                 </div>
                             </div>
                         </div>
-                        <h2 className='mb-1 text-left text-white'>Описание</h2>
+                        <h2 className='mb-1 text-left text-white'>{t("description")}</h2>
                         <p className='mb-6 text-sm text-lightGray'>{item?.description}</p>
                         <DropdownMenuCheckboxes></DropdownMenuCheckboxes>
                         <DropdownMenuCheckboxes></DropdownMenuCheckboxes>
-                        <h2 className='mb-3 text-left text-white'>Алергени</h2>
+                        <h2 className='mb-3 text-left text-white'>{t("allergens")}</h2>
                         <div className='mb-6 flex gap-2'>
                             <Image
                                 src='/images/allergens-1.png'
@@ -99,7 +102,7 @@ export default function Page({ params }: ProductPageProps) {
                             variant='default'
                             onClick={() => addToCart(item as Product, item?.name, quantity)}
                         >
-                            Добави
+                            {t("add")}
                         </Button>
                     </div>
                 </ScrollArea>
