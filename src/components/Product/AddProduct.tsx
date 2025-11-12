@@ -23,6 +23,11 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
 
     const { addToCart, isAddBtnActive } = useAddToCart()
 
+    const truncateText = (text: string, maxLength: number = 30): string => {
+        if (text.length <= maxLength) return text
+        return text.substring(0, maxLength) + "..."
+    }
+
     const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
         addToCart(itemData, itemData.name)
@@ -30,9 +35,9 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
 
     return (
         <>
-            <div className='min-w-0'>
-                <h1 className='text-base'>{name}</h1>
-                <p className='truncate-text truncate text-sm text-lightGray'>{description}</p>
+            <div className='min-w-0 flex-1'>
+                <h1 className='text-base'>{truncateText(name)}</h1>
+                <p className='text-sm text-lightGray'>{truncateText(description || "")}</p>
                 <div className='flex gap-2'>
                     <p className='font-bold'>
                         {price.toFixed(2)} лв {priceInEur ? `/ €${priceInEur.toFixed(2)}` : ""}

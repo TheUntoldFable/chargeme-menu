@@ -20,7 +20,7 @@ const ProductCard = ({ productId, classNames, children, isBlocked, image }: Prod
                     src={image ? image : "/images/pizza.png"}
                     width={96}
                     height={96}
-                    className='h-24 w-24 rounded-s-2xl'
+                    className='h-24 w-24 rounded-s-2xl object-contain'
                     alt='Img'
                 />
                 <div className='p2 flex min-w-0 flex-1 flex-row items-center justify-between px-4'>{children}</div>
