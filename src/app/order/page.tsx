@@ -8,6 +8,7 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTableOrder } from "@/context/TableOrderContext"
+import { useTranslations } from "next-intl"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPriceEur } from "@/lib/utils"
@@ -18,6 +19,8 @@ import { v4 as uuidv4 } from "uuid"
 
 export default function OrderPage() {
     const { order, setPrice, price, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
+    const tOrder = useTranslations("order")
+    const tCommon = useTranslations("common")
     const inputRef = useRef<HTMLInputElement>(null)
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
@@ -163,10 +166,10 @@ export default function OrderPage() {
                 isOpen={confirmDialogOpen}
                 onConfirm={initPayment}
                 onCancel={handleCancelDialog}
-                title='Сигурни ли сте, че искате да платите?'
-                description='Изберете вашата банка, за да платите'
-                defaultTitle='Да'
-                cancelTitle='Не'
+                title={tOrder("confirmPayment.title")}
+                description={tOrder("confirmPayment.description")}
+                defaultTitle={tCommon("yes")}
+                cancelTitle={tCommon("no")}
                 shouldConfirm
             />
             <div className='w-full gap-4 p-4'>
@@ -177,7 +180,7 @@ export default function OrderPage() {
                     variant='select'
                     onClick={() => setSplitBill((prev) => !prev)}
                 >
-                    {splitBill ? "Назад" : "Раздели и плати"}{" "}
+                    {splitBill ? tCommon("back") : tOrder("splitAndPay")}{" "}
                 </Button>
                 <Button
                     onClick={() => {
@@ -189,7 +192,7 @@ export default function OrderPage() {
                     id='add'
                     variant='select'
                 >
-                    Плати {price ? price.toFixed(2) : 0} лв{" "}
+                    {tCommon("pay")} {price ? price.toFixed(2) : 0} {tCommon("currency")}{" "}
                     {order?.orderItems && (
                         <span className='text-gray'>/ €{calculateTotalPriceEur(order.orderItems, false).toFixed(2)}</span>
                     )}

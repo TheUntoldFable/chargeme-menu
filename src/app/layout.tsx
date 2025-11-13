@@ -5,6 +5,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 
 import { AppWrapper } from "@/components/common/AppWrapper"
+import { IntlProvider } from "@/components/providers/intl-provider"
 import { LocationProvider } from "@/components/providers/location-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
@@ -34,19 +35,21 @@ export default function RootLayout({
             <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
                 <Toaster />
                 <RecoilContextProvider>
-                    <QueryClientProvider client={queryClient}>
-                        <Suspense>
-                            <LocationProvider>
-                                {env !== "production" ? (
-                                    <HydrationOverlay>
+                    <IntlProvider>
+                        <QueryClientProvider client={queryClient}>
+                            <Suspense>
+                                <LocationProvider>
+                                    {env !== "production" ? (
+                                        <HydrationOverlay>
+                                            <AppWrapper>{children}</AppWrapper>
+                                        </HydrationOverlay>
+                                    ) : (
                                         <AppWrapper>{children}</AppWrapper>
-                                    </HydrationOverlay>
-                                ) : (
-                                    <AppWrapper>{children}</AppWrapper>
-                                )}
-                            </LocationProvider>
-                        </Suspense>
-                    </QueryClientProvider>
+                                    )}
+                                </LocationProvider>
+                            </Suspense>
+                        </QueryClientProvider>
+                    </IntlProvider>
                 </RecoilContextProvider>
             </body>
         </html>

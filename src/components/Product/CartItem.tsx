@@ -2,6 +2,7 @@
 
 import IconPlus from "#/public/svg/icons/IconPlus"
 import QuantityControl from "@/components/common/QuantityControl"
+import { useTranslations } from "next-intl"
 import { OrderProductProps } from "@/models/product"
 import { cartState } from "@/store/cart"
 import React from "react"
@@ -10,6 +11,7 @@ import { toast } from "../ui/use-toast"
 
 const CartItem = ({ name, id, tempQuantity, quantity, description, price, priceInEur, increment, decrement }: OrderProductProps) => {
     const [cartItems, setCartItems] = useRecoilState(cartState)
+    const tCart = useTranslations("cart")
 
     const handleRemoveFromCart = (e: React.MouseEvent) => {
         e.preventDefault()
@@ -17,8 +19,8 @@ const CartItem = ({ name, id, tempQuantity, quantity, description, price, priceI
         setCartItems(filteredItems)
         toast({
             variant: "destructive",
-            title: "Премахване от поръчка",
-            description: `Продуктът ${name} е успешно премахнат от вашата поръчка!`,
+            title: tCart("removeItem.title"),
+            description: tCart("removeItem.description"),
         })
     }
 
