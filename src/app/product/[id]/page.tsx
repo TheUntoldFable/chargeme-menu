@@ -34,7 +34,7 @@ export default function Page({ params }: ProductPageProps) {
                         src={item?.image ?? "/images/pizza.png"}
                         width={393}
                         height={248}
-                        className='mb-6 h-60 w-full rounded'
+                        className='mb-6 h-60 w-full rounded object-contain'
                         alt='Img'
                     />{" "}
                     <div className='w-full px-4 pb-4'>

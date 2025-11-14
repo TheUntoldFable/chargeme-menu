@@ -81,7 +81,7 @@ export default function OrderPage() {
 
         const payload: WSSendMessagePayload = {
             transactionItems,
-            totalPrice: price,
+            totalPrice: Number(price.toFixed(2)),
             itemsPrice: Number(calculateItemsPrice(price, tip, inputTip).toFixed(2)),
             tip: Number(calculateTipForOrder(price, tip, inputTip).toFixed(2)),
             orderId: order.orderId,

@@ -102,7 +102,6 @@ export default function CartPage() {
                 })
 
                 router.push(withRestaurantParams("/order", restaurantId, tableId))
-                console.log("ORDER CREATED")
             } else {
                 throw new Error("No connection to socket!")
             }
@@ -130,7 +129,7 @@ export default function CartPage() {
                 restaurantId: restaurantInfo.restaurantId,
                 orderId: order.orderId,
             })
-            console.log("ORDER UPDATED")
+            router.push(withRestaurantParams("/order", restaurantId, tableId))
         } else {
             throw new Error("No connection to socket!")
         }
