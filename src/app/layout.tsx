@@ -1,5 +1,6 @@
 "use client"
 
+import "@smastrom/react-rating/style.css"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Inter } from "next/font/google"
 import "./globals.css"

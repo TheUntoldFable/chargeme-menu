@@ -10,7 +10,7 @@ import { useEffect, useState } from "react"
 
 import IconFailed from "#/public/svg/icons/IconFailed"
 import IconSuccess from "#/public/svg/icons/IconSuccess"
-import DialogPopUp from "@/components/common/DialogPopUp"
+import { DialogPopUp } from "@/components/common/DialogPopUp"
 
 import appleLogo from "#/public/svg/logos/apple.svg"
 import mastercardLogo from "#/public/svg/logos/mastercard.svg"

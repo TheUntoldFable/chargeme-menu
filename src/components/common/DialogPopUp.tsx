@@ -11,7 +11,7 @@ import { ReactNode } from "react"
 
 interface DialogProps {
     title: string
-    description: string
+    description?: string | JSX.Element
     cancelTitle?: string
     defaultTitle: string
     icon?: ReactNode
@@ -21,7 +21,7 @@ interface DialogProps {
     shouldConfirm?: boolean
 }
 
-const DialogPopUp = ({
+export const DialogPopUp = ({
     title,
     description,
     cancelTitle,
@@ -38,8 +38,9 @@ const DialogPopUp = ({
                 <AlertDialogHeader className='items-center'>
                     {icon && <div>{icon}</div>}
                     <AlertDialogTitle className='text-white'>{title}</AlertDialogTitle>
-                    <AlertDialogDescription className='text-lightGray'>{description}</AlertDialogDescription>
                 </AlertDialogHeader>
+                {description && <AlertDialogDescription className='text-lightGray'>{description}</AlertDialogDescription>}
+
                 <AlertDialogFooter className='flex-row items-center gap-2'>
                     <Button
                         onClick={onConfirm}
@@ -62,5 +63,3 @@ const DialogPopUp = ({
         </AlertDialog>
     )
 }
-
-export default DialogPopUp
