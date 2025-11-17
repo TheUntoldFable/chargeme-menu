@@ -12,6 +12,7 @@ import TotalPrice from "@/components/ui/total-price"
 import { usePrePay } from "@/context/PrePayContext"
 import { useTableOrder } from "@/context/TableOrderContext"
 import { usePrePayOrder } from "@/hooks/send-payment-data"
+import { useTranslations } from "next-intl"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { withRestaurantParams } from "@/lib/navigation-utils"
@@ -27,6 +28,8 @@ export default function CartPage() {
     const router = useRouter()
     const [restaurantInfo] = useRecoilState(restaurantState)
     const { restaurantData } = usePrePay()
+    const tCart = useTranslations("cart")
+    const tCommon = useTranslations("common")
 
     const { updateOrder, order, cartItems, increment, decrement } = useOrder()
     const { restaurantId, tableId } = restaurantInfo
@@ -99,7 +102,6 @@ export default function CartPage() {
                 })
 
                 router.push(withRestaurantParams("/order", restaurantId, tableId))
-                console.log("ORDER CREATED")
             } else {
                 throw new Error("No connection to socket!")
             }
@@ -127,7 +129,7 @@ export default function CartPage() {
                 restaurantId: restaurantInfo.restaurantId,
                 orderId: order.orderId,
             })
-            console.log("ORDER UPDATED")
+            router.push(withRestaurantParams("/order", restaurantId, tableId))
         } else {
             throw new Error("No connection to socket!")
         }
@@ -140,13 +142,13 @@ export default function CartPage() {
     // Get button text based on pre-pay mode
     const getButtonText = () => {
         if (isPrePayMode) {
-            return tableOrder?.status === "ORDERED" ? "Добави и плати" : "Поръчай и плати"
+            return tableOrder?.status === "ORDERED" ? tCart("addAndPay") : tCart("orderAndPay")
         }
-        return tableOrder?.status === "ORDERED" ? "Добави" : "Поръчай"
+        return tableOrder?.status === "ORDERED" ? tCart("add") : tCart("order")
     }
 
     return (
-        <Container title='Избрано'>
+        <Container title={tCart("selected")}>
             <ScrollArea className='calc-height min-w-full px-4 pt-4'>
                 {cartItems.map((item) => (
                     <CardContainer
@@ -181,14 +183,10 @@ export default function CartPage() {
                     {getButtonText()}
                 </Button>
                 <DialogPopUp
-                    title='Сигурни ли сте, че искате да продължите?'
-                    description={
-                        isPrePayMode
-                            ? "Това ще запази поръчката ви и ще ви изпрати към плащането."
-                            : "Това ще запази поръчката ви и ще ви изпрати на следващата стъпка."
-                    }
-                    defaultTitle='Да'
-                    cancelTitle='Не'
+                    title={tCart("confirmDialog.title")}
+                    description={tCart("confirmDialog.description")}
+                    defaultTitle={tCommon("yes")}
+                    cancelTitle={tCommon("no")}
                     isOpen={isOpenDialog}
                     onConfirm={handleOrderAction}
                     onCancel={() => setIsOpenDialog(false)}
@@ -196,9 +194,9 @@ export default function CartPage() {
                 />
                 <DialogPopUp
                     icon={<IconFailed />}
-                    title='Неуспешно плащане!'
-                    description={"Възникна грешка по време на плащането, моля опитайте пак."}
-                    defaultTitle='Продължи'
+                    title={tCart("paymentFailed.title")}
+                    description={tCart("paymentFailed.description")}
+                    defaultTitle={tCommon("yes")}
                     isOpen={isOpenFailedDialog}
                     onConfirm={() => setIsOpenFailedDialog(false)}
                 />

@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Toggle } from "@/components/ui/toggle"
+import { useTranslations } from "next-intl"
 import { calculateTotalPriceEur } from "@/lib/utils"
 import { Product } from "@/models/product"
 import { ChangeEvent, RefObject } from "react"
@@ -70,6 +71,9 @@ export default function TipDialog({
     basePrice,
     orderItems,
 }: TipDialogProps) {
+    const tTip = useTranslations("tip")
+    const tCommon = useTranslations("common")
+
     return (
         <Dialog
             open={open}
@@ -77,10 +81,10 @@ export default function TipDialog({
         >
             <DialogContent className='bg-darkBg text-white'>
                 <DialogHeader>
-                    <DialogTitle>Добавете бакшиш</DialogTitle>
+                    <DialogTitle>{tTip("title")}</DialogTitle>
                 </DialogHeader>
                 <div className='mb-2 flex w-full flex-col gap-2 border-t border-lightBg p-4'>
-                    <h2 className='text-base font-medium text-white'>Комплимент за сервитьора</h2>
+                    <h2 className='text-base font-medium text-white'>{tTip("subtitle")}</h2>
                     <div className='flex flex-1 justify-between gap-1'>
                         {toggleOptions.map((option) => (
                             <div
@@ -108,7 +112,7 @@ export default function TipDialog({
                             ref={inputRef}
                             type='number'
                             className='border-2 border-lightBg text-base text-white'
-                            placeholder='Въведете сума'
+                            placeholder={tTip("enterAmount")}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                 setInputTip(true)
                                 if (e.target.value) {
@@ -119,15 +123,15 @@ export default function TipDialog({
                             }}
                         />
                         <span className='absolute right-0 top-0 flex h-12 w-12 items-center justify-center rounded-r-2xl border-2 border-lightBg bg-lighterGray text-center text-white'>
-                            лв
+                            {tCommon("currency")}
                         </span>
                     </label>
 
                     {/* Total Price Display */}
                     <div className='mt-4 rounded-lg bg-lightBg p-4'>
-                        <h3 className='mb-2 text-sm font-medium text-white'>Обща сума с бакшиш:</h3>
+                        <h3 className='mb-2 text-sm font-medium text-white'>{tTip("totalWithTip")}</h3>
                         <div className='flex items-center justify-between'>
-                            <span className='text-lg font-bold text-white'>{calculateTotalWithTip(basePrice, tip).toFixed(2)} лв</span>
+                            <span className='text-lg font-bold text-white'>{calculateTotalWithTip(basePrice, tip).toFixed(2)} {tCommon("currency")}</span>
                             <span className='text-sm text-lightGray'>
                                 / €{calculateTotalWithTipEur(calculateTotalPriceEur(orderItems, false), tip).toFixed(2)}
                             </span>
@@ -143,7 +147,7 @@ export default function TipDialog({
                             onConfirm()
                         }}
                     >
-                        Потвърди и продължи
+                        {tTip("confirmAndContinue")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

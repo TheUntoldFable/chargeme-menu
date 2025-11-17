@@ -1,8 +1,8 @@
 import { GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
 import { cartState } from "@/store/cart"
-import { orderPrice, orderState } from "@/store/order"
 import { languageState } from "@/store/language"
+import { orderPrice, orderState } from "@/store/order"
 import { useRecoilState, useRecoilValue } from "recoil"
 import { fetchMenuItem } from "./get-menu-item"
 
@@ -43,7 +43,6 @@ export function useOrder() {
                 })
             })
         )
-        console.log(orderItemMap)
 
         const finalItems = Array.from(orderItemMap.values())
             .filter((item) => item.remaining > 0)

@@ -3,12 +3,14 @@
 import Container from "@/components/common/container"
 import { useLocation } from "@/components/providers/location-provider"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 import { MapPin } from "lucide-react"
 import { useState } from "react"
 
 export default function LocationError() {
     const { checkLocation, isChecking } = useLocation()
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const t = useTranslations("location.error")
 
     const handleCheckLocation = async () => {
         setIsButtonDisabled(true)
@@ -28,9 +30,9 @@ export default function LocationError() {
                         <MapPin className='h-12 w-12 text-white' />
                     </div>
 
-                    <h1 className='text-2xl font-semibold text-white'>Моля сканирайте QR кода отново.</h1>
+                    <h1 className='text-2xl font-semibold text-white'>{t("title")}</h1>
 
-                    <p className='text-gray-400 text-sm'>Трябва да сте в ресторанта, за да направите поръчка</p>
+                    <p className='text-gray-400 text-sm'>{t("description")}</p>
 
                     <Button
                         onClick={handleCheckLocation}
@@ -38,7 +40,7 @@ export default function LocationError() {
                         className='gap-2 bg-lightBg px-6 py-3 text-base font-medium text-white transition-transform ease-in-out active:scale-75'
                         variant='default'
                     >
-                        {isChecking || isButtonDisabled ? "Проверява се..." : "Провери отново"}
+                        {isChecking || isButtonDisabled ? t("checking") : t("checkAgain")}
                     </Button>
                 </div>
             </div>

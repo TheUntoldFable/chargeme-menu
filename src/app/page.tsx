@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { useCategories } from "@/hooks/get-categories"
 import { Rating as ReactRating } from "@smastrom/react-rating"
+import { useTranslations } from "next-intl"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -24,6 +25,8 @@ export default function Home() {
     const [rating, setRating] = useState(0)
     const [shouldRate, setShouldRate] = useState(false)
     const [feedbackOpen, setFeedbackOpen] = useState(false)
+    const tPayment = useTranslations("payment")
+    const tCommon = useTranslations("common")
 
     const router = useRouter()
     const pathname = usePathname()
@@ -131,17 +134,17 @@ export default function Home() {
             />
             <DialogPopUp
                 icon={<IconSuccess />}
-                title='Успешно плащане!'
-                description='Благодарим Ви, че избрахте нас, очакваме ви отново скоро!'
-                defaultTitle='Ok'
+                title={tPayment("success.title")}
+                description={tPayment("success.description")}
+                defaultTitle={tCommon("ok")}
                 isOpen={isOpenSuccessDialog}
                 onConfirm={handleAccept}
             />
             <DialogPopUp
                 icon={<IconFailed />}
-                title='Неуспешно плащане!'
-                description='Възникна грешка по време на плащането, моля опитайте пак.'
-                defaultTitle='Ok'
+                title={tPayment("failed.title")}
+                description={tPayment("failed.description")}
+                defaultTitle={tCommon("ok")}
                 isOpen={isOpenFailedDialog}
                 onConfirm={handleAccept}
             />

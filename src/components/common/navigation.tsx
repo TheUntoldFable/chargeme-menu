@@ -5,6 +5,7 @@ import IconSoup from "#/public/svg/icons/IconSoup"
 import IconWallet from "#/public/svg/icons/IconWallet"
 import { Badge } from "@/components/ui/badge"
 import { usePrePay } from "@/context/PrePayContext"
+import { useTranslations } from "next-intl"
 import { useRestaurantParams, withRestaurantParams } from "@/lib/navigation-utils"
 import { cartState } from "@/store/cart"
 import { orderState } from "@/store/order"
@@ -24,6 +25,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
     const currentPath = usePathname()
     const { restaurantData } = usePrePay()
     const { restaurantId, table } = useRestaurantParams()
+    const t = useTranslations("navigation")
 
     const isPrePayMode = restaurantData?.paymentInAdvance || false
 
@@ -42,7 +44,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
             <Link href={withRestaurantParams("/", restaurantId, table)}>
                 <div className='flex flex-col items-center'>
                     <IconMenu color={getIconColor("/")} />
-                    <p className={`bold text-sm ${getLinkClasses("/")}`}>Меню</p>
+                    <p className={`bold text-sm ${getLinkClasses("/")}`}>{t("menu")}</p>
                 </div>
             </Link>
             <Link href={withRestaurantParams("/cart", restaurantId, table)}>
@@ -56,7 +58,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
                         </Badge>
                     )}
                     <IconSoup color={getIconColor("/cart")} />
-                    <p className={`bold text-sm ${getLinkClasses("/cart")}`}>Моят избор</p>
+                    <p className={`bold text-sm ${getLinkClasses("/cart")}`}>{t("mySelection")}</p>
                 </div>
             </Link>
             {!isPrePayMode && (
@@ -72,7 +74,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
                         )}
 
                         <IconWallet color={getIconColor("/order")} />
-                        <p className={`bold text-sm ${getLinkClasses("/order")}`}>Плащане</p>
+                        <p className={`bold text-sm ${getLinkClasses("/order")}`}>{t("payment")}</p>
                     </div>
                 </Link>
             )}

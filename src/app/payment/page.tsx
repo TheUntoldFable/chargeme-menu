@@ -4,6 +4,7 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useTranslations } from "next-intl"
 import { useOrder } from "@/hooks/useOrder"
 import Image from "next/image"
 import { useEffect, useState } from "react"
@@ -23,6 +24,8 @@ export default function PaymentPage() {
     const [isSuccessful, setIsSuccessfull] = useState<boolean>(false)
     const [isUnSuccessful, setIsUnsuccessful] = useState<boolean>(false)
     const { price, order } = useOrder()
+    const tPayment = useTranslations("payment")
+    const tCommon = useTranslations("common")
     const [paymentMethod, setPaymentMethod] = useState("card")
 
     const { lastMessage, lastJsonMessage } = useWebSocket(SOCKET_URL, {
@@ -41,17 +44,17 @@ export default function PaymentPage() {
         <Container title={""}>
             <DialogPopUp
                 icon={<IconSuccess />}
-                title='Успешно плащане!'
-                description='Благодарим Ви, че избрахте нас, очакваме ви отново скоро!'
-                defaultTitle='Ok'
+                title={tPayment("success.title")}
+                description={tPayment("success.description")}
+                defaultTitle={tCommon("ok")}
                 isOpen={isSuccessful}
                 onConfirm={() => setIsSuccessfull(false)}
             />
             <DialogPopUp
                 icon={<IconFailed />}
-                title='Неуспешно плащане!'
-                description='Възникна грешка по време на плащането, моля опитайте пак.'
-                defaultTitle='Оптиай пак'
+                title={tPayment("failed.title")}
+                description={tPayment("failed.description")}
+                defaultTitle={tCommon("ok")}
                 isOpen={isUnSuccessful}
                 onConfirm={() => setIsUnsuccessful(false)}
             />
@@ -63,15 +66,15 @@ export default function PaymentPage() {
                             src={appleLogo}
                             alt='appleLogo'
                         />
-                        <p>Pay</p>
+                        <p>{tCommon("pay")}</p>
                     </div>
                 </Button>
                 <div className='flex flex-row items-center justify-between gap-2'>
                     <div className='h-[1px] w-full bg-lightGray' />
-                    <p className='text-lightGray'>или</p>
+                    <p className='text-lightGray'>{tCommon("or")}</p>
                     <div className='h-[1px] w-full bg-lightGray' />
                 </div>
-                <h3>Изберете начин на плащане:</h3>
+                <h3>{tPayment("chooseMethod")}</h3>
                 <RadioGroup
                     className='text-lightGray'
                     defaultValue='option-one'
@@ -86,7 +89,7 @@ export default function PaymentPage() {
                             value='card'
                             id='option-card'
                         />
-                        <Label htmlFor='option-one'>Кредитна / Дебитна карта</Label>
+                        <Label htmlFor='option-one'>{tPayment("methods.card")}</Label>
                         <div className='flex items-center gap-2'>
                             <Image
                                 width={40}
@@ -110,7 +113,7 @@ export default function PaymentPage() {
                             value='pos'
                             id='option-pos'
                         />
-                        <Label htmlFor='option-one'>POS терминал</Label>
+                        <Label htmlFor='option-one'>{tPayment("methods.pos")}</Label>
                     </div>
                     <div
                         onClick={() => setPaymentMethod("cash")}
@@ -122,7 +125,7 @@ export default function PaymentPage() {
                             value='cash'
                             id='option-cash'
                         />
-                        <Label htmlFor='option-one'>В брой</Label>
+                        <Label htmlFor='option-one'>{tPayment("methods.cash")}</Label>
                     </div>
                 </RadioGroup>
             </div>
@@ -138,7 +141,7 @@ export default function PaymentPage() {
                 className='mb-10 mt-auto'
                 variant='select'
             >
-                <p className='text-darkBg'>Плати {price.toFixed(2)} лв</p>
+                <p className='text-darkBg'>{tCommon("pay")} {price.toFixed(2)} {tCommon("currency")}</p>
             </Button>
         </Container>
     )
