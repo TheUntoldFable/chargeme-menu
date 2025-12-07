@@ -11,15 +11,15 @@ import { useAddToCart } from "@/hooks/useAddToCart"
 import { Product } from "@/models/product"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
-import { useState } from "react"
+import { use, useState } from "react"
 
 interface ProductPageProps {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }
 
 // TODO: Split to components/component
 export default function Page({ params }: ProductPageProps) {
-    const { id } = params
+    const { id } = use(params)
     const { data: item, isLoading } = useMenuItem(id)
     const [quantity, setQuantity] = useState(1)
     const { addToCart, isAddBtnActive } = useAddToCart()
