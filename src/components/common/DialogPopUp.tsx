@@ -11,7 +11,7 @@ import { ReactNode } from "react"
 
 interface DialogProps {
     title: string
-    description?: string | JSX.Element
+    description?: ReactNode
     cancelTitle?: string
     defaultTitle: string
     icon?: ReactNode
@@ -34,7 +34,7 @@ export const DialogPopUp = ({
 }: DialogProps) => {
     return (
         <AlertDialog open={isOpen}>
-            <AlertDialogContent className='max-w-[90%] rounded-lg border-0 bg-lightBg'>
+            <AlertDialogContent className='bg-lightBg max-w-[90%] rounded-lg border-0'>
                 <AlertDialogHeader className='items-center'>
                     {icon && <div>{icon}</div>}
                     <AlertDialogTitle className='text-white'>{title}</AlertDialogTitle>
@@ -52,7 +52,7 @@ export const DialogPopUp = ({
                     {shouldConfirm && (
                         <Button
                             onClick={onCancel}
-                            className='w-full rounded-2xl bg-lighterGray'
+                            className='bg-lighterGray w-full rounded-2xl'
                             variant='default'
                         >
                             {cancelTitle}

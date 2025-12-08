@@ -36,7 +36,6 @@ export default function Home() {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors },
     } = useForm()
 
@@ -52,7 +51,7 @@ export default function Home() {
         setFeedbackOpen(true)
     }
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: Record<string, unknown>) => {
         console.log(data)
     }
 

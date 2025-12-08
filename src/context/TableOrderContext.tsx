@@ -3,7 +3,7 @@ import { createContext, useContext } from "react"
 
 export const TableOrderContext = createContext<{
     tableOrder: GetOrderRes | undefined
-    setTableOrder: (order: any) => void
+    setTableOrder: (order: GetOrderRes | undefined) => void
     refetch: () => void
 } | null>(null)
 

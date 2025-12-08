@@ -7,10 +7,9 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { languageState, type LanguageCode } from "@/store/language"
-import { ChevronDown } from "lucide-react"
+import { useLanguageStore, type LanguageCode } from "@/store/language"
 import { useQueryClient } from "@tanstack/react-query"
-import { useRecoilState } from "recoil"
+import { ChevronDown } from "lucide-react"
 
 const LANGUAGES: { code: LanguageCode; label: string }[] = [
     { code: "BG", label: "BG" },
@@ -18,7 +17,7 @@ const LANGUAGES: { code: LanguageCode; label: string }[] = [
 ]
 
 export function LanguageSwitcher() {
-    const [language, setLanguage] = useRecoilState(languageState)
+    const { language, setLanguage } = useLanguageStore()
     const queryClient = useQueryClient()
 
     const handleLanguageChange = (newLanguage: string) => {
@@ -30,18 +29,24 @@ export function LanguageSwitcher() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className='flex items-center gap-1 rounded-lg bg-lighterGray px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-gray focus:outline-none'>
+                <button className='bg-lighterGray hover:bg-gray flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-white transition-colors focus:outline-none'>
                     <span>{language}</span>
                     <ChevronDown className='h-3 w-3' />
                 </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='min-w-[80px] border-lighterGray bg-darkGray'>
-                <DropdownMenuRadioGroup value={language} onValueChange={handleLanguageChange}>
+            <DropdownMenuContent
+                align='end'
+                className='border-lighterGray bg-darkGray min-w-[80px]'
+            >
+                <DropdownMenuRadioGroup
+                    value={language}
+                    onValueChange={handleLanguageChange}
+                >
                     {LANGUAGES.map(({ code, label }) => (
                         <DropdownMenuRadioItem
                             key={code}
                             value={code}
-                            className='cursor-pointer text-white hover:bg-lighterGray focus:bg-lighterGray data-[state=checked]:text-yellow'
+                            className='hover:bg-lighterGray focus:bg-lighterGray data-[state=checked]:text-yellow cursor-pointer text-white'
                         >
                             {label}
                         </DropdownMenuRadioItem>

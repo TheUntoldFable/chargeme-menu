@@ -5,23 +5,22 @@ import IconSoup from "#/public/svg/icons/IconSoup"
 import IconWallet from "#/public/svg/icons/IconWallet"
 import { Badge } from "@/components/ui/badge"
 import { usePrePay } from "@/context/PrePayContext"
-import { useTranslations } from "next-intl"
 import { useRestaurantParams, withRestaurantParams } from "@/lib/navigation-utils"
-import { cartState } from "@/store/cart"
-import { orderState } from "@/store/order"
+import { useCartStore } from "@/store/cart"
+import { useOrderStore } from "@/store/order"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useRecoilValue } from "recoil"
 
 interface BottomNavigationProps {
     classNames?: string
 }
 
 export default function BottomNavigation({ classNames }: BottomNavigationProps) {
-    const cartItems = useRecoilValue(cartState)
-    const order = useRecoilValue(orderState)
+    const cartItems = useCartStore((state) => state.items)
+    const orderItems = useOrderStore((state) => state.orderItems)
     const cartItemsLength = cartItems.length
-    const orderItemsLength = order?.orderItems?.length
+    const orderItemsLength = orderItems?.length
     const currentPath = usePathname()
     const { restaurantData } = usePrePay()
     const { restaurantId, table } = useRestaurantParams()
@@ -39,7 +38,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
 
     return (
         <div
-            className={`mb-0 mt-auto flex h-20 min-w-full items-center shadow-top-lg ${!isPrePayMode ? "justify-between" : "justify-around"} bg-darkGray px-4 py-4 ${classNames} fixed bottom-0`}
+            className={`shadow-top-lg mt-auto mb-0 flex h-20 min-w-full items-center ${!isPrePayMode ? "justify-between" : "justify-around"} bg-darkGray px-4 py-4 ${classNames} fixed bottom-0`}
         >
             <Link href={withRestaurantParams("/", restaurantId, table)}>
                 <div className='flex flex-col items-center'>
@@ -67,7 +66,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
                         {!!orderItemsLength && (
                             <Badge
                                 variant='destructive'
-                                className='absolute -right-1 -top-2 flex h-5 w-5 items-center justify-center rounded-full p-1'
+                                className='absolute -top-2 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-1'
                             >
                                 {orderItemsLength}
                             </Badge>

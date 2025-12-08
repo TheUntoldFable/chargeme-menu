@@ -41,7 +41,7 @@ export const calculateTotalPriceEur = (
 
     items.forEach((item) => {
         const qty = hasTempQuantity ? tempQuantity?.[item.id as string] : item?.quantity
-        const unitPriceEur = (item as any).priceInEur
+        const unitPriceEur = (item as Product & { priceInEur?: number }).priceInEur ?? 0
         totalPrice += (qty || 0) * unitPriceEur
     })
 

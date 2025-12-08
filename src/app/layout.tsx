@@ -10,7 +10,7 @@ const inter = Inter({
     variable: "--font-sans",
 })
 
-// Force dynamic rendering for all pages to avoid Recoil SSR issues
+// Force dynamic rendering for all pages
 export const dynamic = "force-dynamic"
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
             <head>
                 <title>ChargeMe Menu</title>
             </head>
-            <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
+            <body className={cn("bg-background min-h-screen font-sans antialiased", inter.variable)}>
                 <ClientProviders>{children}</ClientProviders>
             </body>
         </html>

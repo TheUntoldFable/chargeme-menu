@@ -20,7 +20,7 @@ const PaymentProduct = ({
         <div className='relative w-full'>
             <Checkbox
                 onClick={onCheckboxToggle}
-                className={`absolute -right-3 top-1.5 mx-2 h-6 w-6 border-[3px] ${
+                className={`absolute top-1.5 -right-3 mx-2 h-6 w-6 border-[3px] ${
                     splitBill ? "border-yellowNew bg-transparent text-black" : "border-lightGray"
                 }`}
                 checked={checked}
@@ -28,7 +28,7 @@ const PaymentProduct = ({
             />
             <div>
                 <h1 className='text-base'>{name}</h1>
-                <p className='w-52 truncate text-sm text-lightGray'>{description}</p>
+                <p className='text-lightGray w-52 truncate text-sm'>{description}</p>
                 <QuantityControl
                     tempQuantity={tempQuantity}
                     quantity={quantity}

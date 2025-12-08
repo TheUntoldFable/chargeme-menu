@@ -16,11 +16,11 @@ interface CategoryPageProps {
 
 export default function CategoryPage({ params }: CategoryPageProps) {
     const { id, type } = use(params)
-    const productId = useSearchParams().get("productId")
-    const isWine = useSearchParams().get("isWine") || "false"
+    const searchParams = useSearchParams()
+    searchParams.get("productId")
+    searchParams.get("isWine")
     const productRef = useRef<null | HTMLDivElement>(null)
-    const { data: menuItems, isLoading: isLoadingMenuItems } =
-        type === "category" ? useCategoryMenuItems(id) : useSubCategoryMenuItems(id)
+    const { data: menuItems, isLoading: isLoadingMenuItems } = type === "category" ? useCategoryMenuItems(id) : useSubCategoryMenuItems(id)
 
     const scrollToElement = () => {
         const { current } = productRef

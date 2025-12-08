@@ -1,8 +1,7 @@
 import { API_BASE_URL, headers } from "@/api/config"
 import { MenuItem } from "@/models/categories"
-import { languageState, getApiLanguage, type LanguageCode } from "@/store/language"
+import { getApiLanguage, useLanguageStore, type LanguageCode } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { useRecoilValue } from "recoil"
 
 export const fetchMenuItemsBySubCategory = async (subCategoryId: string, language: LanguageCode): Promise<MenuItem[]> => {
     const apiLang = getApiLanguage(language)
@@ -15,7 +14,7 @@ export const fetchMenuItemsBySubCategory = async (subCategoryId: string, languag
 }
 
 export const useSubCategoryMenuItems = (subCategoryId: string): UseQueryResult<MenuItem[]> => {
-    const language = useRecoilValue(languageState)
+    const language = useLanguageStore((state) => state.language)
     return useQuery({
         queryKey: ["sub-category-id", subCategoryId, language],
         queryFn: () => fetchMenuItemsBySubCategory(subCategoryId, language),

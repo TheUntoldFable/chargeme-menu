@@ -22,7 +22,7 @@ export default function Page({ params }: ProductPageProps) {
     const { id } = use(params)
     const { data: item, isLoading } = useMenuItem(id)
     const [quantity, setQuantity] = useState(1)
-    const { addToCart, isAddBtnActive } = useAddToCart()
+    const { addToCart } = useAddToCart()
     const t = useTranslations("product")
     const tCommon = useTranslations("common")
 
@@ -38,7 +38,7 @@ export default function Page({ params }: ProductPageProps) {
                         alt='Img'
                     />{" "}
                     <div className='w-full px-4 pb-4'>
-                        <div className='mb-6 flex items-center justify-between rounded-2xl bg-lightBg py-2 pl-4 pr-2'>
+                        <div className='bg-lightBg mb-6 flex items-center justify-between rounded-2xl py-2 pr-2 pl-4'>
                             <p className='text-lightGray'>
                                 {t("finalPrice")}{" "}
                                 <span className='block text-white'>
@@ -47,12 +47,12 @@ export default function Page({ params }: ProductPageProps) {
                                         : ""}
                                 </span>
                             </p>
-                            <div className='flex w-1/3 items-center justify-between rounded-xl bg-gray px-3 py-2 text-white'>
-                                <div className='flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-yellowNew bg-transparent'>
+                            <div className='bg-gray flex w-1/3 items-center justify-between rounded-xl px-3 py-2 text-white'>
+                                <div className='border-yellowNew flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border bg-transparent'>
                                     <IconMinus onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))} />
                                 </div>
                                 {quantity}
-                                <div className='cursor-pointer rounded-full bg-yellow p-1'>
+                                <div className='bg-yellow cursor-pointer rounded-full p-1'>
                                     <IconPlus
                                         color='black'
                                         onClick={() => setQuantity((prev) => prev + 1)}
@@ -61,7 +61,7 @@ export default function Page({ params }: ProductPageProps) {
                             </div>
                         </div>
                         <h2 className='mb-1 text-left text-white'>{t("description")}</h2>
-                        <p className='mb-6 text-sm text-lightGray'>{item?.description}</p>
+                        <p className='text-lightGray mb-6 text-sm'>{item?.description}</p>
                         <DropdownMenuCheckboxes></DropdownMenuCheckboxes>
                         <DropdownMenuCheckboxes></DropdownMenuCheckboxes>
                         <h2 className='mb-3 text-left text-white'>{t("allergens")}</h2>
@@ -96,7 +96,7 @@ export default function Page({ params }: ProductPageProps) {
                             />
                         </div>
                         <Button
-                            className='w-full flex-1 gap-2 rounded-xl bg-yellowNew py-4 text-lg'
+                            className='bg-yellowNew w-full flex-1 gap-2 rounded-xl py-4 text-lg'
                             type='button'
                             id='price'
                             variant='default'

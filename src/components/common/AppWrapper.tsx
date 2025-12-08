@@ -4,10 +4,9 @@ import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
 import { useRestaurant } from "@/hooks/useRestaurant"
 import { GetOrderRes } from "@/models/order"
-import { restaurantState } from "@/store/restaurant"
+import { useRestaurantStore } from "@/store/restaurant"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { useRecoilState } from "recoil"
 import { Loader } from "../ui/loader"
 import Center from "./Center"
 
@@ -17,18 +16,17 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     const tableParam = searchParams.get("table")
     const isPaidParam = searchParams.get("isPaid")
     const table = tableParam !== null ? tableParam : undefined
-    const [restaurantInfo, setRestaurantInfo] = useRecoilState(restaurantState)
+    const { tableId, restaurantData: storedRestaurantData, setRestaurantInfo } = useRestaurantStore()
 
     const { clearOrder, updateOrder, clearCart } = useOrder()
 
     const {
         data: restaurantData,
         isLoading: isLoadingRestaurantData,
-        refetch: refetchRestaurantData,
         //! This should come from a config
     } = useRestaurant(restaurantIdParam ?? "")
 
-    const { data, isLoading: isLoadingOrders, refetch } = useGetAllOrders(restaurantInfo.tableId)
+    const { data, isLoading: isLoadingOrders, refetch } = useGetAllOrders(tableId)
     const [tableOrder, setTableOrder] = useState<GetOrderRes | undefined>(undefined)
 
     useEffect(() => {
@@ -66,7 +64,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         )
 
     return (
-        <PrePayProvider restaurantData={restaurantInfo.restaurantData ?? undefined}>
+        <PrePayProvider restaurantData={storedRestaurantData ?? undefined}>
             <TableOrderContext.Provider value={{ setTableOrder, tableOrder, refetch }}>{children}</TableOrderContext.Provider>
         </PrePayProvider>
     )
