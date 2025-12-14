@@ -17,7 +17,7 @@ export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
     const [paymentAmount, setPaymentAmount] = useState<number>(0)
     const t = useTranslations("payment.stripe")
 
-    const [message, setMessage] = useState<string | null | undefined>(null)
+    const [, setMessage] = useState<string | null | undefined>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     useEffect(() => {

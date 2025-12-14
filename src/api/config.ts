@@ -1,6 +1,5 @@
+import { getApiLanguage, type LanguageCode } from "@/store/language"
 import axios from "axios"
-import type { LanguageCode } from "@/store/language"
-import { getApiLanguage } from "@/store/language"
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL
 
@@ -14,14 +13,14 @@ export const API = axios.create({
     headers,
 })
 
-// Helper to get language from localStorage
+// Helper to get language from localStorage (Zustand store)
 export const getLanguage = (): LanguageCode => {
     if (typeof window === "undefined") return "BG"
     try {
-        const persist = localStorage.getItem("recoil-persist")
+        const persist = localStorage.getItem("language-storage")
         if (!persist) return "BG"
         const data = JSON.parse(persist)
-        return data.Language || "BG"
+        return data.state?.language || "BG"
     } catch {
         return "BG"
     }

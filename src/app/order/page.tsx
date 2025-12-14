@@ -8,12 +8,12 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTableOrder } from "@/context/TableOrderContext"
-import { useTranslations } from "next-intl"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPriceEur } from "@/lib/utils"
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
+import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 
@@ -74,7 +74,7 @@ export default function OrderPage() {
 
         const selected: Product[] = order.orderItems.filter((item) => item.isSelected)
 
-        const transactionItems: WSSendMessageItems[] = selected.map((c, _index) => ({
+        const transactionItems: WSSendMessageItems[] = selected.map((c) => ({
             orderItemId: c?.orderItemId,
             quantity: c.tempQuantity,
         }))
@@ -126,7 +126,7 @@ export default function OrderPage() {
             <ScrollArea className='calc-height min-w-full p-4'>
                 {order.orderItems &&
                     order.orderItems.length &&
-                    order.orderItems.map((item, index) => (
+                    order.orderItems.map((item) => (
                         <CardContainer
                             productId={item.id}
                             classNames='mb-6 mx-auto bg-lightBg'
@@ -174,7 +174,7 @@ export default function OrderPage() {
             />
             <div className='w-full gap-4 p-4'>
                 <Button
-                    className='mb-4 w-full gap-2 bg-lightBg py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
+                    className='bg-lightBg mb-4 w-full gap-2 py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
                     type='button'
                     id='add'
                     variant='select'
@@ -187,7 +187,7 @@ export default function OrderPage() {
                         handleConfirmTip()
                     }}
                     disabled={isPaymentDisabled}
-                    className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
+                    className='text-lightBg w-full gap-2 py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
                     type='button'
                     id='add'
                     variant='select'

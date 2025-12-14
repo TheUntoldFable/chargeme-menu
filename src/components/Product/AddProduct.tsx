@@ -2,9 +2,8 @@
 
 import { useAddToCart } from "@/hooks/useAddToCart"
 import { Product } from "@/models/product"
-import { cartState } from "@/store/cart"
-import { LegacyRef, forwardRef } from "react"
-import { useRecoilState } from "recoil"
+import { useCartStore } from "@/store/cart"
+import { forwardRef } from "react"
 import { Button } from "../ui/button"
 
 interface AddProductProps {
@@ -13,8 +12,9 @@ interface AddProductProps {
     isWine: boolean
 }
 
-const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDivElement> | undefined) => {
-    const [cartItems] = useRecoilState(cartState)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+const AddProduct = forwardRef<HTMLDivElement, AddProductProps>(function AddProduct({ itemData, isWine }, ref) {
+    const cartItems = useCartStore((state) => state.items)
     if (!itemData) return null
 
     const { name, price, weight, id, description, priceInEur } = itemData
@@ -37,7 +37,7 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
         <>
             <div className='min-w-0 flex-1'>
                 <h1 className='text-base'>{truncateText(name)}</h1>
-                <p className='text-sm text-lightGray'>{truncateText(description || "")}</p>
+                <p className='text-lightGray text-sm'>{truncateText(description || "")}</p>
                 <div className='flex gap-2'>
                     <p className='font-bold'>
                         {price.toFixed(2)} лв {priceInEur ? `/ €${priceInEur.toFixed(2)}` : ""}
@@ -55,6 +55,6 @@ const AddProduct = ({ itemData, isWine }: AddProductProps, ref: LegacyRef<HTMLDi
             ></Button>
         </>
     )
-}
+})
 
-export default forwardRef(AddProduct)
+export default AddProduct

@@ -1,8 +1,7 @@
 import { API_BASE_URL, headers } from "@/api/config"
 import { MenuItem } from "@/models/categories"
-import { languageState, getApiLanguage, LanguageCode } from "@/store/language"
+import { LanguageCode, getApiLanguage, useLanguageStore } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { useRecoilValue } from "recoil"
 
 export const fetchMenuItem = async (id: string, language: LanguageCode): Promise<MenuItem> => {
     const apiLang = getApiLanguage(language)
@@ -15,7 +14,7 @@ export const fetchMenuItem = async (id: string, language: LanguageCode): Promise
 }
 
 export const useMenuItem = (id: string): UseQueryResult<MenuItem> => {
-    const language = useRecoilValue(languageState)
+    const language = useLanguageStore((state) => state.language)
     return useQuery({
         queryKey: ["menu-item", id, language],
         queryFn: () => fetchMenuItem(id, language),

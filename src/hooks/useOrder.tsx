@@ -1,30 +1,31 @@
 import { GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
-import { cartState } from "@/store/cart"
-import { languageState } from "@/store/language"
-import { orderPrice, orderState } from "@/store/order"
-import { useRecoilState, useRecoilValue } from "recoil"
+import { useCartStore } from "@/store/cart"
+import { useLanguageStore } from "@/store/language"
+import { useOrderStore } from "@/store/order"
 import { fetchMenuItem } from "./get-menu-item"
 
 export function useOrder() {
-    const [cartItems, setCartItems] = useRecoilState<Product[] | []>(cartState)
-    const [order, setOrder] = useRecoilState(orderState)
-    const [price, setPrice] = useRecoilState<number>(orderPrice)
-    const language = useRecoilValue(languageState)
-
-    const toggleSelect = (id: string) => {
-        const updatedOrderItems = order.orderItems.map((orderItem) =>
-            orderItem.id === id ? { ...orderItem, isSelected: !orderItem.isSelected } : orderItem
-        )
-        setOrder({ ...order, orderItems: updatedOrderItems })
-    }
-
-    const clearCart = (): void => {
-        setCartItems([])
-    }
+    const { items: cartItems, setItems: setCartItems, clearCart } = useCartStore()
+    const {
+        orderId,
+        orderItems,
+        remainingItems,
+        paid,
+        status,
+        transactionSessionId,
+        price,
+        setOrder,
+        setOrderItems,
+        toggleSelect,
+        setPrice,
+        clearOrder,
+        attachSessionId,
+    } = useOrderStore()
+    const language = useLanguageStore((state) => state.language)
 
     const updateOrder = async (e: GetOrderRes): Promise<void> => {
-        const orderId = e.id
+        const newOrderId = e.id
         const orderItemMap: Map<string, Product> = new Map([])
 
         await Promise.all(
@@ -55,68 +56,65 @@ export function useOrder() {
                 }
             })
 
-        setOrder({ orderId, orderItems: finalItems, paid: e.paid ?? false, status: e.status, remainingItems: [...finalItems] })
+        setOrder({
+            orderId: newOrderId,
+            orderItems: finalItems,
+            paid: e.paid ?? false,
+            status: e.status,
+            remainingItems: [...finalItems],
+        })
 
         if (cartItems.length > 0) {
-            setCartItems([])
+            clearCart()
         }
     }
 
-    const attachSessionID = (sessionId: string) => {
-        setOrder((order) => ({ ...order, transactionSessionId: sessionId }))
-    }
-
     const increment = (id: string | number, quantity: number, source: "cart" | "order") => {
-        const items = source === "cart" ? cartItems : order.orderItems
+        const items = source === "cart" ? cartItems : orderItems
         const itemIndex = items.findIndex((i) => i.id === id)
 
         if (itemIndex === -1) return
 
-        const updatedItems = [...items]
-
         if (source === "cart") {
+            const updatedItems = [...items]
             updatedItems[itemIndex] = {
                 ...updatedItems[itemIndex],
                 quantity: quantity + 1,
             }
             setCartItems(updatedItems)
         } else {
+            const updatedItems = [...orderItems]
             updatedItems[itemIndex] = {
                 ...updatedItems[itemIndex],
                 tempQuantity: quantity + 1,
             }
-            setOrder({ ...order, orderItems: updatedItems })
+            setOrderItems(updatedItems)
         }
     }
 
     const decrement = (id: string | number, quantity: number, source: "cart" | "order") => {
         if (quantity <= 1) return
 
-        const items = source === "cart" ? cartItems : order.orderItems
+        const items = source === "cart" ? cartItems : orderItems
         const itemIndex = items.findIndex((i) => i.id === id)
 
         if (itemIndex === -1) return
 
-        const updatedItems = [...items]
-
         if (source === "cart") {
+            const updatedItems = [...items]
             updatedItems[itemIndex] = {
                 ...updatedItems[itemIndex],
                 quantity: quantity - 1,
             }
-
             setCartItems(updatedItems)
         } else {
+            const updatedItems = [...orderItems]
             updatedItems[itemIndex] = {
                 ...updatedItems[itemIndex],
                 tempQuantity: quantity - 1,
             }
-            setOrder({ ...order, orderItems: updatedItems })
+            setOrderItems(updatedItems)
         }
-    }
-
-    const clearOrder = () => {
-        setOrder({ orderId: "", status: "", orderItems: [], paid: false, remainingItems: [] })
     }
 
     return {
@@ -125,11 +123,18 @@ export function useOrder() {
         decrement,
         increment,
         cartItems,
-        order,
+        order: {
+            orderId,
+            orderItems,
+            remainingItems,
+            paid,
+            status,
+            transactionSessionId,
+        },
         updateOrder,
         clearCart,
         clearOrder,
-        attachSessionID,
+        attachSessionID: attachSessionId,
         toggleSelect,
     }
 }

@@ -33,7 +33,7 @@ const Header = ({ className }: { className?: string }) => {
     const headerTitle = getHeaderTitle(pathname)
 
     return (
-        <div className={`flex max-h-12 min-w-full items-center justify-between bg-lightBg p-4 shadow-md ${className}`}>
+        <div className={`bg-lightBg flex max-h-12 min-w-full items-center justify-between p-4 shadow-md ${className}`}>
             <div
                 onClick={onBack}
                 className='text-white hover:cursor-pointer'

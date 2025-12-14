@@ -14,7 +14,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ productId, classNames, children, isBlocked, image }: ProductCardProps) => {
     const RenderCard = () => (
-        <Card className={`flex flex-col justify-center rounded-2xl border-0 bg-lightBg ${classNames}`}>
+        <Card className={`bg-lightBg flex flex-col justify-center rounded-2xl border-0 ${classNames}`}>
             <CardContent className='flex w-full rounded-lg p-0'>
                 <Image
                     src={image ? image : "/images/pizza.png"}

@@ -4,8 +4,8 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useTranslations } from "next-intl"
 import { useOrder } from "@/hooks/useOrder"
+import { useTranslations } from "next-intl"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
@@ -23,7 +23,7 @@ const SOCKET_URL = "/topic/orders/"
 export default function PaymentPage() {
     const [isSuccessful, setIsSuccessfull] = useState<boolean>(false)
     const [isUnSuccessful, setIsUnsuccessful] = useState<boolean>(false)
-    const { price, order } = useOrder()
+    const { price } = useOrder()
     const tPayment = useTranslations("payment")
     const tCommon = useTranslations("common")
     const [paymentMethod, setPaymentMethod] = useState("card")
@@ -70,9 +70,9 @@ export default function PaymentPage() {
                     </div>
                 </Button>
                 <div className='flex flex-row items-center justify-between gap-2'>
-                    <div className='h-[1px] w-full bg-lightGray' />
+                    <div className='bg-lightGray h-[1px] w-full' />
                     <p className='text-lightGray'>{tCommon("or")}</p>
-                    <div className='h-[1px] w-full bg-lightGray' />
+                    <div className='bg-lightGray h-[1px] w-full' />
                 </div>
                 <h3>{tPayment("chooseMethod")}</h3>
                 <RadioGroup
@@ -81,7 +81,7 @@ export default function PaymentPage() {
                 >
                     <div
                         onClick={() => setPaymentMethod("card")}
-                        className='flex items-center justify-between space-x-2 rounded-xl bg-lightBg px-2 py-4'
+                        className='bg-lightBg flex items-center justify-between space-x-2 rounded-xl px-2 py-4'
                     >
                         <RadioGroupItem
                             checked={paymentMethod === "card"}
@@ -105,7 +105,7 @@ export default function PaymentPage() {
                     </div>
                     <div
                         onClick={() => setPaymentMethod("pos")}
-                        className='flex items-center space-x-2 rounded-xl bg-lightBg px-2 py-4'
+                        className='bg-lightBg flex items-center space-x-2 rounded-xl px-2 py-4'
                     >
                         <RadioGroupItem
                             checked={paymentMethod === "pos"}
@@ -117,7 +117,7 @@ export default function PaymentPage() {
                     </div>
                     <div
                         onClick={() => setPaymentMethod("cash")}
-                        className='flex items-center space-x-2 rounded-xl bg-lightBg px-2 py-4'
+                        className='bg-lightBg flex items-center space-x-2 rounded-xl px-2 py-4'
                     >
                         <RadioGroupItem
                             checked={paymentMethod === "cash"}
@@ -138,10 +138,12 @@ export default function PaymentPage() {
                         setIsUnsuccessful(true)
                     }
                 }}
-                className='mb-10 mt-auto'
+                className='mt-auto mb-10'
                 variant='select'
             >
-                <p className='text-darkBg'>{tCommon("pay")} {price.toFixed(2)} {tCommon("currency")}</p>
+                <p className='text-darkBg'>
+                    {tCommon("pay")} {price.toFixed(2)} {tCommon("currency")}
+                </p>
             </Button>
         </Container>
     )

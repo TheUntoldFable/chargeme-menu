@@ -1,9 +1,8 @@
 "use client"
 
+import { useLanguageStore, type LanguageCode } from "@/store/language"
 import { NextIntlClientProvider } from "next-intl"
 import { useEffect, useState } from "react"
-import { useRecoilValue } from "recoil"
-import { languageState, type LanguageCode } from "@/store/language"
 import bgMessages from "../../../messages/bg.json"
 import enMessages from "../../../messages/en.json"
 
@@ -13,7 +12,7 @@ const messages: Record<LanguageCode, typeof bgMessages> = {
 }
 
 export function IntlProvider({ children }: { children: React.ReactNode }) {
-    const language = useRecoilValue(languageState)
+    const language = useLanguageStore((state) => state.language)
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
@@ -25,7 +24,10 @@ export function IntlProvider({ children }: { children: React.ReactNode }) {
     const currentMessages = messages[language]
 
     return (
-        <NextIntlClientProvider locale={locale} messages={currentMessages}>
+        <NextIntlClientProvider
+            locale={locale}
+            messages={currentMessages}
+        >
             {children}
         </NextIntlClientProvider>
     )

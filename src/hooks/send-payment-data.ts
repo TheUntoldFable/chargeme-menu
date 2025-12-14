@@ -2,7 +2,7 @@ import { API, headers } from "@/api/config"
 import { CreateOrderRequest, GetOrderRes, PrePayOrderResponse } from "@/models/order"
 import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query"
 
-export const getAllOrders = async (tableId: string): Promise<unknown> => {
+export const getAllOrders = async (tableId: string): Promise<GetOrderRes> => {
     const { data } = await API.get("/orders/active", { params: { tableNumber: tableId } })
     return data
 }

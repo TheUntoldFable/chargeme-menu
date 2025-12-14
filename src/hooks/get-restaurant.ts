@@ -1,7 +1,6 @@
 import { API_BASE_URL } from "@/api/config"
-import { languageState, getApiLanguage, type LanguageCode } from "@/store/language"
+import { getApiLanguage, useLanguageStore, type LanguageCode } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { useRecoilValue } from "recoil"
 
 export interface RestaurantDetails {
     id: string
@@ -29,7 +28,7 @@ export const fetchRestaurantDetails = async (restaurantId: string, language: Lan
 }
 
 export const useRestaurantDetails = (restaurantId?: string): UseQueryResult<RestaurantDetails, Error> => {
-    const language = useRecoilValue(languageState)
+    const language = useLanguageStore((state) => state.language)
     return useQuery({
         queryKey: ["restaurant-details", restaurantId, language],
         queryFn: () => fetchRestaurantDetails(restaurantId as string, language),

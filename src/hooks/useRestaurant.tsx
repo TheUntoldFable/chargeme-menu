@@ -1,8 +1,7 @@
 import { API, headers } from "@/api/config"
 import { GetRestaurantResponse } from "@/models/restaurant"
-import { languageState } from "@/store/language"
+import { useLanguageStore } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { useRecoilValue } from "recoil"
 
 export const getRestaurantById = async (restaurantId: string): Promise<GetRestaurantResponse> => {
     const { data } = await API.get(`/restaurants/${restaurantId}`)
@@ -10,7 +9,7 @@ export const getRestaurantById = async (restaurantId: string): Promise<GetRestau
 }
 
 export const useRestaurant = (restaurantId: string): UseQueryResult<GetRestaurantResponse> => {
-    const language = useRecoilValue(languageState)
+    const language = useLanguageStore((state) => state.language)
     return useQuery({
         queryKey: ["restaurant", restaurantId, language],
         queryFn: () => getRestaurantById(restaurantId),

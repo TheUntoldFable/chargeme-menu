@@ -17,18 +17,26 @@
         "plugin:react/recommended",
         "prettier"
     ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
     "rules": {
         "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-explicit-any": "warn",
         "no-compare-neg-zero": "error",
         "camelcase": "error",
         "semi-style": "error",
-        "no-duplicate-imports": "error",
+        "no-duplicate-imports": "warn",
         "no-dupe-keys": "error",
         "no-unused-vars": "warn",
         "no-unused-expressions": "warn",
         "no-duplicate-case": "error",
         "no-dupe-else-if": "error",
         "react/react-in-jsx-scope": "off",
+        "react/no-unknown-property": "warn",
+        "react/prop-types": "off",
         "prettier/prettier": 1
     }
 }

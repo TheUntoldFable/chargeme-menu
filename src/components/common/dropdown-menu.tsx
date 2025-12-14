@@ -20,12 +20,12 @@ export const DropdownMenuCheckboxes = () => {
             <DropdownMenuTrigger asChild>
                 <Button
                     variant='outline'
-                    className='mb-6 w-full rounded-2xl border-0 bg-lightBg py-2 pl-4 pr-2 text-center text-white'
+                    className='bg-lightBg mb-6 w-full rounded-2xl border-0 py-2 pr-2 pl-4 text-center text-white'
                 >
                     {t("optionsWithout")}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className='w-56 w-full border-0 bg-lightBg text-white'>
+            <DropdownMenuContent className='bg-lightBg w-56 w-full border-0 text-white'>
                 <DropdownMenuCheckboxItem
                     checked={showStatusBar}
                     onCheckedChange={setShowStatusBar}

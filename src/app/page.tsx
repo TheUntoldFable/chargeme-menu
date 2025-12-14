@@ -36,7 +36,6 @@ export default function Home() {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors },
     } = useForm()
 
@@ -52,7 +51,7 @@ export default function Home() {
         setFeedbackOpen(true)
     }
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: Record<string, unknown>) => {
         console.log(data)
     }
 
@@ -69,14 +68,14 @@ export default function Home() {
             width='34'
             height='34'
         >
-            <g clip-path='url(#a)'>
+            <g clipPath='url(#a)'>
                 <path
                     fill='#24252A'
                     d='M0 0h33.871v33.871H0z'
                 />
                 <path
                     stroke='#E9C500'
-                    stroke-width='2.2'
+                    strokeWidth='2.2'
                     d='M26.064 31.754c-.223 0-.44-.069-.621-.199l-8.508-6.168-8.508 6.168a1.058 1.058 0 0 1-1.624-1.195l3.318-9.83-8.6-5.897a1.058 1.058 0 0 1 .595-1.931h10.61l3.202-9.854a1.059 1.059 0 0 1 2.014 0l3.202 9.857h10.61a1.058 1.058 0 0 1 .598 1.931l-8.603 5.895 3.316 9.826a1.057 1.057 0 0 1-1 1.397Z'
                 />
             </g>

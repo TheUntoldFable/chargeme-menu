@@ -47,7 +47,7 @@ function StripePage() {
     }
 
     return (
-        <Wrapper className='bg-none w-full pt-12'>
+        <Wrapper className='w-full bg-none pt-12'>
             {clientSecret && (
                 <Elements
                     options={options}

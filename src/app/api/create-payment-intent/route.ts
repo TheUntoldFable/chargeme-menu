@@ -1,8 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-import { NextRequest, NextResponse } from "next/server" // eslint-disable-next-line @typescript-eslint/no-var-requires
+import { NextRequest, NextResponse } from "next/server"
+import Stripe from "stripe"
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
 const calculateOrderAmount = (items: []): number => {
     // Replace this constant with a calculation of the order's amount
@@ -36,7 +35,7 @@ export async function POST(req: NextRequest) {
         })
 
         return NextResponse.json({ clientSecret: paymentIntent.client_secret })
-    } catch (e) {
+    } catch {
         throw new Error("Error creating payment intent!")
     }
 }
