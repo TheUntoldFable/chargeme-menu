@@ -51,9 +51,9 @@ export const calculateTotalPriceEur = (
 export const stringToStripeAmount = (str: string): number => Math.round(parseFloat(str) * 100)
 
 export const formatAmount = (amount: number): string =>
-    new Intl.NumberFormat("bg-BG", {
+    new Intl.NumberFormat("de-DE", {
         style: "currency",
-        currency: "BGN",
+        currency: "EUR",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     })

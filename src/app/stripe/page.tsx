@@ -30,7 +30,7 @@ function StripePage() {
                         amount: stringToStripeAmount(totalAmount),
                     },
                 ],
-                currency: "bgn",
+                currency: "eur",
             }),
         })
             .then((res) => res.json())

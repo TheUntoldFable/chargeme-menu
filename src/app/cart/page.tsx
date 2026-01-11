@@ -9,13 +9,12 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import TotalPrice from "@/components/ui/total-price"
-import { usePrePay } from "@/context/PrePayContext"
-import { useTableOrder } from "@/context/TableOrderContext"
+import { useTableOrderContext } from "@/context/TableOrderContext"
 import { usePrePayOrder } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { withRestaurantParams } from "@/lib/navigation-utils"
-import { calculateTotalPrice } from "@/lib/utils"
+import { calculateTotalPriceEur } from "@/lib/utils"
 import { CreateOrderItem, GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
 import { useRestaurantStore } from "@/store/restaurant"
@@ -25,32 +24,33 @@ import { useCallback, useState } from "react"
 
 export default function CartPage() {
     const router = useRouter()
-    const { restaurantId, tableId, restaurantData: storedRestaurantData } = useRestaurantStore()
-    const { restaurantData } = usePrePay()
     const tCart = useTranslations("cart")
     const tCommon = useTranslations("common")
 
+    const { tableOrder, setTableOrder } = useTableOrderContext()
+    const { restaurantId, tableId, restaurantData: storedRestaurantData } = useRestaurantStore()
     const { updateOrder, order, cartItems, increment, decrement } = useOrder()
-    const [isOpenDialog, setIsOpenDialog] = useState(false)
-    const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
+    const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false)
+    const [isOpenFailedDialog, setIsOpenFailedDialog] = useState<boolean>(false)
+    const [isOpenCreateOrderFailedDialog, setIsOpenCreateOrderFailedDialog] = useState<boolean>(false)
 
-    const { tableOrder, setTableOrder } = useTableOrder()
     const { mutateAsync: prePayOrder } = usePrePayOrder()
-
     // Check if this restaurant uses pre-payment
-    const isPrePayMode = restaurantData?.paymentInAdvance ?? false
-    console.log({ restaurantId, tableId, storedRestaurantData })
+    const isPrePayMode = !!storedRestaurantData?.paymentInAdvance
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
-        topic: tableOrder ? `/topic/orders/${tableOrder.id}` : `/topic/orders/${restaurantId}/${tableId}`,
+        topic: tableOrder ? `/topic/orders/${tableOrder?.id}` : `/topic/orders/${restaurantId}/${tableId}`,
         onMessage: (e: GetOrderRes) => {
             if (e.id) {
                 updateOrder(e).then(() => {
                     if (cartItems.length > 0) {
                         setTableOrder(e)
                     }
+                    router.push(withRestaurantParams("/order", restaurantId, tableId))
                 })
+            } else {
+                setIsOpenCreateOrderFailedDialog(true)
             }
         },
         disabled: isPrePayMode,
@@ -68,9 +68,9 @@ export default function CartPage() {
                     })),
                     tableNumber: tableId,
                     numberOfGuests: 1,
-                    totalPrice: Number(calculateTotalPrice(cartItems, false).toFixed(2)),
+                    totalPrice: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
                     restaurantId: restaurantId,
-                    itemsPrice: Number(cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)),
+                    itemsPrice: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
                     tip: 0,
                 })
 
@@ -89,7 +89,7 @@ export default function CartPage() {
                     note: "string",
                 }))
 
-                const rItemsPrice = calculateTotalPrice(cartItems, false)
+                const rItemsPrice = calculateTotalPriceEur(cartItems, false)
 
                 socket.sendMessage("/app/createOrder", {
                     orderItems: rItems,
@@ -99,7 +99,7 @@ export default function CartPage() {
                     restaurantId: restaurantId,
                 })
 
-                router.push(withRestaurantParams("/order", restaurantId, tableId))
+                setIsOpenDialog(false)
             } else {
                 throw new Error("No connection to socket!")
             }
@@ -107,6 +107,7 @@ export default function CartPage() {
     }, [cartItems, restaurantId, socket.isConnected, isPrePayMode])
 
     const handleUpdate = useCallback(() => {
+        //Only for socket connection
         if (!cartItems.length || cartItems.length < 1) throw new Error("No order items in cart!")
 
         if (socket.isConnected) {
@@ -117,7 +118,7 @@ export default function CartPage() {
                 note: "string",
             }))
 
-            const rItemsPrice = calculateTotalPrice(cartItems, false)
+            const rItemsPrice = calculateTotalPriceEur(cartItems, false)
 
             socket.sendMessage("/app/updateOrder", {
                 orderItems: rItems,
@@ -127,7 +128,6 @@ export default function CartPage() {
                 restaurantId: restaurantId,
                 orderId: order.orderId,
             })
-            router.push(withRestaurantParams("/order", restaurantId, tableId))
         } else {
             throw new Error("No connection to socket!")
         }
@@ -196,11 +196,11 @@ export default function CartPage() {
                 />
                 <DialogPopUp
                     icon={<IconFailed />}
-                    title={tCart("paymentFailed.title")}
-                    description={tCart("paymentFailed.description")}
-                    defaultTitle={tCommon("yes")}
-                    isOpen={isOpenFailedDialog}
-                    onConfirm={() => setIsOpenFailedDialog(false)}
+                    title={tCart("createOrderFailed.title")}
+                    description={tCart("createOrderFailed.description")}
+                    defaultTitle={tCommon("ok")}
+                    isOpen={isOpenCreateOrderFailedDialog}
+                    onConfirm={() => setIsOpenCreateOrderFailedDialog(false)}
                 />
             </div>
         </Container>
