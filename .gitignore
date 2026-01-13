@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+package.lock.json
 
 # testing
 /coverage
@@ -26,6 +27,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
 .env.development
 .env.production
@@ -41,7 +43,6 @@ yarn-error.log*
 next-env.d.ts
 /.idea/.gitignore
 /.idea/aws.xml
-/src/components/ui/card.tsx
 /.idea/chargeme-menu.iml
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea/dbnavigator.xml

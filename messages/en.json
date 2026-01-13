@@ -1,105 +1,109 @@
 {
-  "navigation": {
-    "menu": "Menu",
-    "mySelection": "My Selection",
-    "payment": "Payment"
-  },
-  "common": {
-    "yes": "Yes",
-    "no": "No",
-    "ok": "OK",
-    "pay": "Pay",
-    "back": "Back",
-    "currency": "BGN",
-    "or": "or",
-    "loading": "Loading...",
-    "add": "Add",
-    "empty": "[Empty]",
-    "test": "Test",
-    "impossibleStep": {
-      "title": "Impossible Step!",
-      "description": "This action cannot be performed."
+    "navigation": {
+        "menu": "Menu",
+        "mySelection": "My Selection",
+        "payment": "Payment"
+    },
+    "common": {
+        "yes": "Yes",
+        "no": "No",
+        "ok": "OK",
+        "pay": "Pay",
+        "back": "Back",
+        "currency": "BGN",
+        "or": "or",
+        "loading": "Loading...",
+        "add": "Add",
+        "empty": "[Empty]",
+        "test": "Test",
+        "impossibleStep": {
+            "title": "Impossible Step!",
+            "description": "This action cannot be performed."
+        }
+    },
+    "cart": {
+        "selected": "Selected",
+        "add": "Add",
+        "order": "Order",
+        "addAndPay": "Add and Pay",
+        "orderAndPay": "Order and Pay",
+        "confirmDialog": {
+            "title": "Are you sure you want to continue?",
+            "description": "After confirmation, you will not be able to go back to add or remove products from your order."
+        },
+        "paymentFailed": {
+            "title": "Payment Failed!",
+            "description": "Something went wrong with your payment. Please try again."
+        },
+        "createOrderFailed": {
+            "title": "Order Creation Failed!",
+            "description": "Something went wrong with your order. Please try again."
+        },
+        "removeItem": {
+            "title": "Remove from Order",
+            "description": "The product was successfully removed from your order."
+        },
+        "removeFromCart": {
+            "title": "Remove from Cart",
+            "description": "The product {name} has been successfully removed from your cart!"
+        }
+    },
+    "order": {
+        "confirmPayment": {
+            "title": "Are you sure you want to pay?",
+            "description": "Select your bank to pay"
+        },
+        "splitAndPay": "Split and Pay"
+    },
+    "payment": {
+        "success": {
+            "title": "Payment Successful!",
+            "description": "Your order was successfully paid. Thank you for your trust!"
+        },
+        "failed": {
+            "title": "Payment Failed!",
+            "description": "Something went wrong with your payment. Please try again."
+        },
+        "chooseMethod": "Choose payment method:",
+        "methods": {
+            "card": "Credit / Debit Card",
+            "pos": "POS Terminal",
+            "cash": "Cash"
+        },
+        "stripe": {
+            "succeeded": "Payment succeeded!",
+            "processing": "Your payment is processing.",
+            "requiresPaymentMethod": "Payment was not successful, please try again.",
+            "error": "Something went wrong.",
+            "unexpectedError": "An unexpected error occurred.",
+            "payButton": "Pay"
+        }
+    },
+    "tip": {
+        "title": "Add Tip",
+        "subtitle": "Compliment for the waiter",
+        "enterAmount": "Enter amount",
+        "totalWithTip": "Total amount with tip:",
+        "confirmAndContinue": "Confirm and Continue"
+    },
+    "product": {
+        "finalPrice": "Final Price:",
+        "description": "Description",
+        "allergens": "Allergens",
+        "add": "Add",
+        "optionsWithout": "Options 'WITHOUT'",
+        "ingredients": {
+            "mushrooms": "Mushrooms",
+            "tomatoes": "Tomatoes",
+            "chickenFillet": "Chicken Fillet"
+        }
+    },
+    "location": {
+        "error": {
+            "title": "Please scan the QR code again.",
+            "description": "You must be in the restaurant to place an order",
+            "checking": "Checking...",
+            "checkAgain": "Check Again"
+        }
     }
-  },
-  "cart": {
-    "selected": "Selected",
-    "add": "Add",
-    "order": "Order",
-    "addAndPay": "Add and Pay",
-    "orderAndPay": "Order and Pay",
-    "confirmDialog": {
-      "title": "Are you sure you want to continue?",
-      "description": "After confirmation, you will not be able to go back to add or remove products from your order."
-    },
-    "paymentFailed": {
-      "title": "Payment Failed!",
-      "description": "Something went wrong with your payment. Please try again."
-    },
-    "removeItem": {
-      "title": "Remove from Order",
-      "description": "The product was successfully removed from your order."
-    },
-    "removeFromCart": {
-      "title": "Remove from Cart",
-      "description": "The product {name} has been successfully removed from your cart!"
-    }
-  },
-  "order": {
-    "confirmPayment": {
-      "title": "Are you sure you want to pay?",
-      "description": "Select your bank to pay"
-    },
-    "splitAndPay": "Split and Pay"
-  },
-  "payment": {
-    "success": {
-      "title": "Payment Successful!",
-      "description": "Your order was successfully paid. Thank you for your trust!"
-    },
-    "failed": {
-      "title": "Payment Failed!",
-      "description": "Something went wrong with your payment. Please try again."
-    },
-    "chooseMethod": "Choose payment method:",
-    "methods": {
-      "card": "Credit / Debit Card",
-      "pos": "POS Terminal",
-      "cash": "Cash"
-    },
-    "stripe": {
-      "succeeded": "Payment succeeded!",
-      "processing": "Your payment is processing.",
-      "requiresPaymentMethod": "Payment was not successful, please try again.",
-      "error": "Something went wrong.",
-      "unexpectedError": "An unexpected error occurred.",
-      "payButton": "Pay"
-    }
-  },
-  "tip": {
-    "title": "Add Tip",
-    "subtitle": "Compliment for the waiter",
-    "enterAmount": "Enter amount",
-    "totalWithTip": "Total amount with tip:",
-    "confirmAndContinue": "Confirm and Continue"
-  },
-  "product": {
-    "finalPrice": "Final Price:",
-    "description": "Description",
-    "allergens": "Allergens",
-    "add": "Add",
-    "optionsWithout": "Options 'WITHOUT'",
-    "ingredients": {
-      "mushrooms": "Mushrooms",
-      "tomatoes": "Tomatoes",
-      "chickenFillet": "Chicken Fillet"
-    }
-  },
-  "location": {
-    "error": {
-      "title": "Please scan the QR code again.",
-      "description": "You must be in the restaurant to place an order",
-      "checking": "Checking...",
-      "checkAgain": "Check Again"
-    }
-  }
 }

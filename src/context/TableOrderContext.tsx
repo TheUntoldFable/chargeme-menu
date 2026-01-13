@@ -7,7 +7,7 @@ export const TableOrderContext = createContext<{
     refetch: () => void
 } | null>(null)
 
-export const useTableOrder = () => {
+export const useTableOrderContext = () => {
     const context = useContext(TableOrderContext)
     if (!context) {
         throw new Error("useTableOrder must be used within a TableOrderProvider")

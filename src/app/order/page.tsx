@@ -7,7 +7,7 @@ import { DialogPopUp } from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useTableOrder } from "@/context/TableOrderContext"
+import { useTableOrderContext } from "@/context/TableOrderContext"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPriceEur } from "@/lib/utils"
@@ -27,7 +27,7 @@ export default function OrderPage() {
     const [splitBill, setSplitBill] = useState(false)
     const [tipDialogOpen, setTipDialogOpen] = useState(false)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
-    const { tableOrder } = useTableOrder()
+    const { tableOrder } = useTableOrderContext()
 
     const [topic, setTopic] = useState(order ? `/topic/orders/${order.orderId}` : null)
 
@@ -100,7 +100,7 @@ export default function OrderPage() {
     useEffect(() => {
         const selectedTotal = order.orderItems
             .filter((item) => item.isSelected)
-            .reduce((sum, item) => sum + item.price * item.tempQuantity, 0)
+            .reduce((sum, item) => sum + (item.priceInEur ?? 0) * item.tempQuantity, 0)
 
         const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
@@ -110,7 +110,7 @@ export default function OrderPage() {
     // Calculate base price without tip for the tip dialog
     const basePriceWithoutTip = order.orderItems
         .filter((item) => item.isSelected)
-        .reduce((sum, item) => sum + item.price * item.tempQuantity, 0)
+        .reduce((sum, item) => sum + (item.priceInEur ?? 0) * item.tempQuantity, 0)
 
     const isPaymentDisabled = useMemo(() => {
         if (!order) return true

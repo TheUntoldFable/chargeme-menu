@@ -7,9 +7,9 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { ReactNode } from "react"
+import { FC, ReactNode } from "react"
 
-interface DialogProps {
+type DialogProps = {
     title: string
     description?: ReactNode
     cancelTitle?: string
@@ -21,7 +21,7 @@ interface DialogProps {
     shouldConfirm?: boolean
 }
 
-export const DialogPopUp = ({
+export const DialogPopUp: FC<DialogProps> = ({
     title,
     description,
     cancelTitle,
@@ -31,7 +31,7 @@ export const DialogPopUp = ({
     onConfirm,
     onCancel,
     shouldConfirm = false,
-}: DialogProps) => {
+}) => {
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogContent className='bg-lightBg max-w-[90%] rounded-lg border-0'>
