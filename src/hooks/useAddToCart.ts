@@ -5,19 +5,12 @@ import { useState } from "react"
 
 export const useAddToCart = () => {
     const { toast, dismiss } = useToast()
-    const { items: cartItems, setItems: setCartItems } = useCartStore()
+    const { items: cartItems, addItem } = useCartStore()
     const [isAddBtnActive, setIsAddBtnActive] = useState(false)
 
     const addToCart = (item: Product, title: string = "", quantity = 1) => {
         setIsAddBtnActive(true)
-        const existingItem = cartItems.find((cartItem) => cartItem.id === item.id)
-        if (existingItem) {
-            setCartItems(
-                cartItems.map((cartItem) => (cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + quantity } : cartItem))
-            )
-        } else {
-            setCartItems([...cartItems, { ...item, isSelected: true, quantity: quantity }])
-        }
+        addItem(item, quantity)
 
         const { id: toastId } = toast({
             variant: "default",

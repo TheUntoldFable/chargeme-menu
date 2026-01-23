@@ -53,7 +53,14 @@
             "title": "Are you sure you want to pay?",
             "description": "Select your bank to pay"
         },
-        "splitAndPay": "Split and Pay"
+        "splitAndPay": "Split and Pay",
+        "ratingDialog": {
+            "title": "How did you like {productName}?",
+            "description": "Your feedback is important to us!",
+            "feedbackPlaceholder": "Share your experience (optional)...",
+            "submit": "Submit",
+            "skip": "Skip"
+        }
     },
     "payment": {
         "success": {
