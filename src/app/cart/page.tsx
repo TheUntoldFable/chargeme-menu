@@ -17,6 +17,7 @@ import { withRestaurantParams } from "@/lib/navigation-utils"
 import { calculateTotalPriceEur } from "@/lib/utils"
 import { CreateOrderItem, GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
+import { PaymentProvider } from "@/models/restaurant"
 import { useRestaurantStore } from "@/store/restaurant"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
@@ -35,8 +36,14 @@ export default function CartPage() {
     const [isOpenCreateOrderFailedDialog, setIsOpenCreateOrderFailedDialog] = useState<boolean>(false)
 
     const { mutateAsync: prePayOrder } = usePrePayOrder()
-    // Check if this restaurant uses pre-payment
-    const isPrePayMode = !!storedRestaurantData?.paymentInAdvance
+    // Check if this restaurant uses pre-payment and which provider
+    // TEMPORARY: Force Paypercut mode for testing
+    const isPrePayMode = true  // Force prepay mode
+    const paymentProvider: PaymentProvider = "paypercut"  // Force Paypercut
+    
+    // Original logic (commented for testing):
+    // const isPrePayMode = !!storedRestaurantData?.paymentInAdvance
+    // const paymentProvider: PaymentProvider = storedRestaurantData?.paymentProvider || "none"
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
@@ -57,8 +64,42 @@ export default function CartPage() {
     })
 
     const handleCreate = useCallback(async () => {
+        console.log("Payment Debug Info:", {
+            isPrePayMode,
+            paymentProvider,
+            cartItemsCount: cartItems.length,
+            storedRestaurantData: storedRestaurantData
+        })
+        
         if (isPrePayMode) {
-            // TODO: Implement pre-pay mode
+            const totalAmount = calculateTotalPriceEur(cartItems, false)
+            console.log("Prepay mode activated, total amount:", totalAmount)
+            
+            // Handle different payment providers
+            if (paymentProvider === "stripe") {
+                console.log("Redirecting to Stripe...")
+                // Redirect to Stripe checkout
+                const stripeUrl = withRestaurantParams(
+                    `/stripe?totalAmount=${totalAmount.toFixed(2)}`, 
+                    restaurantId, 
+                    tableId
+                )
+                router.push(stripeUrl)
+                return
+            } else if (paymentProvider === "paypercut") {
+                // Redirect to Paypercut checkout
+                console.log("Redirecting to Paypercut...")
+                const paypercutUrl = withRestaurantParams(
+                    `/paypercut?totalAmount=${totalAmount.toFixed(2)}`, 
+                    restaurantId, 
+                    tableId
+                )
+                console.log("Paypercut URL:", paypercutUrl)
+                router.push(paypercutUrl)
+                return
+            }
+            
+            // Fallback: Try backend pre-pay order (legacy behavior)
             try {
                 const res = await prePayOrder({
                     orderItems: cartItems.map((p: Product) => ({
@@ -68,9 +109,9 @@ export default function CartPage() {
                     })),
                     tableNumber: tableId,
                     numberOfGuests: 1,
-                    totalPrice: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
+                    totalPrice: Number(totalAmount.toFixed(2)),
                     restaurantId: restaurantId,
-                    itemsPrice: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
+                    itemsPrice: Number(totalAmount.toFixed(2)),
                     tip: 0,
                 })
 
@@ -141,10 +182,19 @@ export default function CartPage() {
         }
     }
 
-    // Get button text based on pre-pay mode
+    // Get button text based on pre-pay mode and payment provider
     const getButtonText = () => {
         if (isPrePayMode) {
-            return tableOrder?.status === "ORDERED" ? tCart("addAndPay") : tCart("orderAndPay")
+            const baseText = tableOrder?.status === "ORDERED" ? tCart("addAndPay") : tCart("orderAndPay")
+            
+            // Add payment provider info if available
+            if (paymentProvider === "stripe") {
+                return `${baseText} (Stripe)`
+            } else if (paymentProvider === "paypercut") {
+                return `${baseText} (Paypercut)`
+            }
+            
+            return baseText
         }
         return tableOrder?.status === "ORDERED" ? tCart("add") : tCart("order")
     }

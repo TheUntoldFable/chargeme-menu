@@ -1,3 +1,5 @@
+export type PaymentProvider = "none" | "stripe" | "paypercut"
+
 export interface GetRestaurantResponse {
     id: string
     vendor: string
@@ -7,6 +9,7 @@ export interface GetRestaurantResponse {
     vendorPassword: string
     tipEnabled: boolean
     paymentInAdvance: boolean
+    paymentProvider?: PaymentProvider // New field for payment provider selection
     latitude: number
     longitude: number
     tableNumbers: Array<{

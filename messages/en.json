@@ -77,6 +77,15 @@
             "error": "Something went wrong.",
             "unexpectedError": "An unexpected error occurred.",
             "payButton": "Pay"
+        },
+        "paypercut": {
+            "title": "Paypercut Payment",
+            "description": "Complete your payment securely with Paypercut",
+            "sessionId": "Session",
+            "redirecting": "Redirecting...",
+            "payButton": "Pay with Paypercut",
+            "securePayment": "Secure payment powered by Paypercut",
+            "error": "Payment Error"
         }
     },
     "tip": {

@@ -77,6 +77,15 @@
             "error": "Нещо се обърка.",
             "unexpectedError": "Възникна неочаквана грешка.",
             "payButton": "Плати"
+        },
+        "paypercut": {
+            "title": "Paypercut Плащане",
+            "description": "Завършете плащането си сигурно с Paypercut",
+            "sessionId": "Сесия",
+            "redirecting": "Пренасочване...",
+            "payButton": "Плати с Paypercut",
+            "securePayment": "Сигурно плащане чрез Paypercut",
+            "error": "Грешка в плащането"
         }
     },
     "tip": {
