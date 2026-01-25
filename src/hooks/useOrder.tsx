@@ -14,11 +14,11 @@ export function useOrder() {
         paid,
         status,
         transactionSessionId,
-        price,
+        priceInBgn,
         setOrder,
         setOrderItems,
         toggleSelect,
-        setPrice,
+        setPriceInBgn,
         clearOrder,
         attachSessionId,
     } = useOrderStore()
@@ -118,8 +118,8 @@ export function useOrder() {
     }
 
     return {
-        price,
-        setPrice,
+        priceInBgn,
+        setPriceInBgn,
         decrement,
         increment,
         cartItems,

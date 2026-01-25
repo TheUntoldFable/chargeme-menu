@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl"
 import React from "react"
 import { toast } from "../ui/use-toast"
 
-const CartItem = ({ name, id, tempQuantity, quantity, description, price, priceInEur, increment, decrement }: OrderProductProps) => {
+const CartItem = ({ name, id, tempQuantity, quantity, description, priceInBgn, priceInEur, increment, decrement }: OrderProductProps) => {
     const { items: cartItems, setItems: setCartItems } = useCartStore()
     const tCart = useTranslations("cart")
 
@@ -39,7 +39,7 @@ const CartItem = ({ name, id, tempQuantity, quantity, description, price, priceI
             <div className='flex h-10 w-full items-center justify-between gap-2 rounded-lg text-lg'>
                 <div className='flex gap-2'>
                     <p className='text-sm font-bold'>
-                        {price}лв {priceInEur && <span className='text-lightGray'>/ €{priceInEur.toFixed(2)}</span>}
+                        {priceInBgn}лв {priceInEur && <span className='text-lightGray'>/ €{priceInEur.toFixed(2)}</span>}
                     </p>
                     <p className='text-lightGray text-sm'>x{quantity}</p>
                 </div>

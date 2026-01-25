@@ -17,7 +17,7 @@ const AddProduct = forwardRef<HTMLDivElement, AddProductProps>(function AddProdu
     const cartItems = useCartStore((state) => state.items)
     if (!itemData) return null
 
-    const { name, price, weight, id, description, priceInEur } = itemData
+    const { name, priceInBgn, weight, id, description, priceInEur } = itemData
 
     const isInCart = cartItems.find((c) => c.id === id)
 
@@ -40,14 +40,14 @@ const AddProduct = forwardRef<HTMLDivElement, AddProductProps>(function AddProdu
                 <p className='text-lightGray text-sm'>{truncateText(description || "")}</p>
                 <div className='flex gap-2'>
                     <p className='font-bold'>
-                        {price.toFixed(2)} лв {priceInEur ? `/ €${priceInEur.toFixed(2)}` : ""}
+                        {priceInBgn.toFixed(2)} лв {priceInEur ? `/ €${priceInEur.toFixed(2)}` : ""}
                     </p>
                     <span className='text-white'>|</span>
                     {weight && <p className='text-lightGray'>{weight}гр.</p>}
                 </div>
             </div>
             <Button
-                className={`${isAddBtnActive ? "active" : ""} btn-check icon-container c-button-reset c-plus-to-check h-9 w-9 flex-shrink-0 gap-2 rounded-full p-0 text-lg ${isWine ? "bg-wine-default text-white" : "bg-gray text-black"}`}
+                className={`${isAddBtnActive ? "active" : ""} btn-check icon-container c-button-reset c-plus-to-check h-9 w-9 shrink-0 gap-2 rounded-full p-0 text-lg ${isWine ? "bg-wine-default text-white" : "bg-gray text-black"}`}
                 type='button'
                 id='add'
                 variant={isInCart ? "destructive" : "default"}
