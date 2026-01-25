@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 
 export default function OrderPage() {
-    const { order, setPriceInBgb, priceInBgn, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
+    const { order, setPriceInBgn, priceInBgn, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
     const tOrder = useTranslations("order")
     const tCommon = useTranslations("common")
     const inputRef = useRef<HTMLInputElement>(null)
@@ -104,7 +104,7 @@ export default function OrderPage() {
 
         const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
-        setPriceInBgb(finalPrice)
+        setPriceInBgn(finalPrice)
     }, [tip, inputTip, order.orderItems])
 
     // Calculate base price without tip for the tip dialog
