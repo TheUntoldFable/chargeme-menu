@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware"
 
 interface CartState {
     items: Product[]
+    productToRate: Product | null
 }
 
 interface CartActions {
@@ -18,17 +19,21 @@ export const useCartStore = create<CartState & CartActions>()(
     persist(
         (set) => ({
             items: [],
-
+            productToRate: null,
             addItem: (item: Product, quantity = 1) => {
                 set((state) => {
                     const existingItem = state.items.find((i) => i.id === item.id)
+
+                    const newProductToRate = state.productToRate ?? item
                     if (existingItem) {
                         return {
                             items: state.items.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i)),
+                            productToRate: newProductToRate,
                         }
                     }
                     return {
                         items: [...state.items, { ...item, isSelected: true, quantity }],
+                        productToRate: newProductToRate,
                     }
                 })
             },

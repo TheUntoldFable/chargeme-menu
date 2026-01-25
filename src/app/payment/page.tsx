@@ -23,7 +23,7 @@ const SOCKET_URL = "/topic/orders/"
 export default function PaymentPage() {
     const [isSuccessful, setIsSuccessfull] = useState<boolean>(false)
     const [isUnSuccessful, setIsUnsuccessful] = useState<boolean>(false)
-    const { price } = useOrder()
+    const { priceInBgn } = useOrder()
     const tPayment = useTranslations("payment")
     const tCommon = useTranslations("common")
     const [paymentMethod, setPaymentMethod] = useState("card")
@@ -70,9 +70,9 @@ export default function PaymentPage() {
                     </div>
                 </Button>
                 <div className='flex flex-row items-center justify-between gap-2'>
-                    <div className='bg-lightGray h-[1px] w-full' />
+                    <div className='bg-lightGray h-px w-full' />
                     <p className='text-lightGray'>{tCommon("or")}</p>
-                    <div className='bg-lightGray h-[1px] w-full' />
+                    <div className='bg-lightGray h-px w-full' />
                 </div>
                 <h3>{tPayment("chooseMethod")}</h3>
                 <RadioGroup
@@ -142,7 +142,7 @@ export default function PaymentPage() {
                 variant='select'
             >
                 <p className='text-darkBg'>
-                    {tCommon("pay")} {price.toFixed(2)} {tCommon("currency")}
+                    {tCommon("pay")} {priceInBgn.toFixed(2)} {tCommon("currency")}
                 </p>
             </Button>
         </Container>

@@ -43,7 +43,7 @@ export default function Page({ params }: ProductPageProps) {
                                 {t("finalPrice")}{" "}
                                 <span className='block text-white'>
                                     {item
-                                        ? `${item.price.toFixed(2)} ${tCommon("currency")}${item.priceInEur !== undefined ? ` / €${item.priceInEur.toFixed(2)}` : ""}`
+                                        ? `${item.priceInBgn.toFixed(2)} ${tCommon("currency")}${item.priceInEur !== undefined ? ` / €${item.priceInEur.toFixed(2)}` : ""}`
                                         : ""}
                                 </span>
                             </p>

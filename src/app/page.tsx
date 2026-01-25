@@ -3,6 +3,7 @@
 import IconFailed from "#/public/svg/icons/IconFailed"
 import IconSuccess from "#/public/svg/icons/IconSuccess"
 import CategoriesCard from "@/components/Category/CategoriesCard"
+import { ProductRatingDialog } from "@/components/Rating/ProductRatingDialog"
 import Center from "@/components/common/Center"
 import { DialogPopUp } from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
@@ -10,6 +11,7 @@ import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { useCategories } from "@/hooks/get-categories"
+import { useCartStore } from "@/store/cart"
 import { Rating as ReactRating } from "@smastrom/react-rating"
 import { useTranslations } from "next-intl"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -17,21 +19,25 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 export default function Home() {
-    const searchParams = useSearchParams()
-    const restaurantIdParam = searchParams.get("restaurantId") ?? ""
-    const isPaidParam = searchParams.get("isPaid")
-    const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
-    const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
-    const [rating, setRating] = useState(0)
-    const [shouldRate, setShouldRate] = useState(false)
-    const [feedbackOpen, setFeedbackOpen] = useState(false)
-    const tPayment = useTranslations("payment")
-    const tCommon = useTranslations("common")
-
     const router = useRouter()
     const pathname = usePathname()
+    const searchParams = useSearchParams()
     const nextSearchParams = new URLSearchParams(searchParams.toString())
+
+    const tPayment = useTranslations("payment")
+    const tCommon = useTranslations("common")
+    const restaurantIdParam = searchParams.get("restaurantId") ?? ""
+    const isPaidParam = searchParams.get("isPaid")
+
+    const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
+    const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
+    const [appRating, setAppRating] = useState(0)
+    const [shouldRateApp, setShouldRateApp] = useState(false)
+    const [shouldRateProduct, setShouldRateProduct] = useState(false)
+    const [feedbackOpen, setFeedbackOpen] = useState(false)
+
     const { data: categories, isLoading, status } = useCategories(restaurantIdParam)
+    const productToRate = useCartStore((state) => state.productToRate)
 
     const {
         register,
@@ -42,13 +48,19 @@ export default function Home() {
     const handleAccept = () => {
         setIsOpenSuccesDialog(false)
         setIsOpenFailedDialog(false)
-        setShouldRate(true)
+        setShouldRateApp(true)
     }
 
     const handleSetRating = (rating: number) => {
-        setRating(rating)
-        setShouldRate(false)
-        setFeedbackOpen(true)
+        if (shouldRateApp) {
+            setAppRating(rating)
+            setShouldRateApp(false)
+            setFeedbackOpen(true)
+        }
+
+        if (shouldRateProduct) {
+            setShouldRateProduct(false)
+        }
     }
 
     const onSubmit = (data: Record<string, unknown>) => {
@@ -110,6 +122,7 @@ export default function Home() {
                 shouldConfirm
                 onConfirm={() => {
                     setFeedbackOpen(false)
+                    setShouldRateProduct(true)
                 }}
                 onCancel={() => {
                     setFeedbackOpen(false)
@@ -119,18 +132,29 @@ export default function Home() {
                 title='Лесно ли се ориентирахте в приложението?'
                 description={
                     <ReactRating
-                        value={rating}
+                        value={appRating}
                         onChange={handleSetRating}
                         itemStyles={customStyles}
                     />
                 }
                 defaultTitle='Пропусни'
-                isOpen={shouldRate}
+                isOpen={shouldRateApp}
                 onConfirm={() => {
-                    setShouldRate(false)
+                    setShouldRateApp(false)
                     setFeedbackOpen(true)
                 }}
             />
+            {productToRate && (
+                <ProductRatingDialog
+                    isOpen={shouldRateProduct}
+                    product={productToRate}
+                    onSubmit={(rating, feedback) => {
+                        console.log({ rating, feedback, productId: productToRate?.id })
+                        setShouldRateProduct(false)
+                    }}
+                    onSkip={() => setShouldRateProduct(false)}
+                />
+            )}
             <DialogPopUp
                 icon={<IconSuccess />}
                 title={tPayment("success.title")}

@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 
 export default function OrderPage() {
-    const { order, setPrice, price, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
+    const { order, setPriceInBgn, priceInBgn, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
     const tOrder = useTranslations("order")
     const tCommon = useTranslations("common")
     const inputRef = useRef<HTMLInputElement>(null)
@@ -81,9 +81,9 @@ export default function OrderPage() {
 
         const payload: WSSendMessagePayload = {
             transactionItems,
-            totalPrice: Number(price.toFixed(2)),
-            itemsPrice: Number(calculateItemsPrice(price, tip, inputTip).toFixed(2)),
-            tip: Number(calculateTipForOrder(price, tip, inputTip).toFixed(2)),
+            totalPrice: Number(priceInBgn.toFixed(2)),
+            itemsPrice: Number(calculateItemsPrice(priceInBgn, tip, inputTip).toFixed(2)),
+            tip: Number(calculateTipForOrder(priceInBgn, tip, inputTip).toFixed(2)),
             orderId: order.orderId,
             sessionId: order.transactionSessionId,
         }
@@ -104,7 +104,7 @@ export default function OrderPage() {
 
         const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
-        setPrice(finalPrice)
+        setPriceInBgn(finalPrice)
     }, [tip, inputTip, order.orderItems])
 
     // Calculate base price without tip for the tip dialog
@@ -117,9 +117,9 @@ export default function OrderPage() {
         if (order?.orderItems?.length < 1) return true
         if (order?.orderItems?.every((item) => item.isSelected === false)) return true
         if (order.paid) return true
-        if (price <= 0) return true
+        if (priceInBgn <= 0) return true
         return false
-    }, [order, price])
+    }, [order, priceInBgn])
 
     return (
         <Container title={""}>
@@ -141,7 +141,7 @@ export default function OrderPage() {
                                 tempQuantity={item?.tempQuantity ?? 0}
                                 quantity={item.quantity ?? 0}
                                 description={item.description ?? ""}
-                                price={item.price ?? 0}
+                                priceInBgn={item.priceInBgn ?? 0}
                                 splitBill={splitBill}
                                 increment={increment}
                                 decrement={decrement}
@@ -192,7 +192,7 @@ export default function OrderPage() {
                     id='add'
                     variant='select'
                 >
-                    {tCommon("pay")} {price ? price.toFixed(2) : 0} {tCommon("currency")}{" "}
+                    {tCommon("pay")} {priceInBgn ? priceInBgn.toFixed(2) : 0} {tCommon("currency")}{" "}
                     {order?.orderItems && (
                         <span className='text-gray'>/ €{calculateTotalPriceEur(order.orderItems, false).toFixed(2)}</span>
                     )}

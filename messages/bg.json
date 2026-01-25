@@ -53,7 +53,14 @@
             "title": "Сигурни ли сте, че искате да платите?",
             "description": "Изберете вашата банка, за да платите"
         },
-        "splitAndPay": "Раздели и плати"
+        "splitAndPay": "Раздели и плати",
+        "ratingDialog": {
+            "title": "Хареса ли ви хареса {productName}?",
+            "description": "Вашето мнение е важно за нас!",
+            "feedbackPlaceholder": "Споделете вашите впечатления (по избор)...",
+            "submit": "Изпрати",
+            "skip": "Пропусни"
+        }
     },
     "payment": {
         "success": {

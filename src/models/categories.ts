@@ -4,7 +4,7 @@ export interface MenuItem extends Product {
     id: string
     barsyId: number
     name: string
-    price: number
+    priceInBgn: number
     priceInEur: number
     description: string
     categoryId: string
