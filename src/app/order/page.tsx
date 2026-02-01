@@ -100,7 +100,7 @@ export default function OrderPage() {
     useEffect(() => {
         const selectedTotal = order.orderItems
             .filter((item) => item.isSelected)
-            .reduce((sum, item) => sum + (item.priceInEur ?? 0) * item.tempQuantity, 0)
+            .reduce((sum, item) => sum + (item.priceInBgn ?? 0) * item.tempQuantity, 0)
 
         const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
