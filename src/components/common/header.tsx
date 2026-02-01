@@ -41,7 +41,7 @@ const Header = ({ className }: { className?: string }) => {
                 <IconBack />
             </div>
             {headerTitle ? (
-                <p>{headerTitle}</p>
+                <p className='ml-4'>{headerTitle}</p>
             ) : (
                 <Image
                     src='/images/logo.png'
