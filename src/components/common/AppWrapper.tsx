@@ -1,14 +1,12 @@
 import { PrePayProvider } from "@/context/PrePayContext"
 import { TableOrderContext } from "@/context/TableOrderContext"
 import { useGetAllOrders } from "@/hooks/send-payment-data"
-import { useOrder } from "@/hooks/useOrder"
-import { useRestaurant } from "@/hooks/useRestaurant"
+import { useOrder } from "@/hooks/use-order"
+import { useRestaurant } from "@/hooks/use-restaurant"
 import { GetOrderRes } from "@/models/order"
 import { useRestaurantStore } from "@/store/restaurant"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Loader } from "../ui/loader"
-import Center from "./Center"
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     const searchParams = useSearchParams()
@@ -56,12 +54,12 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         }
     }, [restaurantData, isLoadingRestaurantData, restaurantIdParam, table])
 
-    if (isLoadingRestaurantData || isLoadingOrders)
-        return (
-            <Center className='h-screen w-full flex-1 bg-[#111111]'>
-                <Loader />
-            </Center>
-        )
+    // if (isLoadingRestaurantData || isLoadingOrders)
+    //     return (
+    //         <Center>
+    //             <Loader />
+    //         </Center>
+    //     )
 
     return (
         <PrePayProvider restaurantData={storedRestaurantData ?? undefined}>
