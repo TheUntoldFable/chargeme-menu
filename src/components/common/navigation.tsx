@@ -5,23 +5,26 @@ import IconSoup from "#/public/svg/icons/IconSoup"
 import IconWallet from "#/public/svg/icons/IconWallet"
 import { Badge } from "@/components/ui/badge"
 import { usePrePay } from "@/context/PrePayContext"
-import { cartState } from "@/store/cart"
-import { orderState } from "@/store/order"
+import { useRestaurantParams, withRestaurantParams } from "@/lib/navigation-utils"
+import { useCartStore } from "@/store/cart"
+import { useOrderStore } from "@/store/order"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useRecoilValue } from "recoil"
 
 interface BottomNavigationProps {
     classNames?: string
 }
 
 export default function BottomNavigation({ classNames }: BottomNavigationProps) {
-    const cartItems = useRecoilValue(cartState)
-    const order = useRecoilValue(orderState)
+    const cartItems = useCartStore((state) => state.items)
+    const orderItems = useOrderStore((state) => state.orderItems)
     const cartItemsLength = cartItems.length
-    const orderItemsLength = order?.orderItems?.length
+    const orderItemsLength = orderItems?.length
     const currentPath = usePathname()
     const { restaurantData } = usePrePay()
+    const { restaurantId, table } = useRestaurantParams()
+    const t = useTranslations("navigation")
 
     const isPrePayMode = restaurantData?.paymentInAdvance || false
 
@@ -35,15 +38,15 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
 
     return (
         <div
-            className={`shadow-top-lg mb-0 mt-auto flex h-20 min-w-full items-center ${!isPrePayMode ? "justify-between" : "justify-around"} bg-darkGray px-4 py-4 ${classNames} fixed bottom-0`}
+            className={`shadow-top-lg mt-auto mb-0 flex h-20 min-w-full items-center ${!isPrePayMode ? "justify-between" : "justify-around"} bg-darkGray px-4 py-4 ${classNames} fixed bottom-0`}
         >
-            <Link href='/'>
+            <Link href={withRestaurantParams("/", restaurantId, table)}>
                 <div className='flex flex-col items-center'>
                     <IconMenu color={getIconColor("/")} />
-                    <p className={`bold text-sm ${getLinkClasses("/")}`}>Меню</p>
+                    <p className={`bold text-sm ${getLinkClasses("/")}`}>{t("menu")}</p>
                 </div>
             </Link>
-            <Link href='/cart'>
+            <Link href={withRestaurantParams("/cart", restaurantId, table)}>
                 <div className='relative flex flex-col items-center'>
                     {!!cartItemsLength && (
                         <Badge
@@ -54,23 +57,23 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
                         </Badge>
                     )}
                     <IconSoup color={getIconColor("/cart")} />
-                    <p className={`bold text-sm ${getLinkClasses("/cart")}`}>Моят избор</p>
+                    <p className={`bold text-sm ${getLinkClasses("/cart")}`}>{t("mySelection")}</p>
                 </div>
             </Link>
             {!isPrePayMode && (
-                <Link href='/order'>
+                <Link href={withRestaurantParams("/order", restaurantId, table)}>
                     <div className='relative flex flex-col items-center'>
                         {!!orderItemsLength && (
                             <Badge
                                 variant='destructive'
-                                className='absolute -right-1 -top-2 flex h-5 w-5 items-center justify-center rounded-full p-1'
+                                className='absolute -top-2 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-1'
                             >
                                 {orderItemsLength}
                             </Badge>
                         )}
 
                         <IconWallet color={getIconColor("/order")} />
-                        <p className={`bold text-sm ${getLinkClasses("/order")}`}>Плащане</p>
+                        <p className={`bold text-sm ${getLinkClasses("/order")}`}>{t("payment")}</p>
                     </div>
                 </Link>
             )}

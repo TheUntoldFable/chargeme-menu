@@ -8,19 +8,19 @@ import { useCategoryMenuItems } from "@/hooks/get-menu-items-by-category"
 import { useSubCategoryMenuItems } from "@/hooks/get-menu-items-by-subcategory"
 
 import { useSearchParams } from "next/navigation"
-import { useLayoutEffect, useRef } from "react"
+import { use, useLayoutEffect, useRef } from "react"
 
 interface CategoryPageProps {
-    params: { id: string; type: string }
+    params: Promise<{ id: string; type: string }>
 }
 
 export default function CategoryPage({ params }: CategoryPageProps) {
-    const productId = useSearchParams().get("productId")
-    const isWine = useSearchParams().get("isWine") || "false"
+    const { id, type } = use(params)
+    const searchParams = useSearchParams()
+    searchParams.get("productId")
+    searchParams.get("isWine")
     const productRef = useRef<null | HTMLDivElement>(null)
-    const { type } = params
-    const { data: menuItems, isLoading: isLoadingMenuItems } =
-        type === "category" ? useCategoryMenuItems(params.id) : useSubCategoryMenuItems(params.id)
+    const { data: menuItems, isLoading: isLoadingMenuItems } = type === "category" ? useCategoryMenuItems(id) : useSubCategoryMenuItems(id)
 
     const scrollToElement = () => {
         const { current } = productRef
@@ -34,7 +34,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     }, [])
 
     return (
-        <Container title={params.type}>
+        <Container title={type}>
             <ScrollArea className='h-screen min-w-full p-4'>
                 {!isLoadingMenuItems &&
                     menuItems?.length &&

@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { getRestaurantParamsFromWindow, withRestaurantParams } from "@/lib/navigation-utils"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -13,16 +14,16 @@ interface ProductCardProps {
 
 const ProductCard = ({ productId, classNames, children, isBlocked, image }: ProductCardProps) => {
     const RenderCard = () => (
-        <Card className={`flex flex-col justify-center rounded-2xl border-0 bg-lightBg ${classNames}`}>
+        <Card className={`bg-lightBg flex flex-col justify-center rounded-2xl border-0 ${classNames}`}>
             <CardContent className='flex w-full rounded-lg p-0'>
                 <Image
                     src={image ? image : "/images/pizza.png"}
                     width={96}
                     height={96}
-                    className='h-24 w-24 rounded-s-2xl'
+                    className='h-24 w-24 rounded-s-2xl object-contain'
                     alt='Img'
                 />
-                <div className='p2 flex flex-1 flex-row items-center justify-between gap-4 px-4'>{children}</div>
+                <div className='p2 flex min-w-0 flex-1 flex-row items-center justify-between px-4'>{children}</div>
             </CardContent>
         </Card>
     )
@@ -33,7 +34,10 @@ const ProductCard = ({ productId, classNames, children, isBlocked, image }: Prod
                 <RenderCard />
             ) : (
                 <Link
-                    href={`/product/${productId}`}
+                    href={(() => {
+                        const { restaurantId, table } = getRestaurantParamsFromWindow()
+                        return withRestaurantParams(`/product/${productId}`, restaurantId, table)
+                    })()}
                     passHref
                 >
                     <RenderCard />

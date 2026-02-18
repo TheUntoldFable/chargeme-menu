@@ -1,6 +1,6 @@
 import { GetRestaurantResponse } from "@/models/restaurant"
-import { atom } from "recoil"
-import { recoilPersist } from "recoil-persist"
+import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
 
 export interface RestaurantInfo {
     restaurantId: string
@@ -8,20 +8,30 @@ export interface RestaurantInfo {
     restaurantData: GetRestaurantResponse | null
 }
 
-const localStorage = typeof window !== `undefined` ? window.localStorage : undefined
+interface RestaurantActions {
+    setRestaurantInfo: (info: Partial<RestaurantInfo>) => void
+    clearRestaurant: () => void
+}
 
-const { persistAtom } = recoilPersist({
-    key: "recoil-persist", // this key is using to store data in local storage
-    storage: localStorage, // configure which storage will be used to store the data
-})
+const initialState: RestaurantInfo = {
+    restaurantId: "",
+    tableId: "",
+    restaurantData: null,
+}
 
-export const restaurantState = atom<RestaurantInfo>({
-    key: "Restaurant",
-    default: {
-        restaurantId: "",
-        tableId: "",
-        restaurantData: null,
-    },
-    // eslint-disable-next-line camelcase
-    effects_UNSTABLE: [persistAtom],
-})
+export const useRestaurantStore = create<RestaurantInfo & RestaurantActions>()(
+    persist(
+        (set) => ({
+            ...initialState,
+
+            setRestaurantInfo: (info) => set((state) => ({ ...state, ...info })),
+
+            clearRestaurant: () => set(initialState),
+        }),
+        {
+            name: "restaurant-storage",
+            storage: createJSONStorage(() => localStorage),
+            skipHydration: true,
+        }
+    )
+)

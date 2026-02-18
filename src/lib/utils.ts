@@ -20,7 +20,7 @@ export const calculateTotalPrice = (
     if (withSelection) items = items.filter((item) => item.isSelected)
 
     items.forEach((item) => {
-        totalPrice += (hasTempQuantity ? tempQuantity?.[item.id] : item?.quantity) * item.price
+        totalPrice += (hasTempQuantity ? tempQuantity?.[item.id] : item?.quantity) * item.priceInBgn
     })
 
     return totalPrice
@@ -41,7 +41,7 @@ export const calculateTotalPriceEur = (
 
     items.forEach((item) => {
         const qty = hasTempQuantity ? tempQuantity?.[item.id as string] : item?.quantity
-        const unitPriceEur = (item as any).priceInEur
+        const unitPriceEur = (item as Product & { priceInEur?: number }).priceInEur ?? 0
         totalPrice += (qty || 0) * unitPriceEur
     })
 
@@ -51,9 +51,9 @@ export const calculateTotalPriceEur = (
 export const stringToStripeAmount = (str: string): number => Math.round(parseFloat(str) * 100)
 
 export const formatAmount = (amount: number): string =>
-    new Intl.NumberFormat("bg-BG", {
+    new Intl.NumberFormat("de-DE", {
         style: "currency",
-        currency: "BGN",
+        currency: "EUR",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     })

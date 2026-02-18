@@ -2,6 +2,7 @@
 
 import IconMinus from "#/public/svg/icons/IconMinus"
 import IconPlus from "#/public/svg/icons/IconPlus"
+import { useTranslations } from "next-intl"
 import React from "react"
 import { toast } from "../ui/use-toast"
 interface QuantityControlProps {
@@ -23,6 +24,8 @@ const QuantityControl: React.FC<QuantityControlProps> = ({
     actionsDisabled = true,
     source,
 }) => {
+    const t = useTranslations("common.impossibleStep")
+
     const handleOnClick = (
         event: React.MouseEvent<HTMLDivElement>,
         callback?: (id: string | number, quantity: number, source: "cart" | "order") => void
@@ -32,8 +35,8 @@ const QuantityControl: React.FC<QuantityControlProps> = ({
         if (tempQuantity && tempQuantity === quantity && callback?.name === "increment") {
             toast({
                 variant: "destructive",
-                title: "Невъзможна стъпка!",
-                description: `Това действие не може да бъде изпълнено.`,
+                title: t("title"),
+                description: t("description"),
             })
         } else {
             callback?.(id, tempQuantity ? tempQuantity : quantity, source)
@@ -44,7 +47,7 @@ const QuantityControl: React.FC<QuantityControlProps> = ({
         <div className='flex w-1/3 items-center justify-between text-white'>
             <div
                 className={`flex h-6 w-6 items-center justify-center rounded-full border ${
-                    actionsDisabled ? "cursor-pointer border-yellowNew bg-transparent" : "border-lightGray"
+                    actionsDisabled ? "border-yellowNew cursor-pointer bg-transparent" : "border-lightGray"
                 }`}
                 onClick={(event) => actionsDisabled && handleOnClick(event, decrement)}
             >
@@ -52,7 +55,7 @@ const QuantityControl: React.FC<QuantityControlProps> = ({
             </div>
             <span className={`${!actionsDisabled ? "text-lightGray" : ""}`}>{tempQuantity ? tempQuantity : quantity}</span>
             <div
-                className={`rounded-full p-1 ${actionsDisabled ? "cursor-pointer bg-yellow" : "cursor-not-allowed bg-lightGray"}`}
+                className={`rounded-full p-1 ${actionsDisabled ? "bg-yellow cursor-pointer" : "bg-lightGray cursor-not-allowed"}`}
                 onClick={(event) => actionsDisabled && handleOnClick(event, increment)}
             >
                 <IconPlus color='black' />

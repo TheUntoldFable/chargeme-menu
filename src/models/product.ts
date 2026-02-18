@@ -5,7 +5,7 @@ export interface Product extends OrderItem {
     name: string
     description: string
     weight: number
-    price: number
+    priceInBgn: number
     priceInEur: number
     isSelected: boolean
     quantity: number
@@ -30,7 +30,7 @@ export interface OrderProductProps {
     decrement: (id: string | number, quantity: number, source: "cart" | "order") => void
     increment: (id: string | number, quantity: number, source: "cart" | "order") => void
     description: string
-    price: number
+    priceInBgn: number
     priceInEur?: number
 }
 
@@ -41,7 +41,7 @@ export interface PaymentProductProps {
     tempQuantity?: number
     classNames?: string
     description: string
-    price: number
+    priceInBgn: number
     splitBill: boolean
     checked: boolean
     decrement: (id: string | number, quantity: number, source: "cart" | "order") => void

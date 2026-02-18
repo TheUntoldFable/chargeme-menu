@@ -22,9 +22,9 @@ export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0
 
     return (
         <Card className={`mb-1 w-full border-none bg-transparent`}>
-            <CardContent className='bold flex h-11 w-full flex-row items-center justify-center whitespace-pre rounded-lg border-none p-2 text-white'>
+            <CardContent className='bold flex h-11 w-full flex-row items-center justify-center rounded-lg border-none p-2 whitespace-pre text-white'>
                 Обща сума: <span className='text-yellow'>{returnPrice()} лв.</span>
-                <span className='ml-2 text-lightGray'>/ €{sumEur().toFixed(2)}</span>
+                <span className='text-lightGray ml-2'>/ €{sumEur().toFixed(2)}</span>
             </CardContent>
         </Card>
     )

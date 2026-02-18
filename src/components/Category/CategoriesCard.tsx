@@ -3,16 +3,18 @@
 import MenuItem from "@/components/Category/MenuItem"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { CategoriesProps } from "@/models/categories"
+import { useTranslations } from "next-intl"
 
 const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesProps) => {
+    const t = useTranslations("common")
     return (
         <Card className={` ${isWine ? "bg-wine-dark" : "bg-lightBg"} 3 relative flex w-[85%] justify-center border-[0px] ${classNames}`}>
             <CardHeader
                 className={`absolute z-10 text-xl ${isWine ? "bg-wine-default" : "bg-gray"} -top-6 w-auto items-center justify-center rounded-xl border-[0px] px-4 py-2`}
             >
-                <p className='font-bold capitalize'>{name ?? "Test"}</p>
+                <p className='font-bold capitalize'>{name ?? t("test")}</p>
             </CardHeader>
-            <CardContent className='w-full rounded-lg border-none bg-lightBg pt-8 shadow-lg'>
+            <CardContent className='bg-lightBg w-full rounded-lg border-none pt-8 shadow-lg'>
                 {subCategories.length ? (
                     subCategories.map((subCategory) => (
                         <MenuItem

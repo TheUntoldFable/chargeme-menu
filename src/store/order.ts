@@ -1,8 +1,6 @@
 import { Product } from "@/models/product"
-import { atom } from "recoil"
-import { recoilPersist } from "recoil-persist"
-
-const localStorage = typeof window !== `undefined` ? window.localStorage : undefined
+import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
 
 interface OrderState {
     orderId: string | null
@@ -10,31 +8,74 @@ interface OrderState {
     remainingItems: Product[]
     paid: boolean | string
     status: string
-    transactionSessionId?: string | null
+    transactionSessionId: string | null
+    priceInBgn: number
 }
 
-const { persistAtom } = recoilPersist({
-    key: "recoil-persist", // this key is using to store data in local storage
-    storage: localStorage, // configure which storage will be used to store the data
-})
+interface OrderActions {
+    setOrder: (order: Partial<OrderState>) => void
+    setOrderItems: (items: Product[]) => void
+    toggleSelect: (id: string) => void
+    incrementItem: (id: string) => void
+    decrementItem: (id: string) => void
+    attachSessionId: (sessionId: string) => void
+    setPriceInBgn: (priceInBgn: number) => void
+    clearOrder: () => void
+}
 
-export const orderState = atom<OrderState>({
-    key: "Order",
-    default: {
-        orderId: null,
-        orderItems: [],
-        remainingItems: [],
-        status: "",
-        paid: false,
-        transactionSessionId: null,
-    },
-    // eslint-disable-next-line camelcase
-    effects_UNSTABLE: [persistAtom],
-})
+const initialState: OrderState = {
+    orderId: null,
+    orderItems: [],
+    remainingItems: [],
+    status: "",
+    paid: false,
+    transactionSessionId: null,
+    priceInBgn: 0,
+}
 
-export const orderPrice = atom<number>({
-    key: "OrderPrice",
-    default: 0,
-    // eslint-disable-next-line camelcase
-    effects_UNSTABLE: [persistAtom],
-})
+export const useOrderStore = create<OrderState & OrderActions>()(
+    persist(
+        (set) => ({
+            ...initialState,
+
+            setOrder: (order) => set((state) => ({ ...state, ...order })),
+
+            setOrderItems: (items: Product[]) => set({ orderItems: items }),
+
+            toggleSelect: (id: string) => {
+                set((state) => ({
+                    orderItems: state.orderItems.map((item) => (item.id === id ? { ...item, isSelected: !item.isSelected } : item)),
+                }))
+            },
+
+            incrementItem: (id: string) => {
+                set((state) => ({
+                    orderItems: state.orderItems.map((item) =>
+                        item.id === id ? { ...item, tempQuantity: (item.tempQuantity || 0) + 1 } : item
+                    ),
+                }))
+            },
+
+            decrementItem: (id: string) => {
+                set((state) => ({
+                    orderItems: state.orderItems.map((item) =>
+                        item.id === id && (item.tempQuantity || 0) > 1 ? { ...item, tempQuantity: (item.tempQuantity || 0) - 1 } : item
+                    ),
+                }))
+            },
+
+            attachSessionId: (sessionId: string) => {
+                set({ transactionSessionId: sessionId })
+            },
+
+            setPriceInBgn: (priceInBgn: number) => set({ priceInBgn }),
+
+            clearOrder: () => set(initialState),
+        }),
+        {
+            name: "order-storage",
+            storage: createJSONStorage(() => localStorage),
+            skipHydration: true,
+        }
+    )
+)

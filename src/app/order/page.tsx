@@ -3,28 +3,31 @@ import { API_BASE_URL } from "@/api/config"
 import TipDialog, { calculateItemsPrice, calculateTipForOrder } from "@/components/Payment/TipPopUp"
 import CardContainer from "@/components/Product/CardContainer"
 import PaymentProduct from "@/components/Product/PaymentProduct"
-import DialogPopUp from "@/components/common/DialogPopUp"
+import { DialogPopUp } from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useTableOrder } from "@/context/TableOrderContext"
+import { useTableOrderContext } from "@/context/TableOrderContext"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
 import { calculateTotalPriceEur } from "@/lib/utils"
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
+import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 
 export default function OrderPage() {
-    const { order, setPrice, price, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
+    const { order, setPriceInBgn, priceInBgn, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
+    const tOrder = useTranslations("order")
+    const tCommon = useTranslations("common")
     const inputRef = useRef<HTMLInputElement>(null)
     const [tip, setTip] = useState(0)
     const [inputTip, setInputTip] = useState<boolean>(false)
     const [splitBill, setSplitBill] = useState(false)
     const [tipDialogOpen, setTipDialogOpen] = useState(false)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
-    const { tableOrder } = useTableOrder()
+    const { tableOrder } = useTableOrderContext()
 
     const [topic, setTopic] = useState(order ? `/topic/orders/${order.orderId}` : null)
 
@@ -71,16 +74,16 @@ export default function OrderPage() {
 
         const selected: Product[] = order.orderItems.filter((item) => item.isSelected)
 
-        const transactionItems: WSSendMessageItems[] = selected.map((c, _index) => ({
+        const transactionItems: WSSendMessageItems[] = selected.map((c) => ({
             orderItemId: c?.orderItemId,
             quantity: c.tempQuantity,
         }))
 
         const payload: WSSendMessagePayload = {
             transactionItems,
-            totalPrice: price,
-            itemsPrice: Number(calculateItemsPrice(price, tip, inputTip).toFixed(2)),
-            tip: Number(calculateTipForOrder(price, tip, inputTip).toFixed(2)),
+            totalPrice: Number(priceInBgn.toFixed(2)),
+            itemsPrice: Number(calculateItemsPrice(priceInBgn, tip, inputTip).toFixed(2)),
+            tip: Number(calculateTipForOrder(priceInBgn, tip, inputTip).toFixed(2)),
             orderId: order.orderId,
             sessionId: order.transactionSessionId,
         }
@@ -97,33 +100,33 @@ export default function OrderPage() {
     useEffect(() => {
         const selectedTotal = order.orderItems
             .filter((item) => item.isSelected)
-            .reduce((sum, item) => sum + item.price * item.tempQuantity, 0)
+            .reduce((sum, item) => sum + (item.priceInBgn ?? 0) * item.tempQuantity, 0)
 
         const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
 
-        setPrice(finalPrice)
+        setPriceInBgn(finalPrice)
     }, [tip, inputTip, order.orderItems])
 
     // Calculate base price without tip for the tip dialog
     const basePriceWithoutTip = order.orderItems
         .filter((item) => item.isSelected)
-        .reduce((sum, item) => sum + item.price * item.tempQuantity, 0)
+        .reduce((sum, item) => sum + (item.priceInEur ?? 0) * item.tempQuantity, 0)
 
     const isPaymentDisabled = useMemo(() => {
         if (!order) return true
         if (order?.orderItems?.length < 1) return true
         if (order?.orderItems?.every((item) => item.isSelected === false)) return true
         if (order.paid) return true
-        if (price <= 0) return true
+        if (priceInBgn <= 0) return true
         return false
-    }, [order, price])
+    }, [order, priceInBgn])
 
     return (
         <Container title={""}>
             <ScrollArea className='calc-height min-w-full p-4'>
                 {order.orderItems &&
                     order.orderItems.length &&
-                    order.orderItems.map((item, index) => (
+                    order.orderItems.map((item) => (
                         <CardContainer
                             productId={item.id}
                             classNames='mb-6 mx-auto bg-lightBg'
@@ -138,7 +141,7 @@ export default function OrderPage() {
                                 tempQuantity={item?.tempQuantity ?? 0}
                                 quantity={item.quantity ?? 0}
                                 description={item.description ?? ""}
-                                price={item.price ?? 0}
+                                priceInBgn={item.priceInBgn ?? 0}
                                 splitBill={splitBill}
                                 increment={increment}
                                 decrement={decrement}
@@ -163,33 +166,33 @@ export default function OrderPage() {
                 isOpen={confirmDialogOpen}
                 onConfirm={initPayment}
                 onCancel={handleCancelDialog}
-                title='Сигурни ли сте, че искате да платите?'
-                description='Изберете вашата банка, за да платите'
-                defaultTitle='Да'
-                cancelTitle='Не'
+                title={tOrder("confirmPayment.title")}
+                description={tOrder("confirmPayment.description")}
+                defaultTitle={tCommon("yes")}
+                cancelTitle={tCommon("no")}
                 shouldConfirm
             />
             <div className='w-full gap-4 p-4'>
                 <Button
-                    className='mb-4 w-full gap-2 bg-lightBg py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
+                    className='bg-lightBg mb-4 w-full gap-2 py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
                     type='button'
                     id='add'
                     variant='select'
                     onClick={() => setSplitBill((prev) => !prev)}
                 >
-                    {splitBill ? "Назад" : "Раздели и плати"}{" "}
+                    {splitBill ? tCommon("back") : tOrder("splitAndPay")}{" "}
                 </Button>
                 <Button
                     onClick={() => {
                         handleConfirmTip()
                     }}
                     disabled={isPaymentDisabled}
-                    className='w-full gap-2 py-6 text-base font-medium text-lightBg transition-transform ease-in-out active:scale-75'
+                    className='text-lightBg w-full gap-2 py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
                     type='button'
                     id='add'
                     variant='select'
                 >
-                    Плати {price ? price.toFixed(2) : 0} лв{" "}
+                    {tCommon("pay")} {priceInBgn ? priceInBgn.toFixed(2) : 0} {tCommon("currency")}{" "}
                     {order?.orderItems && (
                         <span className='text-gray'>/ €{calculateTotalPriceEur(order.orderItems, false).toFixed(2)}</span>
                     )}

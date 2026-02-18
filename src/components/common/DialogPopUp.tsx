@@ -7,11 +7,11 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { ReactNode } from "react"
+import { FC, ReactNode } from "react"
 
-interface DialogProps {
+type DialogProps = {
     title: string
-    description: string
+    description?: ReactNode
     cancelTitle?: string
     defaultTitle: string
     icon?: ReactNode
@@ -21,7 +21,7 @@ interface DialogProps {
     shouldConfirm?: boolean
 }
 
-const DialogPopUp = ({
+export const DialogPopUp: FC<DialogProps> = ({
     title,
     description,
     cancelTitle,
@@ -31,15 +31,16 @@ const DialogPopUp = ({
     onConfirm,
     onCancel,
     shouldConfirm = false,
-}: DialogProps) => {
+}) => {
     return (
         <AlertDialog open={isOpen}>
-            <AlertDialogContent className='max-w-[90%] rounded-lg border-0 bg-lightBg'>
+            <AlertDialogContent className='bg-lightBg max-w-[90%] rounded-lg border-0'>
                 <AlertDialogHeader className='items-center'>
                     {icon && <div>{icon}</div>}
                     <AlertDialogTitle className='text-white'>{title}</AlertDialogTitle>
-                    <AlertDialogDescription className='text-lightGray'>{description}</AlertDialogDescription>
                 </AlertDialogHeader>
+                {description && <AlertDialogDescription className='text-lightGray'>{description}</AlertDialogDescription>}
+
                 <AlertDialogFooter className='flex-row items-center gap-2'>
                     <Button
                         onClick={onConfirm}
@@ -51,7 +52,7 @@ const DialogPopUp = ({
                     {shouldConfirm && (
                         <Button
                             onClick={onCancel}
-                            className='w-full rounded-2xl bg-lighterGray'
+                            className='bg-lighterGray w-full rounded-2xl'
                             variant='default'
                         >
                             {cancelTitle}
@@ -62,5 +63,3 @@ const DialogPopUp = ({
         </AlertDialog>
     )
 }
-
-export default DialogPopUp

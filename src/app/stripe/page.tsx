@@ -5,6 +5,7 @@ import CheckoutForm from "@/components/Payment/CheckoutForm"
 import { stringToStripeAmount } from "@/lib/utils"
 import { Elements } from "@stripe/react-stripe-js"
 import { Appearance, loadStripe, StripeElementsOptions } from "@stripe/stripe-js"
+import { useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useState } from "react"
 
@@ -29,7 +30,7 @@ function StripePage() {
                         amount: stringToStripeAmount(totalAmount),
                     },
                 ],
-                currency: "bgn",
+                currency: "eur",
             }),
         })
             .then((res) => res.json())
@@ -46,7 +47,7 @@ function StripePage() {
     }
 
     return (
-        <Wrapper className='bg-none w-full pt-12'>
+        <Wrapper className='w-full bg-none pt-12'>
             {clientSecret && (
                 <Elements
                     options={options}
@@ -60,8 +61,10 @@ function StripePage() {
 }
 
 export default function Page() {
+    const t = useTranslations("common")
+
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>{t("loading")}</div>}>
             <StripePage />
         </Suspense>
     )
