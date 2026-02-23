@@ -10,7 +10,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTableOrderContext } from "@/context/TableOrderContext"
 import { useOrder } from "@/hooks/useOrder"
 import { useSockJS } from "@/hooks/useSockJS"
-import { calculateTotalPriceEur } from "@/lib/utils"
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { useTranslations } from "next-intl"
@@ -18,7 +17,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 
 export default function OrderPage() {
-    const { order, setPriceInBgn, priceInBgn, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
+    const {
+        order,
+        setPriceInBgn,
+        priceInBgn,
+        setPriceInEur,
+        priceInEur,
+        increment,
+        decrement,
+        clearOrder,
+        updateOrder,
+        attachSessionID,
+        toggleSelect,
+    } = useOrder()
     const tOrder = useTranslations("order")
     const tCommon = useTranslations("common")
     const inputRef = useRef<HTMLInputElement>(null)
@@ -81,9 +92,9 @@ export default function OrderPage() {
 
         const payload: WSSendMessagePayload = {
             transactionItems,
-            totalPrice: Number(priceInBgn.toFixed(2)),
-            itemsPrice: Number(calculateItemsPrice(priceInBgn, tip, inputTip).toFixed(2)),
-            tip: Number(calculateTipForOrder(priceInBgn, tip, inputTip).toFixed(2)),
+            totalPrice: Number(priceInEur.toFixed(2)),
+            itemsPrice: Number(calculateItemsPrice(priceInEur, tip, inputTip).toFixed(2)),
+            tip: Number(calculateTipForOrder(priceInEur, tip, inputTip).toFixed(2)),
             orderId: order.orderId,
             sessionId: order.transactionSessionId,
         }
@@ -98,13 +109,20 @@ export default function OrderPage() {
     }, [socket.isConnected, tableOrder, socket.isSubscribed, order])
 
     useEffect(() => {
-        const selectedTotal = order.orderItems
+        const selectedTotalInBGN: number = order.orderItems
             .filter((item) => item.isSelected)
             .reduce((sum, item) => sum + (item.priceInBgn ?? 0) * item.tempQuantity, 0)
+        const priceInBgn = !inputTip ? tip * selectedTotalInBGN + selectedTotalInBGN : tip + selectedTotalInBGN
 
-        const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
+        setPriceInBgn(priceInBgn)
 
-        setPriceInBgn(finalPrice)
+        const selectedTotalInEUR: number = order.orderItems
+            .filter((item) => item.isSelected)
+            .reduce((sum, item) => sum + (item.priceInEur ?? 0) * item.tempQuantity, 0)
+
+        const priceInEur = !inputTip ? tip * selectedTotalInEUR + selectedTotalInEUR : tip + selectedTotalInEUR
+
+        setPriceInEur(priceInEur)
     }, [tip, inputTip, order.orderItems])
 
     // Calculate base price without tip for the tip dialog
@@ -118,8 +136,9 @@ export default function OrderPage() {
         if (order?.orderItems?.every((item) => item.isSelected === false)) return true
         if (order.paid) return true
         if (priceInBgn <= 0) return true
+        if (priceInEur <= 0) return true
         return false
-    }, [order, priceInBgn])
+    }, [order, priceInBgn, priceInEur])
 
     return (
         <Container title={""}>
@@ -192,10 +211,8 @@ export default function OrderPage() {
                     id='add'
                     variant='select'
                 >
-                    {tCommon("pay")} {priceInBgn ? priceInBgn.toFixed(2) : 0} {tCommon("currency")}{" "}
-                    {order?.orderItems && (
-                        <span className='text-gray'>/ €{calculateTotalPriceEur(order.orderItems, false).toFixed(2)}</span>
-                    )}
+                    {tCommon("pay")} {priceInEur ? priceInEur.toFixed(2) : 0} {tCommon("currency")}{" "}
+                    {order?.orderItems && <span className='text-gray'>/ {priceInBgn.toFixed(2)} лв</span>}
                 </Button>
             </div>
         </Container>

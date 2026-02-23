@@ -40,7 +40,7 @@ const AddProduct = forwardRef<HTMLDivElement, AddProductProps>(function AddProdu
                 <p className='text-lightGray text-sm'>{truncateText(description || "")}</p>
                 <div className='flex gap-2'>
                     <p className='font-bold'>
-                        {priceInBgn.toFixed(2)} лв {priceInEur ? `/ €${priceInEur.toFixed(2)}` : ""}
+                        €{priceInEur.toFixed(2)} {priceInEur && <span className='text-lightGray'>/ {priceInBgn.toFixed(2)} лв</span>}
                     </p>
                     <span className='text-white'>|</span>
                     {weight && <p className='text-lightGray'>{weight}гр.</p>}

@@ -21,6 +21,8 @@ export function useOrder() {
         setPriceInBgn,
         clearOrder,
         attachSessionId,
+        setPriceInEur,
+        priceInEur,
     } = useOrderStore()
     const language = useLanguageStore((state) => state.language)
 
@@ -120,6 +122,8 @@ export function useOrder() {
     return {
         priceInBgn,
         setPriceInBgn,
+        setPriceInEur,
+        priceInEur,
         decrement,
         increment,
         cartItems,
