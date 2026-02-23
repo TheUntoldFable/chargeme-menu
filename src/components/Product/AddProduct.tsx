@@ -1,6 +1,6 @@
 "use client"
 
-import { useAddToCart } from "@/hooks/useAddToCart"
+import { useAddToCart } from "@/hooks/use-add-to-cart"
 import { Product } from "@/models/product"
 import { useCartStore } from "@/store/cart"
 import { forwardRef } from "react"

@@ -55,7 +55,7 @@
         },
         "splitAndPay": "Раздели и плати",
         "ratingDialog": {
-            "title": "Хареса ли ви хареса {productName}?",
+            "title": "Хареса ли ви {productName}?",
             "description": "Вашето мнение е важно за нас!",
             "feedbackPlaceholder": "Споделете вашите впечатления (по избор)...",
             "submit": "Изпрати",

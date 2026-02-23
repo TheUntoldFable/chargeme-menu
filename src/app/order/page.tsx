@@ -8,8 +8,9 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTableOrderContext } from "@/context/TableOrderContext"
-import { useOrder } from "@/hooks/useOrder"
-import { useSockJS } from "@/hooks/useSockJS"
+import { useOrder } from "@/hooks/use-order"
+import { useSockJS } from "@/hooks/use-sockjs"
+
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
 import { useTranslations } from "next-intl"
@@ -30,6 +31,7 @@ export default function OrderPage() {
         attachSessionID,
         toggleSelect,
     } = useOrder()
+
     const tOrder = useTranslations("order")
     const tCommon = useTranslations("common")
     const inputRef = useRef<HTMLInputElement>(null)
