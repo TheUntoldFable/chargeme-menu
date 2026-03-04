@@ -17,7 +17,7 @@ const ProductCard = ({ productId, classNames, children, isBlocked, image }: Prod
         <Card className={`bg-lightBg flex flex-col justify-center rounded-2xl border-0 ${classNames}`}>
             <CardContent className='flex w-full rounded-lg p-0'>
                 <Image
-                    src={image ? image : "/images/pizza.png"}
+                    src={image ? image : "/images/coming-soon.png"}
                     width={96}
                     height={96}
                     className='h-24 w-24 rounded-s-2xl object-contain'
