@@ -7,6 +7,8 @@ export interface GetRestaurantResponse {
     vendorPassword: string
     tipEnabled: boolean
     paymentInAdvance: boolean
+    selfService: boolean
+    restaurantGoogleUrl: string
     latitude: number
     longitude: number
     tableNumbers: Array<{

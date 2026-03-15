@@ -23,9 +23,7 @@ export const useRestaurantStore = create<RestaurantInfo & RestaurantActions>()(
     persist(
         (set) => ({
             ...initialState,
-
             setRestaurantInfo: (info) => set((state) => ({ ...state, ...info })),
-
             clearRestaurant: () => set(initialState),
         }),
         {
