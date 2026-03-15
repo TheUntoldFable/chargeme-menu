@@ -46,6 +46,11 @@
         "removeFromCart": {
             "title": "Remove from Cart",
             "description": "The product {name} has been successfully removed from your cart!"
+        },
+        "orderSuccess": {
+            "title": "Order accepted!",
+            "description": "Your order has been received successfully, you can pick it up in a few minutes!",
+            "descriptionDefault": "Your order has been received successfully by the staff and will be with you soon!"
         }
     },
     "order": {

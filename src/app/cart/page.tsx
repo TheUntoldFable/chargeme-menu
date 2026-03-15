@@ -1,6 +1,7 @@
 "use client"
 
 import IconFailed from "#/public/svg/icons/IconFailed"
+import IconSuccess from "#/public/svg/icons/IconSuccess"
 import { API_BASE_URL } from "@/api/config"
 import CardContainer from "@/components/Product/CardContainer"
 import CartItem from "@/components/Product/CartItem"
@@ -33,10 +34,20 @@ export default function CartPage() {
     const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false)
     const [isOpenFailedDialog, setIsOpenFailedDialog] = useState<boolean>(false)
     const [isOpenCreateOrderFailedDialog, setIsOpenCreateOrderFailedDialog] = useState<boolean>(false)
+    const [isOpenSuccessDialog, setIsOpenSuccessDialog] = useState<boolean>(false)
 
     const { mutateAsync: prePayOrder } = usePrePayOrder()
     // Check if this restaurant uses pre-payment
     const isPrePayMode = !!storedRestaurantData?.paymentInAdvance
+    const isSelfService = !!storedRestaurantData?.selfService
+
+    const handleRouterPush = useCallback(() => {
+        if (isSelfService) {
+            router.push(withRestaurantParams("/", restaurantId, tableId))
+        } else {
+            router.push(withRestaurantParams("/order", restaurantId, tableId))
+        }
+    }, [isSelfService, restaurantId, tableId])
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
@@ -47,7 +58,7 @@ export default function CartPage() {
                     if (cartItems.length > 0) {
                         setTableOrder(e)
                     }
-                    router.push(withRestaurantParams("/order", restaurantId, tableId))
+                    handleRouterPush()
                 })
             } else {
                 setIsOpenCreateOrderFailedDialog(true)
@@ -98,8 +109,6 @@ export default function CartPage() {
                     totalPrice: rItemsPrice,
                     restaurantId: restaurantId,
                 })
-
-                setIsOpenDialog(false)
             } else {
                 throw new Error("No connection to socket!")
             }
@@ -139,6 +148,8 @@ export default function CartPage() {
         } else {
             handleCreate()
         }
+        setIsOpenDialog(false)
+        setIsOpenSuccessDialog(true)
     }
 
     // Get button text based on pre-pay mode
@@ -201,6 +212,21 @@ export default function CartPage() {
                     defaultTitle={tCommon("ok")}
                     isOpen={isOpenCreateOrderFailedDialog}
                     onConfirm={() => setIsOpenCreateOrderFailedDialog(false)}
+                />
+                <DialogPopUp
+                    icon={<IconSuccess />}
+                    title={tCart("orderSuccess.title")}
+                    description={
+                        <span className='block text-center'>
+                            {isSelfService ? tCart("orderSuccess.description") : tCart("orderSuccess.descriptionDefault")}
+                        </span>
+                    }
+                    defaultTitle={tCommon("ok")}
+                    isOpen={isOpenSuccessDialog}
+                    onConfirm={() => {
+                        setIsOpenSuccessDialog(false)
+                        handleRouterPush()
+                    }}
                 />
             </div>
         </Container>
