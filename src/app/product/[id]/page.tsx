@@ -26,8 +26,6 @@ export default function Page({ params }: ProductPageProps) {
     const t = useTranslations("product")
     const tCommon = useTranslations("common")
 
-    console.log(item, "item")
-
     return (
         !isLoading && (
             <Container title={item?.name || ""}>
