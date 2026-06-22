@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { getRestaurantParamsFromWindow, withRestaurantParams } from "@/lib/navigation-utils"
+import { getBusinessParamsFromWindow, withBusinessParams } from "@/lib/navigation-utils"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -35,8 +35,8 @@ const ProductCard = ({ productId, classNames, children, isBlocked, image }: Prod
             ) : (
                 <Link
                     href={(() => {
-                        const { restaurantId, table } = getRestaurantParamsFromWindow()
-                        return withRestaurantParams(`/product/${productId}`, restaurantId, table)
+                        const { businessId, table } = getBusinessParamsFromWindow()
+                        return withBusinessParams(`/product/${productId}`, businessId, table)
                     })()}
                     passHref
                 >

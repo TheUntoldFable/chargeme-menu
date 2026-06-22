@@ -8,23 +8,25 @@ export interface MenuItem extends Product {
     priceInEur: number
     description: string
     categoryId: string
-    subcategory: string
     allergens: string[]
-    restaurant: string
-    menuItemCount?: number
+    businessId: string
 }
 
+// Categories are now a self-referencing tree (subcategories were removed and are
+// just nested categories). See API CHANGELOG section 4.
 export interface MenuCategory {
     id: string
     name: string
     description: string | null
-    restaurant: string | null
-    subcategories: MenuItem[]
+    businessId: string | null
+    parentId: string | null
+    menuItemCount: number
+    children: MenuCategory[]
 }
 
 export interface CategoriesProps {
     name: string
-    subCategories: MenuItem[]
+    subCategories: MenuCategory[]
     classNames?: string
     isWine: boolean
 }

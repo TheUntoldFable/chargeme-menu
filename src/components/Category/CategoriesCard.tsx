@@ -22,7 +22,7 @@ const CategoriesCard = ({ name, subCategories, classNames, isWine }: CategoriesP
                             name={subCategory.name}
                             catQuantity={subCategory?.menuItemCount ?? 1}
                             id={subCategory.id}
-                            type='subcategory'
+                            type='category'
                             productId={subCategory.id}
                             isWine={isWine}
                         />

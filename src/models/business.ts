@@ -1,5 +1,8 @@
-export interface GetRestaurantResponse {
+export type BusinessType = "RESTAURANT" | "SERVICES" | "OTHER"
+
+export interface GetBusinessResponse {
     id: string
+    type: BusinessType
     vendor: string
     iban: string
     vendorHost: string

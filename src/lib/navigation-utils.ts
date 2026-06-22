@@ -1,9 +1,9 @@
 import { useSearchParams } from "next/navigation"
 
 /**
- * Custom hook to get restaurantId from search params
+ * Custom hook to get businessId from search params
  */
-export function useRestaurantId(): string | null {
+export function useBusinessId(): string | null {
     const searchParams = useSearchParams()
     return searchParams.get("restaurantId")
 }
@@ -17,41 +17,41 @@ export function useTableId(): string | null {
 }
 
 /**
- * Custom hook to get both restaurantId and table from search params
+ * Custom hook to get both businessId and table from search params
  */
-export function useRestaurantParams(): { restaurantId: string | null; table: string | null } {
+export function useBusinessParams(): { businessId: string | null; table: string | null } {
     const searchParams = useSearchParams()
     return {
-        restaurantId: searchParams.get("restaurantId"),
+        businessId: searchParams.get("restaurantId"),
         table: searchParams.get("table"),
     }
 }
 
 /**
- * Utility function to append restaurantId and table to a path if they exist
+ * Utility function to append businessId and table to a path if they exist
  */
-export function withRestaurantParams(path: string, restaurantId: string | null, table: string | null): string {
+export function withBusinessParams(path: string, businessId: string | null, table: string | null): string {
     const params = new URLSearchParams()
-    if (restaurantId) params.set("restaurantId", restaurantId)
+    if (businessId) params.set("restaurantId", businessId)
     if (table) params.set("table", table)
     const queryString = params.toString()
     return queryString ? `${path}?${queryString}` : path
 }
 
 /**
- * Utility function to append restaurantId to a path if it exists (legacy)
+ * Utility function to append businessId to a path if it exists (legacy)
  */
-export function withRestaurantId(path: string, restaurantId: string | null): string {
-    return restaurantId ? `${path}?restaurantId=${restaurantId}` : path
+export function withBusinessId(path: string, businessId: string | null): string {
+    return businessId ? `${path}?restaurantId=${businessId}` : path
 }
 
 /**
- * Utility function to build URL with restaurantId and other params
+ * Utility function to build URL with businessId and other params
  */
 export function buildUrlWithParams(
     basePath: string,
     params: Record<string, string | boolean | null>,
-    restaurantId: string | null,
+    businessId: string | null,
     table?: string | null
 ): string {
     const urlParams = new URLSearchParams()
@@ -63,9 +63,9 @@ export function buildUrlWithParams(
         }
     })
 
-    // Add restaurantId if it exists
-    if (restaurantId) {
-        urlParams.set("restaurantId", restaurantId)
+    // Add businessId if it exists
+    if (businessId) {
+        urlParams.set("restaurantId", businessId)
     }
 
     // Add table if it exists
@@ -78,9 +78,9 @@ export function buildUrlWithParams(
 }
 
 /**
- * Client-side utility to get restaurantId from window.location.search
+ * Client-side utility to get businessId from window.location.search
  */
-export function getRestaurantIdFromWindow(): string | null {
+export function getBusinessIdFromWindow(): string | null {
     if (typeof window === "undefined") return null
     return new URLSearchParams(window.location.search).get("restaurantId")
 }
@@ -94,13 +94,13 @@ export function getTableFromWindow(): string | null {
 }
 
 /**
- * Client-side utility to get both restaurantId and table from window.location.search
+ * Client-side utility to get both businessId and table from window.location.search
  */
-export function getRestaurantParamsFromWindow(): { restaurantId: string | null; table: string | null } {
-    if (typeof window === "undefined") return { restaurantId: null, table: null }
+export function getBusinessParamsFromWindow(): { businessId: string | null; table: string | null } {
+    if (typeof window === "undefined") return { businessId: null, table: null }
     const params = new URLSearchParams(window.location.search)
     return {
-        restaurantId: params.get("restaurantId"),
+        businessId: params.get("restaurantId"),
         table: params.get("table"),
     }
 }

@@ -11,14 +11,15 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import TotalPrice from "@/components/ui/total-price"
 import { useTableOrderContext } from "@/context/TableOrderContext"
+import { businessOrderTopic, useCreateBusinessOrder } from "@/hooks/business-orders"
 import { usePrePayOrder } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/use-order"
 import { useSockJS } from "@/hooks/use-sockjs"
-import { withRestaurantParams } from "@/lib/navigation-utils"
+import { buildUrlWithParams, withBusinessParams } from "@/lib/navigation-utils"
 import { calculateTotalPriceEur } from "@/lib/utils"
-import { CreateOrderItem, GetOrderRes } from "@/models/order"
+import { BusinessOrder, CreateOrderItem, GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
-import { useRestaurantStore } from "@/store/restaurant"
+import { useBusinessStore } from "@/store/business"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
@@ -29,29 +30,41 @@ export default function CartPage() {
     const tCommon = useTranslations("common")
 
     const { tableOrder, setTableOrder } = useTableOrderContext()
-    const { restaurantId, tableId, restaurantData: storedRestaurantData } = useRestaurantStore()
-    const { updateOrder, order, cartItems, increment, decrement } = useOrder()
+    const { businessId, tableId, businessData: storedBusinessData } = useBusinessStore()
+    const {
+        updateOrder,
+        order,
+        cartItems,
+        increment,
+        decrement,
+        clearCart,
+    } = useOrder()
     const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false)
     const [isOpenFailedDialog, setIsOpenFailedDialog] = useState<boolean>(false)
     const [isOpenCreateOrderFailedDialog, setIsOpenCreateOrderFailedDialog] = useState<boolean>(false)
     const [isOpenSuccessDialog, setIsOpenSuccessDialog] = useState<boolean>(false)
+    const [businessOrderId, setBusinessOrderId] = useState<string | null>(null)
 
     const { mutateAsync: prePayOrder } = usePrePayOrder()
+    const { mutateAsync: createBusinessOrder } = useCreateBusinessOrder()
     // Check if this restaurant uses pre-payment
-    const isPrePayMode = !!storedRestaurantData?.paymentInAdvance
-    const isSelfService = !!storedRestaurantData?.selfService
+    const isPrePayMode = !!storedBusinessData?.paymentInAdvance
+    const isSelfService = !!storedBusinessData?.selfService
+    // Non-restaurant businesses use the simpler POS-less business-order flow,
+    // paid fully up front via an Iris payment link.
+    const isBusinessOrderMode = storedBusinessData?.type === "SERVICES" || storedBusinessData?.type === "OTHER"
 
     const handleRouterPush = useCallback(() => {
         if (isSelfService) {
-            router.push(withRestaurantParams("/", restaurantId, tableId))
+            router.push(withBusinessParams("/", businessId, tableId))
         } else {
-            router.push(withRestaurantParams("/order", restaurantId, tableId))
+            router.push(withBusinessParams("/order", businessId, tableId))
         }
-    }, [isSelfService, restaurantId, tableId])
+    }, [isSelfService, businessId, tableId])
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
-        topic: tableOrder ? `/topic/orders/${tableOrder?.id}` : `/topic/orders/${restaurantId}/${tableId}`,
+        topic: tableOrder ? `/topic/orders/${tableOrder?.id}` : `/topic/orders/${businessId}/${tableId}`,
         onMessage: (e: GetOrderRes) => {
             if (e.id) {
                 updateOrder(e).then(() => {
@@ -64,10 +77,46 @@ export default function CartPage() {
                 setIsOpenCreateOrderFailedDialog(true)
             }
         },
-        disabled: isPrePayMode,
+        disabled: isPrePayMode || isBusinessOrderMode,
+    })
+
+    // Live business-order payment results. The primary flow redirects to the Iris
+    // payment link, but if payment completes while the user is still here (e.g. paid
+    // in another tab) we pick up the PAID status and send them back with success.
+    useSockJS({
+        url: `${API_BASE_URL}/ws`,
+        topic: businessOrderId ? businessOrderTopic(businessOrderId) : null,
+        onMessage: (e: BusinessOrder) => {
+            if (e.status === "PAID") {
+                clearCart()
+                router.push(buildUrlWithParams("/", { isPaid: true }, businessId, tableId))
+            }
+        },
+        disabled: !isBusinessOrderMode || !businessOrderId,
     })
 
     const handleCreate = useCallback(async () => {
+        if (isBusinessOrderMode) {
+            try {
+                const res = await createBusinessOrder({
+                    businessId: businessId,
+                    price: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
+                    orderItems: cartItems.map((p: Product) => ({
+                        itemId: p.id,
+                        quantity: p.quantity,
+                    })),
+                })
+
+                setBusinessOrderId(res.order.id)
+                router.replace(res.paymentLink)
+            } catch (error) {
+                console.log(error)
+                setIsOpenDialog(false)
+                setIsOpenFailedDialog(true)
+            }
+            return
+        }
+
         if (isPrePayMode) {
             // TODO: Implement pre-pay mode
             try {
@@ -80,7 +129,8 @@ export default function CartPage() {
                     tableNumber: tableId,
                     numberOfGuests: 1,
                     totalPrice: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
-                    restaurantId: restaurantId,
+                    // Request wire field is still `restaurantId` (request bodies unchanged).
+                    restaurantId: businessId,
                     itemsPrice: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
                     tip: 0,
                 })
@@ -104,16 +154,16 @@ export default function CartPage() {
 
                 socket.sendMessage("/app/createOrder", {
                     orderItems: rItems,
-                    tableNumber: tableId, //Should be defined by restaurant
+                    tableNumber: tableId, //Should be defined by business
                     numberOfGuests: 1, // should be calculated by BE when connecting with the table.
                     totalPrice: rItemsPrice,
-                    restaurantId: restaurantId,
+                    restaurantId: businessId,
                 })
             } else {
                 throw new Error("No connection to socket!")
             }
         }
-    }, [cartItems, restaurantId, socket.isConnected, isPrePayMode])
+    }, [cartItems, businessId, socket.isConnected, isPrePayMode, isBusinessOrderMode])
 
     const handleUpdate = useCallback(() => {
         //Only for socket connection
@@ -131,16 +181,16 @@ export default function CartPage() {
 
             socket.sendMessage("/app/updateOrder", {
                 orderItems: rItems,
-                tableNumber: tableId, //Should be defined by restaurant
+                tableNumber: tableId, //Should be defined by business
                 numberOfGuests: 1, // should be calculated by BE when connecting with the table.
                 totalPrice: rItemsPrice,
-                restaurantId: restaurantId,
+                restaurantId: businessId,
                 orderId: order.orderId,
             })
         } else {
             throw new Error("No connection to socket!")
         }
-    }, [socket.isConnected, cartItems, restaurantId, tableId, isPrePayMode])
+    }, [socket.isConnected, cartItems, businessId, tableId, isPrePayMode])
 
     const handleOrderAction = () => {
         if (tableOrder && tableOrder?.status === "ORDERED") {
@@ -154,7 +204,7 @@ export default function CartPage() {
 
     // Get button text based on pre-pay mode
     const getButtonText = () => {
-        if (isPrePayMode) {
+        if (isPrePayMode || isBusinessOrderMode) {
             return tableOrder?.status === "ORDERED" ? tCart("addAndPay") : tCart("orderAndPay")
         }
         return tableOrder?.status === "ORDERED" ? tCart("add") : tCart("order")

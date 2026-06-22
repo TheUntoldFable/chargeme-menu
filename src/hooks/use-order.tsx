@@ -32,9 +32,9 @@ export function useOrder() {
 
         await Promise.all(
             e.orderItems.map(async (orderItem) => {
-                const item = await fetchMenuItem(orderItem.menuItemId, language)
+                const item = await fetchMenuItem(orderItem.itemId, language)
 
-                orderItemMap.set(orderItem.menuItemId, {
+                orderItemMap.set(orderItem.itemId, {
                     ...item,
                     isSelected: true,
                     quantity: orderItem.quantity,
