@@ -58,6 +58,10 @@
             "title": "Сигурни ли сте, че искате да платите?",
             "description": "Изберете вашата банка, за да платите"
         },
+        "selfServicePayment": {
+            "title": "Плащане",
+            "description": "Може да заплатите брой/карта на бара"
+        },
         "splitAndPay": "Раздели и плати",
         "ratingDialog": {
             "title": "Хареса ли ви {productName}?",

@@ -58,6 +58,10 @@
             "title": "Are you sure you want to pay?",
             "description": "Select your bank to pay"
         },
+        "selfServicePayment": {
+            "title": "Payment",
+            "description": "You can pay cash/card at the bar"
+        },
         "splitAndPay": "Split and Pay",
         "ratingDialog": {
             "title": "How did you like {productName}?",
