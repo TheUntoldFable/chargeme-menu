@@ -13,7 +13,7 @@ import { useSockJS } from "@/hooks/use-sockjs"
 
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
-import { useRestaurantStore } from "@/store/restaurant"
+import { useBusinessStore } from "@/store/business"
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
@@ -43,8 +43,8 @@ export default function OrderPage() {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const [selfServiceDialogOpen, setSelfServiceDialogOpen] = useState(false)
     const { tableOrder } = useTableOrderContext()
-    const { restaurantData } = useRestaurantStore()
-    const isSelfService = !!restaurantData?.selfService
+    const { businessData } = useBusinessStore()
+    const isSelfService = !!businessData?.selfService
 
     const [topic, setTopic] = useState(order ? `/topic/orders/${order.orderId}` : null)
 

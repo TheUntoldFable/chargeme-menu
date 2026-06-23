@@ -2,27 +2,27 @@ import { PrePayProvider } from "@/context/PrePayContext"
 import { TableOrderContext } from "@/context/TableOrderContext"
 import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/use-order"
-import { useRestaurant } from "@/hooks/use-restaurant"
+import { useBusiness } from "@/hooks/use-business"
 import { GetOrderRes } from "@/models/order"
-import { useRestaurantStore } from "@/store/restaurant"
+import { useBusinessStore } from "@/store/business"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     const searchParams = useSearchParams()
-    const restaurantIdParam = searchParams.get("restaurantId")
+    const businessIdParam = searchParams.get("restaurantId")
     const tableParam = searchParams.get("table")
     const isPaidParam = searchParams.get("isPaid")
     const table = tableParam !== null ? tableParam : undefined
-    const { tableId, restaurantData: storedRestaurantData, setRestaurantInfo } = useRestaurantStore()
+    const { tableId, businessData: storedBusinessData, setBusinessInfo } = useBusinessStore()
 
     const { clearOrder, updateOrder, clearCart } = useOrder()
 
     const {
-        data: restaurantData,
-        isLoading: isLoadingRestaurantData,
+        data: businessData,
+        isLoading: isLoadingBusinessData,
         //! This should come from a config
-    } = useRestaurant(restaurantIdParam ?? "")
+    } = useBusiness(businessIdParam ?? "")
 
     const { data, isLoading: isLoadingOrders, refetch } = useGetAllOrders(tableId)
     const [tableOrder, setTableOrder] = useState<GetOrderRes | undefined>(undefined)
@@ -45,16 +45,16 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     }, [data, isPaidParam])
 
     useEffect(() => {
-        if (!isLoadingRestaurantData) {
-            setRestaurantInfo({
-                restaurantId: restaurantIdParam ?? "",
+        if (!isLoadingBusinessData) {
+            setBusinessInfo({
+                businessId: businessIdParam ?? "",
                 tableId: table ?? "",
-                restaurantData: restaurantData ?? null,
+                businessData: businessData ?? null,
             })
         }
-    }, [restaurantData, isLoadingRestaurantData, restaurantIdParam, table])
+    }, [businessData, isLoadingBusinessData, businessIdParam, table])
 
-    // if (isLoadingRestaurantData || isLoadingOrders)
+    // if (isLoadingBusinessData || isLoadingOrders)
     //     return (
     //         <Center>
     //             <Loader />
@@ -62,7 +62,7 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     //     )
 
     return (
-        <PrePayProvider restaurantData={storedRestaurantData ?? undefined}>
+        <PrePayProvider businessData={storedBusinessData ?? undefined}>
             <TableOrderContext.Provider value={{ setTableOrder, tableOrder, refetch }}>{children}</TableOrderContext.Provider>
         </PrePayProvider>
     )

@@ -2,7 +2,7 @@
 
 import { LOCATION_ROUTES } from "@/constants/location"
 import type { LocationCheckResult } from "@/lib/location-utils"
-import { useRestaurantParams, withRestaurantParams } from "@/lib/navigation-utils"
+import { useBusinessParams, withBusinessParams } from "@/lib/navigation-utils"
 import { usePathname, useRouter } from "next/navigation"
 import { useCallback } from "react"
 
@@ -17,7 +17,7 @@ export function useLocationNavigation(options: UseLocationNavigationOptions = {}
     const { enabled = true } = options
     const router = useRouter()
     const pathname = usePathname()
-    const { restaurantId, table } = useRestaurantParams()
+    const { businessId, table } = useBusinessParams()
 
     const isOnErrorPage = pathname === LOCATION_ROUTES.ERROR
 
@@ -26,7 +26,7 @@ export function useLocationNavigation(options: UseLocationNavigationOptions = {}
      */
     const navigateToErrorPage = useCallback(() => {
         if (!isOnErrorPage && enabled) {
-            router.push(withRestaurantParams(LOCATION_ROUTES.ERROR, restaurantId, table))
+            router.push(withBusinessParams(LOCATION_ROUTES.ERROR, businessId, table))
         }
     }, [isOnErrorPage, enabled, router])
 
@@ -35,7 +35,7 @@ export function useLocationNavigation(options: UseLocationNavigationOptions = {}
      */
     const navigateToHomePage = useCallback(() => {
         if (isOnErrorPage && enabled) {
-            router.push(withRestaurantParams(LOCATION_ROUTES.HOME, restaurantId, table))
+            router.push(withBusinessParams(LOCATION_ROUTES.HOME, businessId, table))
         }
     }, [isOnErrorPage, enabled, router])
 

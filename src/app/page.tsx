@@ -26,7 +26,7 @@ export default function Home() {
 
     const tPayment = useTranslations("payment")
     const tCommon = useTranslations("common")
-    const restaurantIdParam = searchParams.get("restaurantId") ?? ""
+    const businessIdParam = searchParams.get("restaurantId") ?? ""
     const isPaidParam = searchParams.get("isPaid")
 
     const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
@@ -35,7 +35,7 @@ export default function Home() {
     const [shouldRateApp, setShouldRateApp] = useState(false)
     const [shouldRateProduct, setShouldRateProduct] = useState(false)
 
-    const { data: categories, isLoading, status } = useCategories(restaurantIdParam)
+    const { data: categories, isLoading, status } = useCategories(businessIdParam)
     const { mutate: submitExperienceFeedback } = useSubmitExperienceFeedback()
     const { mutate: submitFoodFeedback } = useSubmitFoodFeedback()
     const productToRate = useCartStore((state) => state.productToRate)
@@ -52,7 +52,7 @@ export default function Home() {
 
     const handleAppFeedbackSubmit = (data: Record<string, unknown>) => {
         submitExperienceFeedback({
-            restaurant_id: restaurantIdParam,
+            restaurant_id: businessIdParam,
             rating: appRating,
             description: (data.textArea as string) ?? "",
         })
@@ -130,7 +130,7 @@ export default function Home() {
                     product={productToRate}
                     onSubmit={(rating, feedback) => {
                         submitFoodFeedback({
-                            restaurant_id: restaurantIdParam,
+                            restaurant_id: businessIdParam,
                             rating,
                             description: feedback,
                             menu_item_ids: [productToRate.id],
@@ -159,18 +159,23 @@ export default function Home() {
             <Container title=''>
                 {showData && categories?.length && (
                     <ScrollArea className='calc-height h-full min-w-full'>
-                        {categories.map(
-                            (item, index) =>
-                                !!item.subcategories.length && (
+                        {categories.map((item, index) => {
+                            // Categories are a tree now: list nested categories as rows. A
+                            // leaf category that holds items directly is shown as its own row.
+                            const rows = item.children?.length ? item.children : item.menuItemCount > 0 ? [item] : []
+
+                            return (
+                                !!rows.length && (
                                     <CategoriesCard
                                         key={item.id}
                                         classNames='mt-8 mb-2 mx-auto'
                                         name={item.name}
-                                        subCategories={item.subcategories}
+                                        subCategories={rows}
                                         isWine={index === 0}
                                     />
                                 )
-                        )}
+                            )
+                        })}
                     </ScrollArea>
                 )}
 
