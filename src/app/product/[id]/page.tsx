@@ -7,7 +7,7 @@ import { DropdownMenuCheckboxes } from "@/components/common/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMenuItem } from "@/hooks/get-menu-item"
-import { useAddToCart } from "@/hooks/useAddToCart"
+import { useAddToCart } from "@/hooks/use-add-to-cart"
 import { Product } from "@/models/product"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
@@ -31,12 +31,12 @@ export default function Page({ params }: ProductPageProps) {
             <Container title={item?.name || ""}>
                 <ScrollArea className='calc-height h-screen min-w-full px-4 pt-4'>
                     <Image
-                        src={item?.image ?? "/images/pizza.png"}
+                        src={item?.image ?? "/images/coming-soon.png"}
                         width={393}
                         height={248}
                         className='mb-6 h-60 w-full rounded object-contain'
                         alt='Img'
-                    />{" "}
+                    />
                     <div className='w-full px-4 pb-4'>
                         <div className='bg-lightBg mb-6 flex items-center justify-between rounded-2xl py-2 pr-2 pl-4'>
                             <p className='text-lightGray'>

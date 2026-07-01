@@ -14,7 +14,7 @@ export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0
     const sum = (): number => calculateTotalPrice(items, withSelection, tempQuantity)
     const sumEur = (): number => calculateTotalPriceEur(items, withSelection, tempQuantity)
 
-    const returnPrice = () => {
+    const returnPriceInBGN = () => {
         if (inputTip) return String((tip + sum()).toFixed(2))
         if (tip) return String((tip * sum() + sum()).toFixed(2))
         return String(sum().toFixed(2))
@@ -23,8 +23,8 @@ export default function TotalPrice({ items, withSelection, tempQuantity, tip = 0
     return (
         <Card className={`mb-1 w-full border-none bg-transparent`}>
             <CardContent className='bold flex h-11 w-full flex-row items-center justify-center rounded-lg border-none p-2 whitespace-pre text-white'>
-                Обща сума: <span className='text-yellow'>{returnPrice()} лв.</span>
-                <span className='text-lightGray ml-2'>/ €{sumEur().toFixed(2)}</span>
+                Обща сума: <span className='text-yellow'>€{sumEur().toFixed(2)}</span>
+                <span className='text-lightGray ml-2'>/ {returnPriceInBGN()} лв.</span>
             </CardContent>
         </Card>
     )

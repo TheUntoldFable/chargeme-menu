@@ -10,7 +10,7 @@
         "ok": "OK",
         "pay": "Pay",
         "back": "Back",
-        "currency": "BGN",
+        "currency": "€",
         "or": "or",
         "loading": "Loading...",
         "add": "Add",
@@ -46,12 +46,21 @@
         "removeFromCart": {
             "title": "Remove from Cart",
             "description": "The product {name} has been successfully removed from your cart!"
+        },
+        "orderSuccess": {
+            "title": "Order accepted!",
+            "description": "Your order has been received successfully, you can pick it up in a few minutes!",
+            "descriptionDefault": "Your order has been received successfully by the staff and will be with you soon!"
         }
     },
     "order": {
         "confirmPayment": {
             "title": "Are you sure you want to pay?",
             "description": "Select your bank to pay"
+        },
+        "selfServicePayment": {
+            "title": "Payment",
+            "description": "You can pay cash/card at the bar"
         },
         "splitAndPay": "Split and Pay",
         "ratingDialog": {

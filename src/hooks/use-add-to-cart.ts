@@ -14,8 +14,7 @@ export const useAddToCart = () => {
 
         const { id: toastId } = toast({
             variant: "default",
-            title: "Добавяне в поръчка",
-            description: `Продуктът ${title} е успешно добавен във вашата поръчка!`,
+            description: "Продуктът е добавен към Моят избор",
         })
 
         setTimeout(() => {

@@ -8,17 +8,31 @@ import Container from "@/components/common/container"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTableOrderContext } from "@/context/TableOrderContext"
-import { useOrder } from "@/hooks/useOrder"
-import { useSockJS } from "@/hooks/useSockJS"
-import { calculateTotalPriceEur } from "@/lib/utils"
+import { useOrder } from "@/hooks/use-order"
+import { useSockJS } from "@/hooks/use-sockjs"
+
 import { Product } from "@/models/product"
 import { WSSendMessageItems, WSSendMessagePayload } from "@/models/websocket"
+import { useBusinessStore } from "@/store/business"
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 
 export default function OrderPage() {
-    const { order, setPriceInBgn, priceInBgn, increment, decrement, clearOrder, updateOrder, attachSessionID, toggleSelect } = useOrder()
+    const {
+        order,
+        setPriceInBgn,
+        priceInBgn,
+        setPriceInEur,
+        priceInEur,
+        increment,
+        decrement,
+        clearOrder,
+        updateOrder,
+        attachSessionID,
+        toggleSelect,
+    } = useOrder()
+
     const tOrder = useTranslations("order")
     const tCommon = useTranslations("common")
     const inputRef = useRef<HTMLInputElement>(null)
@@ -27,7 +41,10 @@ export default function OrderPage() {
     const [splitBill, setSplitBill] = useState(false)
     const [tipDialogOpen, setTipDialogOpen] = useState(false)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+    const [selfServiceDialogOpen, setSelfServiceDialogOpen] = useState(false)
     const { tableOrder } = useTableOrderContext()
+    const { businessData } = useBusinessStore()
+    const isSelfService = !!businessData?.selfService
 
     const [topic, setTopic] = useState(order ? `/topic/orders/${order.orderId}` : null)
 
@@ -81,9 +98,9 @@ export default function OrderPage() {
 
         const payload: WSSendMessagePayload = {
             transactionItems,
-            totalPrice: Number(priceInBgn.toFixed(2)),
-            itemsPrice: Number(calculateItemsPrice(priceInBgn, tip, inputTip).toFixed(2)),
-            tip: Number(calculateTipForOrder(priceInBgn, tip, inputTip).toFixed(2)),
+            totalPrice: Number(priceInEur.toFixed(2)),
+            itemsPrice: Number(calculateItemsPrice(priceInEur, tip, inputTip).toFixed(2)),
+            tip: Number(calculateTipForOrder(priceInEur, tip, inputTip).toFixed(2)),
             orderId: order.orderId,
             sessionId: order.transactionSessionId,
         }
@@ -98,13 +115,20 @@ export default function OrderPage() {
     }, [socket.isConnected, tableOrder, socket.isSubscribed, order])
 
     useEffect(() => {
-        const selectedTotal = order.orderItems
+        const selectedTotalInBGN: number = order.orderItems
             .filter((item) => item.isSelected)
             .reduce((sum, item) => sum + (item.priceInBgn ?? 0) * item.tempQuantity, 0)
+        const priceInBgn = !inputTip ? tip * selectedTotalInBGN + selectedTotalInBGN : tip + selectedTotalInBGN
 
-        const finalPrice = !inputTip ? tip * selectedTotal + selectedTotal : tip + selectedTotal
+        setPriceInBgn(priceInBgn)
 
-        setPriceInBgn(finalPrice)
+        const selectedTotalInEUR: number = order.orderItems
+            .filter((item) => item.isSelected)
+            .reduce((sum, item) => sum + (item.priceInEur ?? 0) * item.tempQuantity, 0)
+
+        const priceInEur = !inputTip ? tip * selectedTotalInEUR + selectedTotalInEUR : tip + selectedTotalInEUR
+
+        setPriceInEur(priceInEur)
     }, [tip, inputTip, order.orderItems])
 
     // Calculate base price without tip for the tip dialog
@@ -118,8 +142,9 @@ export default function OrderPage() {
         if (order?.orderItems?.every((item) => item.isSelected === false)) return true
         if (order.paid) return true
         if (priceInBgn <= 0) return true
+        if (priceInEur <= 0) return true
         return false
-    }, [order, priceInBgn])
+    }, [order, priceInBgn, priceInEur])
 
     return (
         <Container title={""}>
@@ -154,7 +179,13 @@ export default function OrderPage() {
             <TipDialog
                 open={tipDialogOpen}
                 onOpenChange={setTipDialogOpen}
-                onConfirm={handleConfirmTip}
+                onConfirm={() => {
+                    if (isSelfService && tip === 0) {
+                        setSelfServiceDialogOpen(true)
+                    } else {
+                        handleConfirmTip()
+                    }
+                }}
                 tip={tip}
                 setTip={setTip}
                 setInputTip={setInputTip}
@@ -172,6 +203,13 @@ export default function OrderPage() {
                 cancelTitle={tCommon("no")}
                 shouldConfirm
             />
+            <DialogPopUp
+                isOpen={selfServiceDialogOpen}
+                onConfirm={() => setSelfServiceDialogOpen(false)}
+                title={tOrder("selfServicePayment.title")}
+                description={tOrder("selfServicePayment.description")}
+                defaultTitle={tCommon("ok")}
+            />
             <div className='w-full gap-4 p-4'>
                 <Button
                     className='bg-lightBg mb-4 w-full gap-2 py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
@@ -183,19 +221,15 @@ export default function OrderPage() {
                     {splitBill ? tCommon("back") : tOrder("splitAndPay")}{" "}
                 </Button>
                 <Button
-                    onClick={() => {
-                        handleConfirmTip()
-                    }}
+                    onClick={() => setTipDialogOpen(true)}
                     disabled={isPaymentDisabled}
                     className='text-lightBg w-full gap-2 py-6 text-base font-medium transition-transform ease-in-out active:scale-75'
                     type='button'
                     id='add'
                     variant='select'
                 >
-                    {tCommon("pay")} {priceInBgn ? priceInBgn.toFixed(2) : 0} {tCommon("currency")}{" "}
-                    {order?.orderItems && (
-                        <span className='text-gray'>/ €{calculateTotalPriceEur(order.orderItems, false).toFixed(2)}</span>
-                    )}
+                    {tCommon("pay")} {priceInEur ? priceInEur.toFixed(2) : 0} {tCommon("currency")}{" "}
+                    {order?.orderItems && <span className='text-gray'>/ {priceInBgn.toFixed(2)} лв</span>}
                 </Button>
             </div>
         </Container>

@@ -1,5 +1,5 @@
 import IconArrowRight from "#/public/svg/icons/IconArrowRight"
-import { buildUrlWithParams, useRestaurantParams } from "@/lib/navigation-utils"
+import { buildUrlWithParams, useBusinessParams } from "@/lib/navigation-utils"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 
@@ -13,7 +13,7 @@ interface MenuItemProps {
 }
 
 const MenuItem = ({ name, catQuantity, id, type, productId, isWine }: MenuItemProps) => {
-    const { restaurantId, table } = useRestaurantParams()
+    const { businessId, table } = useBusinessParams()
     const t = useTranslations("common")
     const buildUrl = () => {
         return buildUrlWithParams(
@@ -22,7 +22,7 @@ const MenuItem = ({ name, catQuantity, id, type, productId, isWine }: MenuItemPr
                 isWine,
                 productId: productId || null,
             },
-            restaurantId,
+            businessId,
             table
         )
     }

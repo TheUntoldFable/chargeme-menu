@@ -21,6 +21,8 @@ export function useOrder() {
         setPriceInBgn,
         clearOrder,
         attachSessionId,
+        setPriceInEur,
+        priceInEur,
     } = useOrderStore()
     const language = useLanguageStore((state) => state.language)
 
@@ -30,9 +32,9 @@ export function useOrder() {
 
         await Promise.all(
             e.orderItems.map(async (orderItem) => {
-                const item = await fetchMenuItem(orderItem.menuItemId, language)
+                const item = await fetchMenuItem(orderItem.itemId, language)
 
-                orderItemMap.set(orderItem.menuItemId, {
+                orderItemMap.set(orderItem.itemId, {
                     ...item,
                     isSelected: true,
                     quantity: orderItem.quantity,
@@ -120,6 +122,8 @@ export function useOrder() {
     return {
         priceInBgn,
         setPriceInBgn,
+        setPriceInEur,
+        priceInEur,
         decrement,
         increment,
         cartItems,

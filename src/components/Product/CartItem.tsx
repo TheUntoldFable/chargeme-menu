@@ -18,8 +18,8 @@ const CartItem = ({ name, id, tempQuantity, quantity, description, priceInBgn, p
         setCartItems(filteredItems)
         toast({
             variant: "destructive",
-            title: tCart("removeItem.title"),
             description: tCart("removeItem.description"),
+            duration: 2000,
         })
     }
 
@@ -39,7 +39,8 @@ const CartItem = ({ name, id, tempQuantity, quantity, description, priceInBgn, p
             <div className='flex h-10 w-full items-center justify-between gap-2 rounded-lg text-lg'>
                 <div className='flex gap-2'>
                     <p className='text-sm font-bold'>
-                        {priceInBgn}лв {priceInEur && <span className='text-lightGray'>/ €{priceInEur.toFixed(2)}</span>}
+                        {priceInEur ? `€${priceInEur.toFixed(2)}` : `${priceInBgn.toFixed(2)} лв`}
+                        {priceInEur && <span className='text-lightGray'> / {priceInBgn.toFixed(2)} лв</span>}
                     </p>
                     <p className='text-lightGray text-sm'>x{quantity}</p>
                 </div>

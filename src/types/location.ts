@@ -8,7 +8,7 @@ export interface LocationContextType {
     isChecking: boolean
     result: LocationCheckResult | null
     permissionStatus: PermissionState | null
-    restaurantLocation: LocationCoordinates | null
+    businessLocation: LocationCoordinates | null
     radiusInMeters: number
     isEnabled: boolean
 }

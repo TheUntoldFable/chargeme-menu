@@ -1,23 +1,29 @@
 "use client"
 
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+import { Toast, ToastClose, ToastDescription, ToastProvider, ToastViewport } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
+import Image from "next/image"
 
 export function Toaster() {
     const { toasts } = useToast()
 
     return (
         <ToastProvider>
-            {toasts.map(function ({ id, title, description, action, ...props }) {
+            {toasts.map(function ({ id, description, action, variant, ...props }) {
                 return (
                     <Toast
                         key={id}
+                        variant={variant}
                         {...props}
                     >
-                        <div className='grid gap-1'>
-                            {title && <ToastTitle>{title}</ToastTitle>}
-                            {description && <ToastDescription>{description}</ToastDescription>}
-                        </div>
+                        <Image
+                            src={variant === "destructive" ? "/svg/icons/x.svg" : "/svg/icons/check.svg"}
+                            alt=''
+                            width={24}
+                            height={24}
+                            className='shrink-0'
+                        />
+                        {description && <ToastDescription className='flex-1 text-sm font-medium opacity-100'>{description}</ToastDescription>}
                         {action}
                         <ToastClose />
                     </Toast>

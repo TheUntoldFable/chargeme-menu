@@ -2,44 +2,30 @@ import { API_BASE_URL, headers } from "@/api/config"
 import { MenuCategory } from "@/models/categories"
 import { getApiLanguage, useLanguageStore, type LanguageCode } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { fetchMenuItemsByCategory } from "./get-menu-items-by-category"
 
-export const fetchCategories = async (restaurantId: string, language: LanguageCode): Promise<MenuCategory[]> => {
+// Returns the full category tree for a business. Categories are self-referencing
+// via `children` (subcategories were removed), so no per-category follow-up
+// fetch is needed — `menuItemCount` tells us which categories hold items.
+export const fetchCategories = async (businessId: string, language: LanguageCode): Promise<MenuCategory[]> => {
     try {
-        if (!restaurantId) throw new Error("Missing restaurantId")
+        if (!businessId) throw new Error("Missing businessId")
         const apiLang = getApiLanguage(language)
-        const res = await fetch(`${API_BASE_URL}/menu-items/categories/restaurant/${restaurantId}?lang=${apiLang}`)
+        const res = await fetch(`${API_BASE_URL}/menu-items/categories/business/${businessId}?lang=${apiLang}`)
 
         const data: MenuCategory[] = await res.json()
 
-        // Fetch menu items for categories without subcategories
-        const updatedCategories = await Promise.all(
-            data.map(async (item) => {
-                if (item.subcategories.length === 0) {
-                    try {
-                        const subcategories = await fetchMenuItemsByCategory(item.id, language)
-                        return { ...item, subcategories }
-                    } catch (error) {
-                        console.error(`Failed to fetch menu items for category ${item.id}:`, error)
-                        return item
-                    }
-                }
-                return item
-            })
-        )
-
-        return updatedCategories
+        return Array.isArray(data) ? data : []
     } catch (e) {
         throw new Error(`An error occurred when fetching categories - ${e}`)
     }
 }
 
-export const useCategories = (restaurantId: string): UseQueryResult<MenuCategory[]> => {
+export const useCategories = (businessId: string): UseQueryResult<MenuCategory[]> => {
     const language = useLanguageStore((state) => state.language)
     return useQuery({
-        queryKey: ["categories", restaurantId, language],
-        queryFn: () => fetchCategories(restaurantId, language),
+        queryKey: ["categories", businessId, language],
+        queryFn: () => fetchCategories(businessId, language),
         meta: { headers },
-        enabled: !!restaurantId,
+        enabled: !!businessId,
     })
 }

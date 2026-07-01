@@ -7,7 +7,7 @@ import { PropsWithChildren } from "react"
 import BottomNavigation from "./navigation"
 
 interface ContainerProps {
-    title: string
+    title?: string
 }
 
 const Container = ({ children }: PropsWithChildren<ContainerProps>) => {
