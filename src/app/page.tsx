@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { useCategories } from "@/hooks/get-categories"
 import { useSubmitExperienceFeedback, useSubmitFoodFeedback } from "@/hooks/send-feedback"
+import { resolveFlow } from "@/lib/flow"
 import { useCartStore } from "@/store/cart"
 import { Rating as ReactRating } from "@smastrom/react-rating"
 import { useTranslations } from "next-intl"
@@ -26,7 +27,8 @@ export default function Home() {
 
     const tPayment = useTranslations("payment")
     const tCommon = useTranslations("common")
-    const businessIdParam = searchParams.get("restaurantId") ?? ""
+    const flow = resolveFlow((key) => searchParams.get(key))
+    const businessIdParam = flow.id ?? ""
     const isPaidParam = searchParams.get("isPaid")
 
     const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
@@ -35,7 +37,7 @@ export default function Home() {
     const [shouldRateApp, setShouldRateApp] = useState(false)
     const [shouldRateProduct, setShouldRateProduct] = useState(false)
 
-    const { data: categories, isLoading, status } = useCategories(businessIdParam)
+    const { data: categories, isLoading, status } = useCategories(businessIdParam, flow.kind)
     const { mutate: submitExperienceFeedback } = useSubmitExperienceFeedback()
     const { mutate: submitFoodFeedback } = useSubmitFoodFeedback()
     const productToRate = useCartStore((state) => state.productToRate)

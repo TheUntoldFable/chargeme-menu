@@ -35,8 +35,8 @@ const ProductCard = ({ productId, classNames, children, isBlocked, image }: Prod
             ) : (
                 <Link
                     href={(() => {
-                        const { businessId, table } = getBusinessParamsFromWindow()
-                        return withBusinessParams(`/product/${productId}`, businessId, table)
+                        const { businessId, table, param } = getBusinessParamsFromWindow()
+                        return withBusinessParams(`/product/${productId}`, businessId, table, param)
                     })()}
                     passHref
                 >

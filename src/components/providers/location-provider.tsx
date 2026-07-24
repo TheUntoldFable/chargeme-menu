@@ -4,6 +4,7 @@ import { useBusinessDetails } from "@/hooks/get-business"
 import { useLocationCheck } from "@/hooks/use-location-check"
 import { useLocationNavigation } from "@/hooks/use-location-navigation"
 import { useLocationNotifications } from "@/hooks/use-location-notifications"
+import { resolveFlow } from "@/lib/flow"
 import type { LocationCheckResult } from "@/lib/location-utils"
 import type { LocationContextType, LocationProviderProps } from "@/types/location"
 import { useSearchParams } from "next/navigation"
@@ -35,8 +36,9 @@ export function LocationProvider({
     // Check if location checking is enabled via environment variable
     const isLocationCheckEnabled = process.env.NEXT_PUBLIC_ENABLE_LOCATION_CHECKER === "true"
     const searchParams = useSearchParams()
-    const businessId = searchParams.get("restaurantId") ?? undefined
-    const { data: businessDetails } = useBusinessDetails(businessId)
+    const flow = resolveFlow((key) => searchParams.get(key))
+    const businessId = flow.id ?? undefined
+    const { data: businessDetails } = useBusinessDetails(businessId, flow.kind)
     const businessLocation = businessDetails
         ? { latitude: businessDetails.latitude, longitude: businessDetails.longitude }
         : undefined
