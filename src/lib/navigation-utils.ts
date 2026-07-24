@@ -1,4 +1,5 @@
-import { resolveFlow, type Flow, type FlowKind, type FlowParam } from "@/lib/flow"
+import { idFromParams, paramForKind, type FlowKind, type FlowParam } from "@/lib/flow"
+import { useBusinessStore } from "@/store/business"
 import { useSearchParams } from "next/navigation"
 
 interface BusinessParams {
@@ -9,18 +10,11 @@ interface BusinessParams {
 }
 
 /**
- * Custom hook to resolve the active flow (kind + id + param) from search params
- */
-export function useFlow(): Flow {
-    const searchParams = useSearchParams()
-    return resolveFlow((key) => searchParams.get(key))
-}
-
-/**
- * Custom hook to get the active id (restaurantId or businessId) from search params
+ * Custom hook to get the entity id (from either param) from search params
  */
 export function useBusinessId(): string | null {
-    return useFlow().id
+    const searchParams = useSearchParams()
+    return idFromParams((key) => searchParams.get(key))
 }
 
 /**
@@ -32,12 +26,19 @@ export function useTableId(): string | null {
 }
 
 /**
- * Custom hook to get the id, table and flow metadata from search params
+ * Custom hook to get the id, table and flow metadata. The id comes from the URL;
+ * the flow `kind` comes from the store (derived from the backend `type` once the
+ * business has loaded), so links carry the param that matches the resolved flow.
  */
 export function useBusinessParams(): BusinessParams {
     const searchParams = useSearchParams()
-    const flow = resolveFlow((key) => searchParams.get(key))
-    return { businessId: flow.id, table: searchParams.get("table"), kind: flow.kind, param: flow.param }
+    const kind = useBusinessStore((state) => state.kind)
+    return {
+        businessId: idFromParams((key) => searchParams.get(key)),
+        table: searchParams.get("table"),
+        kind,
+        param: paramForKind(kind),
+    }
 }
 
 /**
@@ -101,7 +102,7 @@ export function buildUrlWithParams(
  */
 export function getBusinessIdFromWindow(): string | null {
     if (typeof window === "undefined") return null
-    return resolveFlow((key) => new URLSearchParams(window.location.search).get(key)).id
+    return idFromParams((key) => new URLSearchParams(window.location.search).get(key))
 }
 
 /**
@@ -118,6 +119,11 @@ export function getTableFromWindow(): string | null {
 export function getBusinessParamsFromWindow(): BusinessParams {
     if (typeof window === "undefined") return { businessId: null, table: null, kind: "restaurant", param: "restaurantId" }
     const search = new URLSearchParams(window.location.search)
-    const flow = resolveFlow((key) => search.get(key))
-    return { businessId: flow.id, table: search.get("table"), kind: flow.kind, param: flow.param }
+    const kind = useBusinessStore.getState().kind
+    return {
+        businessId: idFromParams((key) => search.get(key)),
+        table: search.get("table"),
+        kind,
+        param: paramForKind(kind),
+    }
 }

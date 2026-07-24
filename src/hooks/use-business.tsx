@@ -1,19 +1,20 @@
 import { API, headers } from "@/api/config"
-import { flowEndpoints, type FlowKind } from "@/lib/flow"
 import { GetBusinessResponse } from "@/models/business"
 import { useLanguageStore } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 
-export const getBusinessById = async (businessId: string, kind: FlowKind): Promise<GetBusinessResponse> => {
-    const { data } = await API.get(flowEndpoints[kind].entity(businessId))
+// The entity is always fetched from `/businesses/:id` regardless of flow — this
+// response is what tells us the type that decides the flow.
+export const getBusinessById = async (businessId: string): Promise<GetBusinessResponse> => {
+    const { data } = await API.get(`/businesses/${businessId}`)
     return data
 }
 
-export const useBusiness = (businessId: string, kind: FlowKind): UseQueryResult<GetBusinessResponse> => {
+export const useBusiness = (businessId: string): UseQueryResult<GetBusinessResponse> => {
     const language = useLanguageStore((state) => state.language)
     return useQuery({
-        queryKey: ["business", kind, businessId, language],
-        queryFn: () => getBusinessById(businessId, kind),
+        queryKey: ["business", businessId, language],
+        queryFn: () => getBusinessById(businessId),
         meta: { headers },
         retry: false,
         enabled: !!businessId,

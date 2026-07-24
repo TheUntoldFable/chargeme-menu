@@ -1,42 +1,36 @@
+import { type BusinessType } from "@/models/business"
+
 export type FlowKind = "restaurant" | "business"
 export type FlowParam = "restaurantId" | "businessId"
 
-export interface Flow {
-    kind: FlowKind
-    param: FlowParam
-    id: string | null
-}
-
 /**
- * Resolves the active flow from a param getter (URLSearchParams-style).
+ * The flow is driven by the business `type` returned from the backend: a
+ * `RESTAURANT` runs the restaurant flow, every other type (`BAR`, `RETAIL`,
+ * `SERVICES`, `OTHER`) runs the business flow. The two flows share all UI,
+ * ordering and real-time topics; they diverge only in the categories endpoint
+ * and in the URL param used on links (see `flowEndpoints` / `paramForKind`).
  *
- * `?businessId=` selects the business flow; otherwise we fall back to
- * `?restaurantId=` — the legacy param carried by existing QR codes — which
- * selects the restaurant flow. The two flows share all UI, ordering and
- * real-time topics; they diverge only in the URL param name and in the
- * entity/categories endpoints (see `flowEndpoints`).
+ * The entity itself is ALWAYS fetched from `/businesses/:id` — that response is
+ * what tells us the type, so it cannot depend on the flow.
  */
-export function resolveFlow(get: (key: string) => string | null): Flow {
-    const businessId = get("businessId")
-    if (businessId) return { kind: "business", param: "businessId", id: businessId }
-    return { kind: "restaurant", param: "restaurantId", id: get("restaurantId") }
-}
+export const kindFromType = (type?: BusinessType | null): FlowKind => (type === "RESTAURANT" ? "restaurant" : "business")
 
-/** The URL param name a given flow writes into links. */
+/** The URL param a given flow writes into its links. */
 export const paramForKind = (kind: FlowKind): FlowParam => (kind === "business" ? "businessId" : "restaurantId")
 
 /**
- * Per-flow endpoint builders. Only endpoints that actually differ between the
- * flows live here — everything else (menu items, order creation, WS topics) is
- * shared and stays hard-coded at its call site.
+ * Reads the entity id from search params. New links use `businessId`; existing
+ * QR codes in the wild use the legacy `restaurantId`. Either way the value is a
+ * business id passed to `/businesses/:id`.
  */
-export const flowEndpoints: Record<FlowKind, { entity: (id: string) => string; categories: (id: string) => string }> = {
-    restaurant: {
-        entity: (id) => `/restaurants/${id}`,
-        categories: (id) => `/menu-items/categories/restaurant/${id}`,
-    },
-    business: {
-        entity: (id) => `/businesses/${id}`,
-        categories: (id) => `/menu-items/categories/business/${id}`,
-    },
+export const idFromParams = (get: (key: string) => string | null): string | null => get("businessId") ?? get("restaurantId")
+
+/**
+ * Per-flow endpoint builders. Only the categories endpoint differs — the entity
+ * is unified on `/businesses/:id`, and menu items, order creation and WS topics
+ * are shared.
+ */
+export const flowEndpoints: Record<FlowKind, { categories: (id: string) => string }> = {
+    restaurant: { categories: (id) => `/menu-items/categories/restaurant/${id}` },
+    business: { categories: (id) => `/menu-items/categories/business/${id}` },
 }

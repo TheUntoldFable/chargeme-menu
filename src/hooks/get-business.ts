@@ -1,5 +1,4 @@
 import { API_BASE_URL } from "@/api/config"
-import { flowEndpoints, type FlowKind } from "@/lib/flow"
 import { getApiLanguage, useLanguageStore, type LanguageCode } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 
@@ -10,13 +9,9 @@ export interface BusinessDetails {
     longitude: number
 }
 
-export const fetchBusinessDetails = async (
-    businessId: string,
-    language: LanguageCode,
-    kind: FlowKind
-): Promise<BusinessDetails> => {
+export const fetchBusinessDetails = async (businessId: string, language: LanguageCode): Promise<BusinessDetails> => {
     const apiLang = getApiLanguage(language)
-    const res = await fetch(`${API_BASE_URL}${flowEndpoints[kind].entity(businessId)}?lang=${apiLang}`)
+    const res = await fetch(`${API_BASE_URL}/businesses/${businessId}?lang=${apiLang}`)
     if (!res.ok) {
         throw new Error("Failed to fetch business details")
     }
@@ -32,11 +27,11 @@ export const fetchBusinessDetails = async (
     }
 }
 
-export const useBusinessDetails = (businessId?: string, kind: FlowKind = "restaurant"): UseQueryResult<BusinessDetails, Error> => {
+export const useBusinessDetails = (businessId?: string): UseQueryResult<BusinessDetails, Error> => {
     const language = useLanguageStore((state) => state.language)
     return useQuery({
-        queryKey: ["business-details", kind, businessId, language],
-        queryFn: () => fetchBusinessDetails(businessId as string, language, kind),
+        queryKey: ["business-details", businessId, language],
+        queryFn: () => fetchBusinessDetails(businessId as string, language),
         enabled: Boolean(businessId),
         staleTime: 1000 * 60 * 5,
         retry: 1,

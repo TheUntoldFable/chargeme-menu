@@ -11,7 +11,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { useCategories } from "@/hooks/get-categories"
 import { useSubmitExperienceFeedback, useSubmitFoodFeedback } from "@/hooks/send-feedback"
-import { resolveFlow } from "@/lib/flow"
+import { idFromParams, kindFromType } from "@/lib/flow"
+import { useBusinessStore } from "@/store/business"
 import { useCartStore } from "@/store/cart"
 import { Rating as ReactRating } from "@smastrom/react-rating"
 import { useTranslations } from "next-intl"
@@ -27,9 +28,16 @@ export default function Home() {
 
     const tPayment = useTranslations("payment")
     const tCommon = useTranslations("common")
-    const flow = resolveFlow((key) => searchParams.get(key))
-    const businessIdParam = flow.id ?? ""
+    const businessIdParam = idFromParams((key) => searchParams.get(key)) ?? ""
     const isPaidParam = searchParams.get("isPaid")
+
+    // The flow (and thus the categories endpoint) is driven by the backend type,
+    // which AppWrapper loads into the store. Wait until the loaded business
+    // matches the current id before fetching categories, so we never hit the
+    // wrong endpoint with a stale kind.
+    const businessData = useBusinessStore((state) => state.businessData)
+    const kind = kindFromType(businessData?.type)
+    const isBusinessReady = businessData?.id === businessIdParam
 
     const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
     const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
@@ -37,7 +45,7 @@ export default function Home() {
     const [shouldRateApp, setShouldRateApp] = useState(false)
     const [shouldRateProduct, setShouldRateProduct] = useState(false)
 
-    const { data: categories, isLoading, status } = useCategories(businessIdParam, flow.kind)
+    const { data: categories, isLoading, status } = useCategories(isBusinessReady ? businessIdParam : "", kind)
     const { mutate: submitExperienceFeedback } = useSubmitExperienceFeedback()
     const { mutate: submitFoodFeedback } = useSubmitFoodFeedback()
     const productToRate = useCartStore((state) => state.productToRate)

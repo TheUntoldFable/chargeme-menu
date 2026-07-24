@@ -3,7 +3,7 @@ import { TableOrderContext } from "@/context/TableOrderContext"
 import { useGetAllOrders } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/use-order"
 import { useBusiness } from "@/hooks/use-business"
-import { resolveFlow } from "@/lib/flow"
+import { idFromParams, kindFromType, paramForKind } from "@/lib/flow"
 import { GetOrderRes } from "@/models/order"
 import { useBusinessStore } from "@/store/business"
 import { useSearchParams } from "next/navigation"
@@ -11,8 +11,7 @@ import { useEffect, useState } from "react"
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     const searchParams = useSearchParams()
-    const flow = resolveFlow((key) => searchParams.get(key))
-    const businessIdParam = flow.id
+    const businessIdParam = idFromParams((key) => searchParams.get(key))
     const tableParam = searchParams.get("table")
     const isPaidParam = searchParams.get("isPaid")
     const table = tableParam !== null ? tableParam : undefined
@@ -24,7 +23,10 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         data: businessData,
         isLoading: isLoadingBusinessData,
         //! This should come from a config
-    } = useBusiness(businessIdParam ?? "", flow.kind)
+    } = useBusiness(businessIdParam ?? "")
+
+    // The flow is decided by the type the backend returns, not by the URL param.
+    const kind = kindFromType(businessData?.type)
 
     const { data, isLoading: isLoadingOrders, refetch } = useGetAllOrders(tableId)
     const [tableOrder, setTableOrder] = useState<GetOrderRes | undefined>(undefined)
@@ -51,11 +53,27 @@ export const AppWrapper = ({ children }: { children: React.ReactNode }) => {
             setBusinessInfo({
                 businessId: businessIdParam ?? "",
                 tableId: table ?? "",
-                kind: flow.kind,
+                kind,
                 businessData: businessData ?? null,
             })
         }
-    }, [businessData, isLoadingBusinessData, businessIdParam, table, flow.kind])
+    }, [businessData, isLoadingBusinessData, businessIdParam, table, kind])
+
+    // Once the backend has told us the type, rewrite the address bar so the
+    // param reflects the flow (restaurant -> restaurantId, business -> businessId).
+    // Existing QR codes open with the legacy `restaurantId`; this keeps
+    // copied/shared links correct without a reload.
+    useEffect(() => {
+        if (isLoadingBusinessData || !businessData || !businessIdParam) return
+        const desiredParam = paramForKind(kind)
+        const staleParam = desiredParam === "businessId" ? "restaurantId" : "businessId"
+        const url = new URL(window.location.href)
+        const alreadyCorrect = url.searchParams.get(desiredParam) === businessIdParam && !url.searchParams.has(staleParam)
+        if (alreadyCorrect) return
+        url.searchParams.delete(staleParam)
+        url.searchParams.set(desiredParam, businessIdParam)
+        window.history.replaceState(null, "", url.toString())
+    }, [businessData, isLoadingBusinessData, businessIdParam, kind])
 
     // if (isLoadingBusinessData || isLoadingOrders)
     //     return (
