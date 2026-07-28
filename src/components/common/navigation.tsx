@@ -23,7 +23,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
     const orderItemsLength = orderItems?.length
     const currentPath = usePathname()
     const { businessData } = usePrePay()
-    const { businessId, table } = useBusinessParams()
+    const { businessId, table, param } = useBusinessParams()
     const t = useTranslations("navigation")
 
     const isPrePayMode = businessData?.paymentInAdvance || false
@@ -40,13 +40,13 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
         <div
             className={`shadow-top-lg mt-auto mb-0 flex h-20 min-w-full items-center ${!isPrePayMode ? "justify-between" : "justify-around"} bg-darkGray px-4 py-4 ${classNames} fixed bottom-0`}
         >
-            <Link href={withBusinessParams("/", businessId, table)}>
+            <Link href={withBusinessParams("/", businessId, table, param)}>
                 <div className='flex flex-col items-center'>
                     <IconMenu color={getIconColor("/")} />
                     <p className={`bold text-sm ${getLinkClasses("/")}`}>{t("menu")}</p>
                 </div>
             </Link>
-            <Link href={withBusinessParams("/cart", businessId, table)}>
+            <Link href={withBusinessParams("/cart", businessId, table, param)}>
                 <div className='relative flex flex-col items-center'>
                     {!!cartItemsLength && (
                         <Badge
@@ -61,7 +61,7 @@ export default function BottomNavigation({ classNames }: BottomNavigationProps) 
                 </div>
             </Link>
             {!isPrePayMode && (
-                <Link href={withBusinessParams("/order", businessId, table)}>
+                <Link href={withBusinessParams("/order", businessId, table, param)}>
                     <div className='relative flex flex-col items-center'>
                         {!!orderItemsLength && (
                             <Badge

@@ -1,3 +1,4 @@
+import { type FlowKind } from "@/lib/flow"
 import { GetBusinessResponse } from "@/models/business"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
@@ -5,6 +6,7 @@ import { createJSONStorage, persist } from "zustand/middleware"
 export interface BusinessInfo {
     businessId: string
     tableId: string
+    kind: FlowKind
     businessData: GetBusinessResponse | null
 }
 
@@ -16,6 +18,7 @@ interface BusinessActions {
 const initialState: BusinessInfo = {
     businessId: "",
     tableId: "",
+    kind: "restaurant",
     businessData: null,
 }
 

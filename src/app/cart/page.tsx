@@ -15,6 +15,7 @@ import { businessOrderTopic, useCreateBusinessOrder } from "@/hooks/business-ord
 import { usePrePayOrder } from "@/hooks/send-payment-data"
 import { useOrder } from "@/hooks/use-order"
 import { useSockJS } from "@/hooks/use-sockjs"
+import { paramForKind } from "@/lib/flow"
 import { buildUrlWithParams, withBusinessParams } from "@/lib/navigation-utils"
 import { calculateTotalPriceEur } from "@/lib/utils"
 import { BusinessOrder, CreateOrderItem, GetOrderRes } from "@/models/order"
@@ -30,7 +31,8 @@ export default function CartPage() {
     const tCommon = useTranslations("common")
 
     const { tableOrder, setTableOrder } = useTableOrderContext()
-    const { businessId, tableId, businessData: storedBusinessData } = useBusinessStore()
+    const { businessId, tableId, kind, businessData: storedBusinessData } = useBusinessStore()
+    const param = paramForKind(kind)
     const {
         updateOrder,
         order,
@@ -56,11 +58,11 @@ export default function CartPage() {
 
     const handleRouterPush = useCallback(() => {
         if (isSelfService) {
-            router.push(withBusinessParams("/", businessId, tableId))
+            router.push(withBusinessParams("/", businessId, tableId, param))
         } else {
-            router.push(withBusinessParams("/order", businessId, tableId))
+            router.push(withBusinessParams("/order", businessId, tableId, param))
         }
-    }, [isSelfService, businessId, tableId])
+    }, [isSelfService, businessId, tableId, param])
 
     const socket = useSockJS({
         url: `${API_BASE_URL}/ws`,
@@ -89,7 +91,7 @@ export default function CartPage() {
         onMessage: (e: BusinessOrder) => {
             if (e.status === "PAID") {
                 clearCart()
-                router.push(buildUrlWithParams("/", { isPaid: true }, businessId, tableId))
+                router.push(buildUrlWithParams("/", { isPaid: true }, businessId, tableId, param))
             }
         },
         disabled: !isBusinessOrderMode || !businessOrderId,

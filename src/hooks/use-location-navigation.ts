@@ -17,7 +17,7 @@ export function useLocationNavigation(options: UseLocationNavigationOptions = {}
     const { enabled = true } = options
     const router = useRouter()
     const pathname = usePathname()
-    const { businessId, table } = useBusinessParams()
+    const { businessId, table, param } = useBusinessParams()
 
     const isOnErrorPage = pathname === LOCATION_ROUTES.ERROR
 
@@ -26,7 +26,7 @@ export function useLocationNavigation(options: UseLocationNavigationOptions = {}
      */
     const navigateToErrorPage = useCallback(() => {
         if (!isOnErrorPage && enabled) {
-            router.push(withBusinessParams(LOCATION_ROUTES.ERROR, businessId, table))
+            router.push(withBusinessParams(LOCATION_ROUTES.ERROR, businessId, table, param))
         }
     }, [isOnErrorPage, enabled, router])
 
@@ -35,7 +35,7 @@ export function useLocationNavigation(options: UseLocationNavigationOptions = {}
      */
     const navigateToHomePage = useCallback(() => {
         if (isOnErrorPage && enabled) {
-            router.push(withBusinessParams(LOCATION_ROUTES.HOME, businessId, table))
+            router.push(withBusinessParams(LOCATION_ROUTES.HOME, businessId, table, param))
         }
     }, [isOnErrorPage, enabled, router])
 
