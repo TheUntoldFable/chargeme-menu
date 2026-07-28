@@ -3,6 +3,8 @@ import { GetBusinessResponse } from "@/models/business"
 import { useLanguageStore } from "@/store/language"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 
+// The entity is always fetched from `/businesses/:id` regardless of flow — this
+// response is what tells us the type that decides the flow.
 export const getBusinessById = async (businessId: string): Promise<GetBusinessResponse> => {
     const { data } = await API.get(`/businesses/${businessId}`)
     return data

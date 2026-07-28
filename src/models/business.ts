@@ -1,4 +1,4 @@
-export type BusinessType = "RESTAURANT" | "SERVICES" | "OTHER"
+export type BusinessType = "RESTAURANT" | "BAR" | "RETAIL" | "SERVICES" | "OTHER"
 
 export interface GetBusinessResponse {
     id: string

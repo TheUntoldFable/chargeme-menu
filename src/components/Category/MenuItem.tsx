@@ -13,7 +13,7 @@ interface MenuItemProps {
 }
 
 const MenuItem = ({ name, catQuantity, id, type, productId, isWine }: MenuItemProps) => {
-    const { businessId, table } = useBusinessParams()
+    const { businessId, table, param } = useBusinessParams()
     const t = useTranslations("common")
     const buildUrl = () => {
         return buildUrlWithParams(
@@ -23,7 +23,8 @@ const MenuItem = ({ name, catQuantity, id, type, productId, isWine }: MenuItemPr
                 productId: productId || null,
             },
             businessId,
-            table
+            table,
+            param
         )
     }
 
