@@ -20,6 +20,7 @@ import { buildUrlWithParams, withBusinessParams } from "@/lib/navigation-utils"
 import { calculateTotalPriceEur } from "@/lib/utils"
 import { BusinessOrder, CreateOrderItem, GetOrderRes } from "@/models/order"
 import { Product } from "@/models/product"
+import { PaymentProvider } from "@/models/business"
 import { useBusinessStore } from "@/store/business"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
@@ -49,8 +50,9 @@ export default function CartPage() {
 
     const { mutateAsync: prePayOrder } = usePrePayOrder()
     const { mutateAsync: createBusinessOrder } = useCreateBusinessOrder()
-    // Check if this restaurant uses pre-payment
+    // Check if this restaurant uses pre-payment and which provider
     const isPrePayMode = !!storedBusinessData?.paymentInAdvance
+    const paymentProvider: PaymentProvider = storedBusinessData?.paymentProvider || "none"
     const isSelfService = !!storedBusinessData?.selfService
     // Non-restaurant businesses use the simpler POS-less business-order flow,
     // paid fully up front via an Iris payment link.
@@ -98,6 +100,12 @@ export default function CartPage() {
     })
 
     const handleCreate = useCallback(async () => {
+        console.log("Payment Debug Info:", {
+            isPrePayMode,
+            paymentProvider,
+            cartItemsCount: cartItems.length,
+        })
+
         if (isBusinessOrderMode) {
             try {
                 const res = await createBusinessOrder({
@@ -120,7 +128,38 @@ export default function CartPage() {
         }
 
         if (isPrePayMode) {
-            // TODO: Implement pre-pay mode
+            const totalAmount = calculateTotalPriceEur(cartItems, false)
+            console.log("Prepay mode activated, total amount:", totalAmount)
+            
+            // Handle different payment providers
+            if (paymentProvider === "stripe") {
+                console.log("Redirecting to Stripe...")
+                // Redirect to Stripe checkout
+                const stripeUrl = buildUrlWithParams(
+                    "/stripe",
+                    { totalAmount: totalAmount.toFixed(2) },
+                    businessId,
+                    tableId,
+                    param,
+                )
+                router.push(stripeUrl)
+                return
+            } else if (paymentProvider === "paypercut") {
+                // Redirect to Paypercut checkout
+                console.log("Redirecting to Paypercut...")
+                const paypercutUrl = buildUrlWithParams(
+                    "/paypercut",
+                    { totalAmount: totalAmount.toFixed(2) },
+                    businessId,
+                    tableId,
+                    param,
+                )
+                console.log("Paypercut URL:", paypercutUrl)
+                router.push(paypercutUrl)
+                return
+            }
+            
+            // Fallback: Try backend pre-pay order (legacy behavior)
             try {
                 const res = await prePayOrder({
                     orderItems: cartItems.map((p: Product) => ({
@@ -130,10 +169,10 @@ export default function CartPage() {
                     })),
                     tableNumber: tableId,
                     numberOfGuests: 1,
-                    totalPrice: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
+                    totalPrice: Number(totalAmount.toFixed(2)),
                     // Request wire field is still `restaurantId` (request bodies unchanged).
                     restaurantId: businessId,
-                    itemsPrice: Number(calculateTotalPriceEur(cartItems, false).toFixed(2)),
+                    itemsPrice: Number(totalAmount.toFixed(2)),
                     tip: 0,
                 })
 
@@ -165,7 +204,7 @@ export default function CartPage() {
                 throw new Error("No connection to socket!")
             }
         }
-    }, [cartItems, businessId, socket.isConnected, isPrePayMode, isBusinessOrderMode])
+    }, [cartItems, businessId, tableId, param, socket.isConnected, isPrePayMode, paymentProvider, isBusinessOrderMode])
 
     const handleUpdate = useCallback(() => {
         //Only for socket connection
@@ -201,13 +240,27 @@ export default function CartPage() {
             handleCreate()
         }
         setIsOpenDialog(false)
-        setIsOpenSuccessDialog(true)
+        // Paid flows redirect to checkout, so the order isn't successful yet
+        if (!isPrePayMode && !isBusinessOrderMode) {
+            setIsOpenSuccessDialog(true)
+        }
     }
 
-    // Get button text based on pre-pay mode
+    // Get button text based on pre-pay mode and payment provider
     const getButtonText = () => {
         if (isPrePayMode || isBusinessOrderMode) {
-            return tableOrder?.status === "ORDERED" ? tCart("addAndPay") : tCart("orderAndPay")
+            const baseText = tableOrder?.status === "ORDERED" ? tCart("addAndPay") : tCart("orderAndPay")
+
+            // Business orders pay through their own Iris link, so no provider label applies
+            if (!isBusinessOrderMode) {
+                if (paymentProvider === "stripe") {
+                    return `${baseText} (Stripe)`
+                } else if (paymentProvider === "paypercut") {
+                    return `${baseText} (Paypercut)`
+                }
+            }
+
+            return baseText
         }
         return tableOrder?.status === "ORDERED" ? tCart("add") : tCart("order")
     }
