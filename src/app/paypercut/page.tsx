@@ -21,6 +21,7 @@ function PaypercutPage() {
     
     const searchParam = useSearchParams()
     const totalAmount = searchParam.get("totalAmount") ?? ""
+    const searchParamString = searchParam.toString()
     const t = useTranslations("payment.paypercut")
     const tCommon = useTranslations("common")
 
@@ -36,15 +37,20 @@ function PaypercutPage() {
             console.log("Creating Paypercut session with amount:", totalAmount)
             
             try {
+                // Keep the business and table params when returning from checkout
+                const returnParams = new URLSearchParams(searchParamString)
+                returnParams.delete("totalAmount")
+                const query = returnParams.toString()
+                const suffix = query ? `?${query}` : ""
+
                 const requestData = {
                     totalAmount: totalAmount, // Send as string (e.g., "25.50")
                     currency: "eur",
-                    returnUrl: window.location.origin + "/order"
+                    returnPath: `/order${suffix}`,
+                    cancelPath: `/cart${suffix}`,
                 }
-                
-                console.log("Request data:", requestData)
-                
-                const response = await fetch("https://api.paypercut.io/v1/checkouts", {
+
+                const response = await fetch("/api/create-paypercut-payment", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(requestData),
@@ -89,7 +95,7 @@ function PaypercutPage() {
         }
 
         createPaymentSession()
-    }, [totalAmount])
+    }, [totalAmount, searchParamString])
 
     if (isLoading) {
         return (
@@ -114,7 +120,7 @@ function PaypercutPage() {
                         onClick={() => window.history.back()} 
                         className="text-blue-500 underline"
                     >
-                        {tCommon("goBack") || "Go Back"}
+                        {tCommon("back")}
                     </button>
                 </div>
             </Wrapper>

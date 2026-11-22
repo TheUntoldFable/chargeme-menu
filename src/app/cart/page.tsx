@@ -51,13 +51,8 @@ export default function CartPage() {
     const { mutateAsync: prePayOrder } = usePrePayOrder()
     const { mutateAsync: createBusinessOrder } = useCreateBusinessOrder()
     // Check if this restaurant uses pre-payment and which provider
-    // TEMPORARY: Force Paypercut mode for testing
-    const isPrePayMode = true // Force prepay mode
-    const paymentProvider = "paypercut" as PaymentProvider // Force Paypercut
-
-    // Original logic (commented for testing):
-    // const isPrePayMode = !!storedBusinessData?.paymentInAdvance
-    // const paymentProvider: PaymentProvider = storedBusinessData?.paymentProvider || "none"
+    const isPrePayMode = !!storedBusinessData?.paymentInAdvance
+    const paymentProvider: PaymentProvider = storedBusinessData?.paymentProvider || "none"
     const isSelfService = !!storedBusinessData?.selfService
     // Non-restaurant businesses use the simpler POS-less business-order flow,
     // paid fully up front via an Iris payment link.
@@ -245,7 +240,10 @@ export default function CartPage() {
             handleCreate()
         }
         setIsOpenDialog(false)
-        setIsOpenSuccessDialog(true)
+        // Paid flows redirect to checkout, so the order isn't successful yet
+        if (!isPrePayMode && !isBusinessOrderMode) {
+            setIsOpenSuccessDialog(true)
+        }
     }
 
     // Get button text based on pre-pay mode and payment provider

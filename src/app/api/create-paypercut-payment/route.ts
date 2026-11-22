@@ -14,16 +14,11 @@ import { NextRequest, NextResponse } from "next/server"
 // Correct Paypercut API endpoint from official documentation
 const PAYPERCUT_API_ENDPOINT = "https://api.paypercut.io/v1/checkouts"
 
-const PAYPERCUT_API_BASE = "https://api.paypercut.io"
 const API_SECRET = process.env.PAYPERCUT_API_SECRET  // Server-side secret key
-const API_KEY = process.env.PAYPERCUT_API_KEY        // Client-side public key (for reference)
 
-const calculateOrderAmount = (items: []): number => {
-    const sum = items.reduce((acc, curr: { id: string; amount: number }) => {
-        return acc + curr?.amount
-    }, 0)
-    return sum
-}
+// Only same-site paths are accepted, so checkout can't redirect to another domain
+const safePath = (path: unknown, fallback: string): string =>
+    typeof path === "string" && /^\/(?![/\\])/.test(path) ? path : fallback
 
 export async function POST(req: NextRequest) {
     try {
@@ -33,7 +28,7 @@ export async function POST(req: NextRequest) {
         const parsedBody = JSON.parse(rawBody)
         console.log("Parsed request:", parsedBody)
 
-        const { totalAmount, currency, returnUrl } = parsedBody
+        const { totalAmount, currency, returnPath, cancelPath } = parsedBody
 
         // Validate required fields
         if (!totalAmount || !currency) {
@@ -41,6 +36,12 @@ export async function POST(req: NextRequest) {
                 { error: "Missing required fields: totalAmount and currency" },
                 { status: 400 }
             )
+        }
+
+        // Convert amount to cents (Paypercut expects integer cents)
+        const amountInCents = Math.round(Number(totalAmount) * 100)
+        if (!Number.isSafeInteger(amountInCents) || amountInCents <= 0) {
+            return NextResponse.json({ error: "Invalid totalAmount" }, { status: 400 })
         }
 
         // Check API credentials
@@ -52,22 +53,14 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        console.log("Environment check:", {
-            hasApiKey: !!API_KEY,
-            hasApiSecret: !!API_SECRET,
-            apiSecretMasked: API_SECRET ? `${API_SECRET.substring(0, 8)}...` : 'not set',
-            nodeEnv: process.env.NODE_ENV
-        })
+        const baseUrl = process.env.NEXT_PUBLIC_DOMAIN || req.nextUrl.origin
 
-        // Convert amount to cents (Paypercut expects integer cents)
-        const amountInCents = Math.round(parseFloat(totalAmount) * 100)
-        
         // Create checkout session following Paypercut documentation exactly
         const checkoutData = {
             amount: amountInCents,
             currency: currency.toUpperCase(),
-            success_url: returnUrl || `${process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'}/order`,
-            cancel_url: `${process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'}/cart`,
+            success_url: `${baseUrl}${safePath(returnPath, "/order")}`,
+            cancel_url: `${baseUrl}${safePath(cancelPath, "/cart")}`,
             line_items: [
                 {
                     name: "Restaurant Order",
@@ -160,7 +153,7 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
         console.error("Unexpected error in Paypercut API:", error)
         return NextResponse.json(
-            { error: "Internal server error", details: error.message, stack: error.stack },
+            { error: "Internal server error" },
             { status: 500 }
         )
     }
