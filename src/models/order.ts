@@ -1,6 +1,7 @@
 export interface OrderItem {
     id: string
-    menuItemId: string
+    // Response field renamed `menuItemId` -> `itemId` (the order-item's own id stays `orderItemId`).
+    itemId: string
     note: string
     orderId: string
     paid: number
@@ -22,11 +23,13 @@ export interface GetOrderRes {
     created: string // ISO date string
     updated: string // ISO date string
     paid: string | boolean
-    restaurantId: string
+    businessId: string
     orderItems: OrderItem[]
     tipEnabled: boolean
 }
 
+// NOTE: request bodies are unchanged by the API migration — POST /orders/pre-paid
+// still accepts `restaurantId`, and order items still take `menuItemId`.
 export interface CreateOrderItem {
     menuItemId: string
     quantity: number
@@ -40,6 +43,7 @@ export interface CreateOrderRequest {
     itemsPrice: number
     tip: number
     totalPrice: number
+    // Request wire field — unchanged by the migration (still `restaurantId`).
     restaurantId: string
 }
 
@@ -54,7 +58,7 @@ export interface PrePayOrder {
     created: string
     updated: string
     paid: string
-    restaurantId: string
+    businessId: string
     orderItems: OrderItem[]
     tipEnabled: boolean
 }
@@ -62,4 +66,46 @@ export interface PrePayOrder {
 export interface PrePayOrderResponse {
     order: PrePayOrder
     paymentLink: string
+}
+
+// ---------------------------------------------------------------------------
+// Business orders — a simpler, POS-less flow paid fully up front via an Iris
+// payment link. See API CHANGELOG section 3.
+// ---------------------------------------------------------------------------
+export interface CreateBusinessOrderItem {
+    itemId: string
+    quantity: number
+}
+
+export interface BusinessOrderItem {
+    orderItemId: string
+    itemId: string
+    quantity: number
+}
+
+export type BusinessOrderStatus = "NEW" | "PAID" | "CANCELLED"
+
+export interface BusinessOrder {
+    id: string
+    price: number
+    status: BusinessOrderStatus
+    businessId: string
+    created: string
+    updated: string | null
+    paid: string | null
+    tipEnabled: boolean
+    orderItems: BusinessOrderItem[]
+}
+
+export interface CreateBusinessOrderResponse {
+    order: BusinessOrder
+    paymentLink: string
+}
+
+export interface CreateBusinessOrderRequest {
+    businessId: string
+    // Must equal the sum of (menu item price x quantity); a mismatch returns 400.
+    price: number
+    // Must contain at least one item.
+    orderItems: CreateBusinessOrderItem[]
 }

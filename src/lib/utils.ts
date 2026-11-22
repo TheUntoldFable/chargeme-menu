@@ -20,7 +20,7 @@ export const calculateTotalPrice = (
     if (withSelection) items = items.filter((item) => item.isSelected)
 
     items.forEach((item) => {
-        totalPrice += (hasTempQuantity ? tempQuantity?.[item.id] : item?.quantity) * item.price
+        totalPrice += (hasTempQuantity ? tempQuantity?.[item.id] : item?.quantity) * item.priceInBgn
     })
 
     return totalPrice

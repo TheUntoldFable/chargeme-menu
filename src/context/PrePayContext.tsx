@@ -1,22 +1,22 @@
-import { GetRestaurantResponse } from "@/models/restaurant"
+import { GetBusinessResponse } from "@/models/business"
 import { createContext, ReactNode, useContext } from "react"
 
 interface PrePayContextType {
-    restaurantData?: GetRestaurantResponse
+    businessData?: GetBusinessResponse
 }
 
 const PrePayContext = createContext<PrePayContextType | null>(null)
 
 interface PrePayProviderProps {
     children: ReactNode
-    restaurantData?: GetRestaurantResponse
+    businessData?: GetBusinessResponse
 }
 
-export function PrePayProvider({ children, restaurantData }: PrePayProviderProps) {
+export function PrePayProvider({ children, businessData }: PrePayProviderProps) {
     return (
         <PrePayContext.Provider
             value={{
-                restaurantData,
+                businessData,
             }}
         >
             {children}

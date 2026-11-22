@@ -5,7 +5,6 @@ import CardContainer from "@/components/Product/CardContainer"
 import Container from "@/components/common/container"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCategoryMenuItems } from "@/hooks/get-menu-items-by-category"
-import { useSubCategoryMenuItems } from "@/hooks/get-menu-items-by-subcategory"
 
 import { useSearchParams } from "next/navigation"
 import { use, useLayoutEffect, useRef } from "react"
@@ -20,7 +19,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     searchParams.get("productId")
     searchParams.get("isWine")
     const productRef = useRef<null | HTMLDivElement>(null)
-    const { data: menuItems, isLoading: isLoadingMenuItems } = type === "category" ? useCategoryMenuItems(id) : useSubCategoryMenuItems(id)
+    // Former subcategories are now just nested categories, so everything resolves
+    // through the category endpoint.
+    const { data: menuItems, isLoading: isLoadingMenuItems } = useCategoryMenuItems(id)
 
     const scrollToElement = () => {
         const { current } = productRef

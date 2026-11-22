@@ -5,8 +5,8 @@
     "type": "module",
     "lint-staged": {
         "*.{js,ts,tsx,json}": [
-            "eslint --cache --fix",
-            "prettier --write"
+            "prettier --write",
+            "eslint --cache --fix"
         ]
     },
     "scripts": {

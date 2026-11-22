@@ -3,13 +3,17 @@
 import IconFailed from "#/public/svg/icons/IconFailed"
 import IconSuccess from "#/public/svg/icons/IconSuccess"
 import CategoriesCard from "@/components/Category/CategoriesCard"
-import Center from "@/components/common/Center"
+import { ProductRatingDialog } from "@/components/Rating/ProductRatingDialog"
 import { DialogPopUp } from "@/components/common/DialogPopUp"
 import Container from "@/components/common/container"
 import { Loader } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { useCategories } from "@/hooks/get-categories"
+import { useSubmitExperienceFeedback, useSubmitFoodFeedback } from "@/hooks/send-feedback"
+import { idFromParams, kindFromType } from "@/lib/flow"
+import { useBusinessStore } from "@/store/business"
+import { useCartStore } from "@/store/cart"
 import { Rating as ReactRating } from "@smastrom/react-rating"
 import { useTranslations } from "next-intl"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -17,42 +21,58 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 export default function Home() {
-    const searchParams = useSearchParams()
-    const restaurantIdParam = searchParams.get("restaurantId") ?? ""
-    const isPaidParam = searchParams.get("isPaid")
-    const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
-    const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
-    const [rating, setRating] = useState(0)
-    const [shouldRate, setShouldRate] = useState(false)
-    const [feedbackOpen, setFeedbackOpen] = useState(false)
-    const tPayment = useTranslations("payment")
-    const tCommon = useTranslations("common")
-
     const router = useRouter()
     const pathname = usePathname()
+    const searchParams = useSearchParams()
     const nextSearchParams = new URLSearchParams(searchParams.toString())
-    const { data: categories, isLoading, status } = useCategories(restaurantIdParam)
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm()
+    const tPayment = useTranslations("payment")
+    const tCommon = useTranslations("common")
+    const businessIdParam = idFromParams((key) => searchParams.get(key)) ?? ""
+    const isPaidParam = searchParams.get("isPaid")
+
+    // The flow (and thus the categories endpoint) is driven by the backend type,
+    // which AppWrapper loads into the store. Wait until the loaded business
+    // matches the current id before fetching categories, so we never hit the
+    // wrong endpoint with a stale kind.
+    const businessData = useBusinessStore((state) => state.businessData)
+    const kind = kindFromType(businessData?.type)
+    const isBusinessReady = businessData?.id === businessIdParam
+
+    const [isOpenSuccessDialog, setIsOpenSuccesDialog] = useState(false)
+    const [isOpenFailedDialog, setIsOpenFailedDialog] = useState(false)
+    const [appRating, setAppRating] = useState(0)
+    const [shouldRateApp, setShouldRateApp] = useState(false)
+    const [shouldRateProduct, setShouldRateProduct] = useState(false)
+
+    const { data: categories, isLoading, status } = useCategories(isBusinessReady ? businessIdParam : "", kind)
+    const { mutate: submitExperienceFeedback } = useSubmitExperienceFeedback()
+    const { mutate: submitFoodFeedback } = useSubmitFoodFeedback()
+    const productToRate = useCartStore((state) => state.productToRate)
+
+    const showData = !isLoading && status !== "pending"
+
+    const { register, handleSubmit } = useForm()
 
     const handleAccept = () => {
         setIsOpenSuccesDialog(false)
         setIsOpenFailedDialog(false)
-        setShouldRate(true)
+        setShouldRateApp(true)
     }
 
-    const handleSetRating = (rating: number) => {
-        setRating(rating)
-        setShouldRate(false)
-        setFeedbackOpen(true)
+    const handleAppFeedbackSubmit = (data: Record<string, unknown>) => {
+        submitExperienceFeedback({
+            restaurant_id: businessIdParam,
+            rating: appRating,
+            description: (data.textArea as string) ?? "",
+        })
+        setShouldRateApp(false)
+        setShouldRateProduct(true)
     }
 
-    const onSubmit = (data: Record<string, unknown>) => {
-        console.log(data)
+    const handleAppFeedbackSkip = () => {
+        setShouldRateApp(false)
+        setShouldRateProduct(true)
     }
 
     useEffect(() => {
@@ -91,46 +111,45 @@ export default function Home() {
     return (
         <main>
             <DialogPopUp
-                title='Добавяне на отзив'
+                title='Лесно ли се ориентирахте в приложението?'
                 description={
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className='flex flex-col gap-4'>
+                        <ReactRating
+                            value={appRating}
+                            onChange={setAppRating}
+                            itemStyles={customStyles}
+                        />
                         <Textarea
-                            className='bg-lightBg'
+                            className='bg-darkGray'
                             id='checkout-7j9-optional-comments'
                             placeholder='Вкусна храна'
-                            {...register("textArea", { required: true })}
+                            {...register("textArea")}
                         />
-
-                        {errors.textArea && <span>This field is required</span>}
-                    </form>
+                    </div>
                 }
-                isOpen={feedbackOpen}
                 defaultTitle='Добави'
                 cancelTitle='Пропусни'
                 shouldConfirm
-                onConfirm={() => {
-                    setFeedbackOpen(false)
-                }}
-                onCancel={() => {
-                    setFeedbackOpen(false)
-                }}
+                isOpen={shouldRateApp}
+                onConfirm={handleSubmit(handleAppFeedbackSubmit)}
+                onCancel={handleAppFeedbackSkip}
             />
-            <DialogPopUp
-                title='Лесно ли се ориентирахте в приложението?'
-                description={
-                    <ReactRating
-                        value={rating}
-                        onChange={handleSetRating}
-                        itemStyles={customStyles}
-                    />
-                }
-                defaultTitle='Пропусни'
-                isOpen={shouldRate}
-                onConfirm={() => {
-                    setShouldRate(false)
-                    setFeedbackOpen(true)
-                }}
-            />
+            {productToRate && (
+                <ProductRatingDialog
+                    isOpen={shouldRateProduct}
+                    product={productToRate}
+                    onSubmit={(rating, feedback) => {
+                        submitFoodFeedback({
+                            restaurant_id: businessIdParam,
+                            rating,
+                            description: feedback,
+                            menu_item_ids: [productToRate.id],
+                        })
+                        setShouldRateProduct(false)
+                    }}
+                    onSkip={() => setShouldRateProduct(false)}
+                />
+            )}
             <DialogPopUp
                 icon={<IconSuccess />}
                 title={tPayment("success.title")}
@@ -148,27 +167,29 @@ export default function Home() {
                 onConfirm={handleAccept}
             />
             <Container title=''>
-                <ScrollArea className='calc-height h-full min-w-full'>
-                    {!isLoading && status !== "pending" ? (
-                        categories?.length &&
-                        categories.map(
-                            (item, index) =>
-                                !!item.subcategories.length && (
+                {showData && categories?.length && (
+                    <ScrollArea className='calc-height h-full min-w-full'>
+                        {categories.map((item, index) => {
+                            // Categories are a tree now: list nested categories as rows. A
+                            // leaf category that holds items directly is shown as its own row.
+                            const rows = item.children?.length ? item.children : item.menuItemCount > 0 ? [item] : []
+
+                            return (
+                                !!rows.length && (
                                     <CategoriesCard
                                         key={item.id}
                                         classNames='mt-8 mb-2 mx-auto'
                                         name={item.name}
-                                        subCategories={item.subcategories}
+                                        subCategories={rows}
                                         isWine={index === 0}
                                     />
                                 )
-                        )
-                    ) : (
-                        <Center>
-                            <Loader />
-                        </Center>
-                    )}
-                </ScrollArea>
+                            )
+                        })}
+                    </ScrollArea>
+                )}
+
+                {!showData && <Loader />}
             </Container>
         </main>
     )

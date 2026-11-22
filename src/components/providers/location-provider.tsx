@@ -1,9 +1,10 @@
 "use client"
 
-import { useRestaurantDetails } from "@/hooks/get-restaurant"
+import { useBusinessDetails } from "@/hooks/get-business"
 import { useLocationCheck } from "@/hooks/use-location-check"
 import { useLocationNavigation } from "@/hooks/use-location-navigation"
 import { useLocationNotifications } from "@/hooks/use-location-notifications"
+import { idFromParams } from "@/lib/flow"
 import type { LocationCheckResult } from "@/lib/location-utils"
 import type { LocationContextType, LocationProviderProps } from "@/types/location"
 import { useSearchParams } from "next/navigation"
@@ -35,10 +36,10 @@ export function LocationProvider({
     // Check if location checking is enabled via environment variable
     const isLocationCheckEnabled = process.env.NEXT_PUBLIC_ENABLE_LOCATION_CHECKER === "true"
     const searchParams = useSearchParams()
-    const restaurantId = searchParams.get("restaurantId") ?? undefined
-    const { data: restaurantDetails } = useRestaurantDetails(restaurantId)
-    const restaurantLocation = restaurantDetails
-        ? { latitude: restaurantDetails.latitude, longitude: restaurantDetails.longitude }
+    const businessId = idFromParams((key) => searchParams.get(key)) ?? undefined
+    const { data: businessDetails } = useBusinessDetails(businessId)
+    const businessLocation = businessDetails
+        ? { latitude: businessDetails.latitude, longitude: businessDetails.longitude }
         : undefined
 
     const navigation = useLocationNavigation({ enabled: enableNavigation && isLocationCheckEnabled })
@@ -64,24 +65,24 @@ export function LocationProvider({
     )
 
     const locationCheck = useLocationCheck({
-        autoCheck: enableAutoCheck && isLocationCheckEnabled && !navigation.isOnErrorPage && Boolean(restaurantLocation),
+        autoCheck: enableAutoCheck && isLocationCheckEnabled && !navigation.isOnErrorPage && Boolean(businessLocation),
         onSuccess: handleLocationSuccess,
         onError: handleLocationError,
-        restaurantLocation,
+        businessLocation,
     })
 
     useEffect(() => {
-        if (isLocationCheckEnabled && restaurantLocation && navigation.shouldCheckLocation()) {
+        if (isLocationCheckEnabled && businessLocation && navigation.shouldCheckLocation()) {
             locationCheck.checkLocation()
         }
-    }, [isLocationCheckEnabled, navigation.currentPath, restaurantLocation])
+    }, [isLocationCheckEnabled, navigation.currentPath, businessLocation])
 
     // Re-check when coordinates load from API
     useEffect(() => {
-        if (isLocationCheckEnabled && restaurantLocation && enableAutoCheck && !navigation.isOnErrorPage) {
+        if (isLocationCheckEnabled && businessLocation && enableAutoCheck && !navigation.isOnErrorPage) {
             locationCheck.checkLocation()
         }
-    }, [isLocationCheckEnabled, restaurantLocation, enableAutoCheck, navigation.isOnErrorPage])
+    }, [isLocationCheckEnabled, businessLocation, enableAutoCheck, navigation.isOnErrorPage])
 
     const contextValue = useMemo<LocationContextType>(
         () => ({

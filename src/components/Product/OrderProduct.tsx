@@ -8,7 +8,7 @@ import React from "react"
 import IconPlus from "../../../public/svg/icons/IconPlus"
 import { toast } from "../ui/use-toast"
 
-const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, priceInEur, increment, decrement }: OrderProductProps) => {
+const OrderProduct = ({ name, id, tempQuantity, quantity, description, priceInBgn, priceInEur, increment, decrement }: OrderProductProps) => {
     const { items: cartItems, setItems: setCartItems } = useCartStore()
     const t = useTranslations("cart.removeFromCart")
 
@@ -37,7 +37,7 @@ const OrderProduct = ({ name, id, tempQuantity, quantity, description, price, pr
                 <div className='flex h-10 w-full items-center justify-between gap-2 rounded-lg text-lg'>
                     <div className='flex gap-2'>
                         <p className='font-bold'>
-                            {price.toFixed(2)} лв{typeof priceInEur === "number" ? ` / €${priceInEur.toFixed(2)}` : ""}
+                            {priceInBgn.toFixed(2)} лв{typeof priceInEur === "number" ? ` / €${priceInEur.toFixed(2)}` : ""}
                         </p>
                         <p className='text-lightGray'>x{quantity}</p>
                     </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { getRestaurantRadius } from "@/config/restaurant"
+import { getBusinessRadius } from "@/config/business"
 import { calculateDistance, isWithinRadius, type LocationCheckResult } from "@/lib/location-utils"
 import { LocationService } from "@/services/location.service"
 import type { LocationCoordinates } from "@/types/location"
@@ -10,7 +10,7 @@ interface UseLocationCheckOptions {
     autoCheck?: boolean // Whether to check location automatically on mount
     onSuccess?: (result: LocationCheckResult) => void
     onError?: (error: string) => void
-    restaurantLocation?: LocationCoordinates
+    businessLocation?: LocationCoordinates
     radius?: number
 }
 
@@ -19,12 +19,12 @@ interface UseLocationCheckReturn {
     isChecking: boolean
     result: LocationCheckResult | null
     permissionStatus: PermissionState | null
-    restaurantLocation: LocationCoordinates | null
+    businessLocation: LocationCoordinates | null
     radiusInMeters: number
 }
 
 export function useLocationCheck(options: UseLocationCheckOptions = {}): UseLocationCheckReturn {
-    const { autoCheck = true, onSuccess, onError, restaurantLocation, radius } = options
+    const { autoCheck = true, onSuccess, onError, businessLocation, radius } = options
 
     // Check if location checking is enabled via environment variable
     const isLocationCheckEnabled = process.env.NEXT_PUBLIC_ENABLE_LOCATION_CHECKER === "true"
@@ -49,24 +49,24 @@ export function useLocationCheck(options: UseLocationCheckOptions = {}): UseLoca
             // Get current location
             const userLocation = await LocationService.getCurrentLocation()
 
-            if (!restaurantLocation) {
-                throw new Error("Restaurant coordinates not loaded")
+            if (!businessLocation) {
+                throw new Error("Business coordinates not loaded")
             }
 
-            const radiusInMeters = radius ?? getRestaurantRadius()
+            const radiusInMeters = radius ?? getBusinessRadius()
 
             // Check if within radius
             const withinRadius = isWithinRadius(
                 userLocation.latitude,
                 userLocation.longitude,
-                restaurantLocation.latitude,
-                restaurantLocation.longitude,
+                businessLocation.latitude,
+                businessLocation.longitude,
                 radiusInMeters
             )
 
             // Calculate distance
             const distance = Math.round(
-                calculateDistance(userLocation.latitude, userLocation.longitude, restaurantLocation.latitude, restaurantLocation.longitude)
+                calculateDistance(userLocation.latitude, userLocation.longitude, businessLocation.latitude, businessLocation.longitude)
             )
 
             const checkResult: LocationCheckResult = {
@@ -92,7 +92,7 @@ export function useLocationCheck(options: UseLocationCheckOptions = {}): UseLoca
         } finally {
             setIsChecking(false)
         }
-    }, [onSuccess, onError, restaurantLocation, radius])
+    }, [onSuccess, onError, businessLocation, radius])
 
     // Auto-check on mount if enabled
     useEffect(() => {
@@ -106,7 +106,7 @@ export function useLocationCheck(options: UseLocationCheckOptions = {}): UseLoca
         isChecking,
         result,
         permissionStatus,
-        restaurantLocation: restaurantLocation ?? null,
-        radiusInMeters: radius ?? getRestaurantRadius(),
+        businessLocation: businessLocation ?? null,
+        radiusInMeters: radius ?? getBusinessRadius(),
     }
 }

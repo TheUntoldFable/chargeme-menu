@@ -20,7 +20,7 @@ export const LOCATION_MESSAGES = {
     },
     SUCCESS: {
         WELCOME: "Добре дошли!",
-        AT_RESTAURANT: "Намирате се в ресторанта.",
+        AT_BUSINESS: "Намирате се в ресторанта.",
     },
 }
 

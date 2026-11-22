@@ -27,6 +27,7 @@ export function IntlProvider({ children }: { children: React.ReactNode }) {
         <NextIntlClientProvider
             locale={locale}
             messages={currentMessages}
+            timeZone='Europe/Sofia'
         >
             {children}
         </NextIntlClientProvider>

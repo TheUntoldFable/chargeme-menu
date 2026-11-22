@@ -1,11 +1,20 @@
+import { idFromParams, paramForKind, type FlowKind, type FlowParam } from "@/lib/flow"
+import { useBusinessStore } from "@/store/business"
 import { useSearchParams } from "next/navigation"
 
+interface BusinessParams {
+    businessId: string | null
+    table: string | null
+    kind: FlowKind
+    param: FlowParam
+}
+
 /**
- * Custom hook to get restaurantId from search params
+ * Custom hook to get the entity id (from either param) from search params
  */
-export function useRestaurantId(): string | null {
+export function useBusinessId(): string | null {
     const searchParams = useSearchParams()
-    return searchParams.get("restaurantId")
+    return idFromParams((key) => searchParams.get(key))
 }
 
 /**
@@ -17,42 +26,53 @@ export function useTableId(): string | null {
 }
 
 /**
- * Custom hook to get both restaurantId and table from search params
+ * Custom hook to get the id, table and flow metadata. The id comes from the URL;
+ * the flow `kind` comes from the store (derived from the backend `type` once the
+ * business has loaded), so links carry the param that matches the resolved flow.
  */
-export function useRestaurantParams(): { restaurantId: string | null; table: string | null } {
+export function useBusinessParams(): BusinessParams {
     const searchParams = useSearchParams()
+    const kind = useBusinessStore((state) => state.kind)
     return {
-        restaurantId: searchParams.get("restaurantId"),
+        businessId: idFromParams((key) => searchParams.get(key)),
         table: searchParams.get("table"),
+        kind,
+        param: paramForKind(kind),
     }
 }
 
 /**
- * Utility function to append restaurantId and table to a path if they exist
+ * Utility function to append the flow id (under `param`) and table to a path
  */
-export function withRestaurantParams(path: string, restaurantId: string | null, table: string | null): string {
+export function withBusinessParams(
+    path: string,
+    businessId: string | null,
+    table: string | null,
+    param: FlowParam = "restaurantId"
+): string {
     const params = new URLSearchParams()
-    if (restaurantId) params.set("restaurantId", restaurantId)
+    if (businessId) params.set(param, businessId)
     if (table) params.set("table", table)
     const queryString = params.toString()
     return queryString ? `${path}?${queryString}` : path
 }
 
 /**
- * Utility function to append restaurantId to a path if it exists (legacy)
+ * Utility function to append the flow id (under `param`) to a path if it exists
  */
-export function withRestaurantId(path: string, restaurantId: string | null): string {
-    return restaurantId ? `${path}?restaurantId=${restaurantId}` : path
+export function withBusinessId(path: string, businessId: string | null, param: FlowParam = "restaurantId"): string {
+    return businessId ? `${path}?${param}=${businessId}` : path
 }
 
 /**
- * Utility function to build URL with restaurantId and other params
+ * Utility function to build a URL with the flow id (under `param`) and other params
  */
 export function buildUrlWithParams(
     basePath: string,
     params: Record<string, string | boolean | null>,
-    restaurantId: string | null,
-    table?: string | null
+    businessId: string | null,
+    table?: string | null,
+    param: FlowParam = "restaurantId"
 ): string {
     const urlParams = new URLSearchParams()
 
@@ -63,9 +83,9 @@ export function buildUrlWithParams(
         }
     })
 
-    // Add restaurantId if it exists
-    if (restaurantId) {
-        urlParams.set("restaurantId", restaurantId)
+    // Add the flow id under its param name if it exists
+    if (businessId) {
+        urlParams.set(param, businessId)
     }
 
     // Add table if it exists
@@ -78,11 +98,11 @@ export function buildUrlWithParams(
 }
 
 /**
- * Client-side utility to get restaurantId from window.location.search
+ * Client-side utility to get the active id from window.location.search
  */
-export function getRestaurantIdFromWindow(): string | null {
+export function getBusinessIdFromWindow(): string | null {
     if (typeof window === "undefined") return null
-    return new URLSearchParams(window.location.search).get("restaurantId")
+    return idFromParams((key) => new URLSearchParams(window.location.search).get(key))
 }
 
 /**
@@ -94,13 +114,16 @@ export function getTableFromWindow(): string | null {
 }
 
 /**
- * Client-side utility to get both restaurantId and table from window.location.search
+ * Client-side utility to get the id, table and flow metadata from window.location.search
  */
-export function getRestaurantParamsFromWindow(): { restaurantId: string | null; table: string | null } {
-    if (typeof window === "undefined") return { restaurantId: null, table: null }
-    const params = new URLSearchParams(window.location.search)
+export function getBusinessParamsFromWindow(): BusinessParams {
+    if (typeof window === "undefined") return { businessId: null, table: null, kind: "restaurant", param: "restaurantId" }
+    const search = new URLSearchParams(window.location.search)
+    const kind = useBusinessStore.getState().kind
     return {
-        restaurantId: params.get("restaurantId"),
-        table: params.get("table"),
+        businessId: idFromParams((key) => search.get(key)),
+        table: search.get("table"),
+        kind,
+        param: paramForKind(kind),
     }
 }

@@ -9,7 +9,8 @@ interface OrderState {
     paid: boolean | string
     status: string
     transactionSessionId: string | null
-    price: number
+    priceInBgn: number
+    priceInEur: number
 }
 
 interface OrderActions {
@@ -19,7 +20,8 @@ interface OrderActions {
     incrementItem: (id: string) => void
     decrementItem: (id: string) => void
     attachSessionId: (sessionId: string) => void
-    setPrice: (price: number) => void
+    setPriceInBgn: (priceInBgn: number) => void
+    setPriceInEur: (priceInEur: number) => void
     clearOrder: () => void
 }
 
@@ -30,7 +32,8 @@ const initialState: OrderState = {
     status: "",
     paid: false,
     transactionSessionId: null,
-    price: 0,
+    priceInBgn: 0,
+    priceInEur: 0,
 }
 
 export const useOrderStore = create<OrderState & OrderActions>()(
@@ -68,9 +71,10 @@ export const useOrderStore = create<OrderState & OrderActions>()(
                 set({ transactionSessionId: sessionId })
             },
 
-            setPrice: (price: number) => set({ price }),
+            setPriceInBgn: (priceInBgn: number) => set({ priceInBgn }),
 
             clearOrder: () => set(initialState),
+            setPriceInEur: (priceInEur: number) => set({ priceInEur }),
         }),
         {
             name: "order-storage",
